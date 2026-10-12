@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hero variants — TrachLab</title>
+  <meta name="robots" content="noindex">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .stage { position: relative; width: 100%; max-width: 900px; margin: 0 auto; }
+    .stage > div { position: relative; width: 100%; }
+  </style>
+</head>
+<body>
+  <section style="padding-top:60px">
+    <div class="container">
+      <span class="eyebrow">Preview — not linked from the site</span>
+      <h1 style="font-size:2.6rem">Hero animation: colour variants</h1>
+      <p>Choose a variant to play it.</p>
+      <div class="filters" id="pick">
+        <button data-p="ink" class="active">A — Ink</button>
+        <button data-p="dec">B — Direction</button>
+        <button data-p="aurora">C — Aurora</button>
+      </div>
+      <div class="stage" id="stage"></div>
+    </div>
+  </section>
+  <script src="assets/js/hero.js"></script>
+  <script>
+    const stage = document.getElementById("stage");
+    function play(p) {
+      stage.innerHTML = "";
+      const d = document.createElement("div");
+      d.dataset.palette = p;
+      d.dataset.width = "1.1";
+      stage.appendChild(d);
+      TrachHero.mount(d);
+    }
+    document.querySelectorAll("#pick button").forEach((b) => b.onclick = () => {
+      document.querySelectorAll("#pick button").forEach((x) => x.classList.remove("active"));
+      b.classList.add("active"); play(b.dataset.p);
+    });
+    play(new URLSearchParams(location.search).get("p") || "ink");
+  </script>
+</body>
+</html>

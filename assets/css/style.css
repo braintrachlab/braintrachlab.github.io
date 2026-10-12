@@ -167,7 +167,7 @@ p { margin: 0 0 1.1em; color: var(--ink-soft); }
   align-items: center;
   overflow: hidden;
 }
-.hero-content { position: relative; z-index: 2; max-width: 640px; }
+.hero-content { position: relative; z-index: 2; max-width: 540px; }
 .hero h1 em { color: var(--accent); }
 .hero .lead {
   font-size: 1.2rem;
@@ -177,26 +177,18 @@ p { margin: 0 0 1.1em; color: var(--ink-soft); }
 }
 .hero-art {
   position: absolute;
-  right: -2%;
+  right: 2%;
   top: 50%;
   transform: translateY(-50%);
-  width: min(62vw, 760px);
+  width: min(50vw, 700px);
   z-index: 1;
-  pointer-events: none;
 }
-.hero-art path {
-  fill: none;
-  stroke: var(--accent);
-  stroke-linecap: round;
-  stroke-dasharray: var(--len);
-  stroke-dashoffset: var(--len);
-  animation: draw 3.2s cubic-bezier(.6,.05,.3,1) forwards;
-}
-@keyframes draw { to { stroke-dashoffset: 0; } }
+.hero-art canvas { display: block; }
 
 @media (max-width: 860px) {
-  .hero { min-height: auto; padding: 56px 0 72px; }
-  .hero-art { opacity: 0.18; right: -30%; width: 120vw; }
+  .hero { min-height: auto; padding: 56px 0 72px; flex-direction: column; }
+  .hero-art { position: relative; transform: none; top: auto; right: auto; width: 100%; margin-top: 40px; }
+  .hero > .hero-art { width: calc(100% - 48px); margin: 40px auto 0; }
   .scroll-cue { display: none; }
 }
 
@@ -464,6 +456,5 @@ form button { cursor: pointer; background: none; font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .reveal { opacity: 1; transform: none; transition: none; }
-  .hero-art path { animation: none; stroke-dashoffset: 0; }
   .scroll-cue::after { animation: none; }
 }
