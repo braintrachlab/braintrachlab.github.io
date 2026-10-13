@@ -15,5 +15,7 @@ Website of TrachLab, published with GitHub Pages at https://trachlab.github.io
 
 Text highlighted in yellow inside square brackets is placeholder content to replace.
 
-## Archived
-- `hero-lab.html` + `assets/js/hero.js` + `assets/hero/` — animated tractography with the 3D arterial tree (ICA), growing from the carotid to the peripheral branches. Not used on the home page for now.
+## Home animation
+- `assets/js/hero.js` — fibres (`assets/hero/fibres.bin`, `underlay.png`) drawn on a canvas, then the 3D arterial tree (`assets/hero/arteries.bin`, from ICA.vtk) growing from the carotid along the vessels.
+- `hero-lab.html` — preview page with colour variants (not linked).
+- `assets/img/brain-lines.svg` — archived line-drawing version (not used).

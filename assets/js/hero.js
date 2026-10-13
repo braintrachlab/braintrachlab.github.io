@@ -94,7 +94,7 @@
         vec3 col = uColor * (0.32 + 0.8 * diff) + vec3(1.0) * 0.28 * spec;
         float front = smoothstep(uProg - 0.025, uProg, vT);
         col = mix(col, vec3(1.0, 0.82, 0.82), front * 0.7);
-        gl_FragColor = vec4(col, uGhost > 0.5 ? 0.06 : 1.0);
+        gl_FragColor = vec4(col, uGhost > 0.5 ? 0.035 : 1.0);
       }`;
     const uniforms = () => ({ uProg: { value: 0 }, uColor: { value: new THREE.Color(...color) }, uGhost: { value: 0 } });
     const solid = new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: frag, uniforms: uniforms(), side: THREE.DoubleSide });
@@ -123,10 +123,47 @@
   async function mount(el) {
     const base = el.dataset.src || "assets/hero/";
     const palette = PALETTES[el.dataset.palette] || PALETTES.ink;
-    const data = await fetch(base + "fibres.json").then((r) => r.json());
-    const W = data.w, H = data.h;
+    const [meta, fbuf] = await Promise.all([
+      fetch(base + "fibres-meta.json").then((r) => r.json()),
+      fetch(base + "fibres.bin").then((r) => r.arrayBuffer()),
+    ]);
+    const W = meta.w, H = meta.h, NL = meta.lines, NB = meta.buckets;
+    let o = 0;
+    const cnt = new Uint16Array(fbuf, o, NL); o += NL * 2;
+    const bkt = new Uint8Array(fbuf, o, NL); o += NL;
+    const tim = new Uint8Array(fbuf, o, NL); o += NL + meta.pad;
+    // coordinates: first point (uint16) + int8 deltas, decoded into one Float32Array
+    const st = new Uint16Array(fbuf, o, NL * 2); o += NL * 4;
+    const dl = new Int8Array(fbuf, o, (meta.points - NL) * 2);
+    const xy = new Float32Array(meta.points * 2);
+    const lines = new Array(NL);
+    for (let i = 0, k = 0, d = 0; i < NL; i++) {
+      lines[i] = { s: k, n: cnt[i], b: bkt[i], t: tim[i] / 255, drawn: 0 };
+      let x = st[i * 2], y = st[i * 2 + 1];
+      xy[k++] = x; xy[k++] = y;
+      for (let j = 1; j < cnt[i]; j++) { x += dl[d++]; y += dl[d++]; xy[k++] = x; xy[k++] = y; }
+    }
+    const sc = 1 / meta.scale;
+    // shade of each fibre follows the brightness of the original render
+    const dark = palette.fibreDark || [34, 44, 64], light = palette.fibreLight || [218, 227, 242];
+    const colors = Array.from({ length: NB }, (_, i) => {
+      const t = Math.pow(i / (NB - 1), 0.9);
+      const c = dark.map((v, k) => (v + (light[k] - v) * t) | 0);
+      return `rgb(${c[0]},${c[1]},${c[2]})`;
+    });
+
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     el.style.aspectRatio = `${W} / ${H}`;
+    // soft shading between the fibres, revealed from the centre outwards
+    const und = document.createElement("img");
+    und.src = base + "underlay.png"; und.alt = "";
+    und.style.cssText = "position:absolute;inset:0;width:100%;height:100%;opacity:0.85";
+    const setMask = (r) => {
+      const m = `radial-gradient(circle at 50% 50%, #000 ${r}%, transparent ${r + 18}%)`;
+      und.style.webkitMaskImage = und.style.maskImage = m;
+    };
+    setMask(-20);
+    el.appendChild(und);
 
     const fc = document.createElement("canvas");
     fc.width = W * dpr; fc.height = H * dpr;
@@ -135,29 +172,30 @@
     const fx = fc.getContext("2d");
     fx.scale(dpr, dpr);
     fx.lineCap = "round"; fx.lineJoin = "round";
-    fx.lineWidth = parseFloat(el.dataset.width || "1");
+    fx.lineWidth = parseFloat(el.dataset.width || "0.5");
 
     let drawArt = null;
     try { drawArt = await arteryLayer(el, base, palette.artery, W, H); } catch (e) { console.warn("Arteries unavailable", e); }
 
-    const lines = data.lines.map((L) => ({ p: L.p, n: L.p.length / 2, drawn: 0, t: L.t, color: palette.fibre(L.a, L.d) }));
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
+    let first = 0; // lines are sorted by start time
     function drawFibres(t) {
-      let pending = false;
-      for (const L of lines) {
-        if (L.drawn >= L.n - 1) continue;
+      const paths = colors.map(() => new Path2D());
+      let pending = false, used = false;
+      for (let i = first; i < NL; i++) {
+        const L = lines[i];
+        if (L.drawn >= L.n - 1) { if (i === first) first++; continue; }
         pending = true;
-        const k = Math.max(0, Math.min(1, (t - L.t * FIBRE_SPREAD) / FIBRE_GROW));
-        const target = Math.floor(k * (L.n - 1));
+        const k = (t - L.t * FIBRE_SPREAD) / FIBRE_GROW;
+        if (k <= 0) break;
+        const target = Math.floor(Math.min(1, k) * (L.n - 1));
         if (target <= L.drawn) continue;
-        fx.strokeStyle = L.color;
-        fx.beginPath();
-        fx.moveTo(L.p[L.drawn * 2], L.p[L.drawn * 2 + 1]);
-        for (let j = L.drawn + 1; j <= target; j++) fx.lineTo(L.p[j * 2], L.p[j * 2 + 1]);
-        fx.stroke();
-        L.drawn = target;
+        const P = paths[L.b];
+        P.moveTo(xy[L.s + L.drawn * 2] * sc, xy[L.s + L.drawn * 2 + 1] * sc);
+        for (let j = L.drawn + 1; j <= target; j++) P.lineTo(xy[L.s + j * 2] * sc, xy[L.s + j * 2 + 1] * sc);
+        L.drawn = target; used = true;
       }
+      if (used) paths.forEach((P, i) => { fx.strokeStyle = colors[i]; fx.stroke(P); });
       return pending;
     }
 
@@ -166,6 +204,7 @@
       if (t0 === null) t0 = now;
       const t = reduce ? 99 : (now - t0) / 1000;
       const f = drawFibres(t);
+      setMask(Math.min(120, -20 + (t / (FIBRE_SPREAD * 0.75 + FIBRE_GROW)) * 110));
       const p = Math.max(0, Math.min(1, (t - ART_START) / ART_GROW));
       if (drawArt) drawArt(ease(p) * 1.03);
       if (f || p < 1) requestAnimationFrame(frame);
