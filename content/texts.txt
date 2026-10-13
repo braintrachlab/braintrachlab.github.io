@@ -18,7 +18,9 @@
 #  An empty text hides that element; keys ending in .photo take a picture.
 # ======================================================================
 
-# ---------------- GENERAL — menu and footer (shown on every page)
+# ---------------- GENERAL — logo, menu and footer (shown on every page). In the logo, the part between *stars* is shown in blue italics
+site.logo: TraCh*Lab*
+site.name: TraChLab
 nav.home: Home
 nav.about: About us
 nav.research: Research

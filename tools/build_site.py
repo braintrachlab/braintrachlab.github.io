@@ -96,7 +96,7 @@ def page(filename, title_key, title_default, desc_key, desc_default, body, extra
 <body data-page="{pagekey}">
   <header class="site-header">
     <div class="container nav">
-      <a class="brand" href="index.html">Trach<span>Lab</span></a>
+      <a class="brand" href="index.html" data-text="site.logo">{md(val("site.logo", "Trach*Lab*"))}</a>
       <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
       </button>
@@ -115,9 +115,9 @@ def page(filename, title_key, title_default, desc_key, desc_default, body, extra
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>
-        <a class="brand" href="index.html">Trach<span>Lab</span></a>
+        <a class="brand" href="index.html" data-text="site.logo">{md(val("site.logo", "Trach*Lab*"))}</a>
         {T("p", "footer.tagline", "White matter neuroanatomy & history of neuroscience")}
-        <p>&copy; <span id="year"></span> TrachLab</p>
+        <p>&copy; <span id="year"></span> <span data-text="site.name">{md(val("site.name", "TrachLab"))}</span></p>
       </div>
       <nav>
         <ul class="footer-links">
@@ -143,7 +143,9 @@ def card(n, key, title, text, d=""):
           </div>'''
 
 # ================================================================= HOME
-section("GENERAL — menu and footer (shown on every page)")
+section("GENERAL — logo, menu and footer (shown on every page). In the logo, the part between *stars* is shown in blue italics")
+val("site.logo", "Trach*Lab*")
+val("site.name", "TrachLab")
 for _, k, d in NAV:
     val(k, d)
 val("footer.tagline", "White matter neuroanatomy & history of neuroscience")
