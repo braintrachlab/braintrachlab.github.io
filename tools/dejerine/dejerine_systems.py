@@ -171,9 +171,8 @@ def seed_lines(mask, cell, fx=None, fy=None, total=TOTAL, minlen=12):
         out.append(np.array(L[::5]))
     return out
 
-CELL = 4
-BAND = 2.2 * SIG
-# white matter reachable from the marked points within a short distance along the white matter
+CELL = 8          # spacing of the first, ink-only version (same density relative to the plate)
+# white matter reachable from the points marked as association where no line is drawn
 tips = [tuple(map(float, l.split())) for l in open(GREEN_TIPS) if l.strip() and not l.startswith("#")]
 seed = np.zeros_like(wm_s)
 for x, y in tips:
@@ -181,29 +180,28 @@ for x, y in tips:
     rr = int(25 * WORK / 0.62)
     seed[max(0, yi - rr):yi + rr, max(0, xi - rr):xi + rr] = True
 green_area = ndi.binary_dilation(seed & wm_s, iterations=int(150 * WORK / 0.62), mask=wm_s)
-bands = {k: (FIELDS[k][0] < BAND) & wm_s for k in ("commissural", "projection")}
+
 lines = []
-# a) base layer from the hatching: association everywhere, and commissural/projection only
-#    outside the bands of their dedicated layers
+# a) one layer of streamlines that follow Gillet's hatching; each takes the system of the
+#    nearest guide running parallel to it
 for p in seed_lines(wm_s, CELL):
     sys_, sc = classify(p)
-    if sc <= 0.08:
-        xi0 = np.clip(p[:, 0].astype(int), 0, W - 1); yi0 = np.clip(p[:, 1].astype(int), 0, H - 1)
-        sys_ = "association" if green_area[yi0, xi0].mean() > 0.5 else "neutral"
     xi = np.clip(p[:, 0].astype(int), 0, W - 1); yi = np.clip(p[:, 1].astype(int), 0, H - 1)
-    if sys_ in bands and bands[sys_][yi, xi].mean() > 0.5:
-        continue
+    if sc <= 0.08:
+        sys_ = "association" if green_area[yi, xi].mean() > 0.5 else "neutral"
     lines.append((p, float(np.mean(shade_img[yi, xi])), sys_, 1.0))
-# b) dedicated commissural and projection layers: near their guides the course follows the
-#    guide (drawn along the plate's fibres), so red and blue cross instead of stopping
+# b) where commissural and projection fibres meet (centrum semiovale, internal capsule),
+#    a sparse second layer lets each system continue through the other, so they cross
+near = {k: FIELDS[k][0] < 1.6 * SIG for k in ("commissural", "projection")}
+cross = near["commissural"] & near["projection"] & wm_s
+cross = ndi.binary_dilation(cross, iterations=int(20 * WORK / 0.62)) & wm_s
 for k in ("commissural", "projection"):
     d, tg = FIELDS[k]
-    wg = np.clip(np.exp(-(d / SIG) ** 2 / 2) * 1.2, 0, 0.9)
-    cc = wg * np.cos(2 * tg) + (1 - wg) * np.cos(2 * theta)
-    ss = wg * np.sin(2 * tg) + (1 - wg) * np.sin(2 * theta)
-    cc, ss = ndi.gaussian_filter(cc, 3), ndi.gaussian_filter(ss, 3)
+    wg = np.clip(np.exp(-(d / SIG) ** 2 / 2), 0, 0.7)
+    cc = ndi.gaussian_filter(wg * np.cos(2 * tg) + (1 - wg) * np.cos(2 * theta), 3)
+    ss = ndi.gaussian_filter(wg * np.sin(2 * tg) + (1 - wg) * np.sin(2 * theta), 3)
     th_k = 0.5 * np.arctan2(ss, cc)
-    for p in seed_lines(bands[k], CELL, np.cos(th_k), np.sin(th_k), total=np.cos(np.radians(80)), minlen=16):
+    for p in seed_lines(cross & near[k], 12, np.cos(th_k), np.sin(th_k), total=np.cos(np.radians(60)), minlen=14):
         xi = np.clip(p[:, 0].astype(int), 0, W - 1); yi = np.clip(p[:, 1].astype(int), 0, H - 1)
         lines.append((p, float(np.mean(shade_img[yi, xi])), k, 1.0))
 print("streamlines", len(lines), {k: sum(1 for l in lines if l[2] == k) for k in list(FIELDS) + ["neutral"]})
@@ -219,16 +217,26 @@ cy_, cx_ = ndi.center_of_mass(wm_s & (dt > np.percentile(dt[wm_s], 90)))
 hub = np.array([cx_, cy_]); maxr = np.hypot(W, H) * 0.6
 shs = np.array([l[1] for l in lines]); lo, hi = np.percentile(shs, 3), np.percentile(shs, 97)
 parts = []
+ys_, xs_ = np.nonzero(wm_s)
+X0, X1, Y0, Y1 = xs_.min(), xs_.max(), ys_.min(), ys_.max()
 for p, sh, sys_, sc in lines:
     t = 1.0 - np.clip((sh - lo) / (hi - lo + 1e-6), 0, 1)       # dense hatching -> dark
     dk, lt = (np.array(c) for c in (PAL.get(sys_, NEUTRAL)))
     r, g_, b_ = (lt * t + dk * (1 - t)).astype(int)
-    if np.hypot(*(p[0] - hub)) > np.hypot(*(p[-1] - hub)): p = p[::-1]
-    d = 1.2 + np.hypot(*(p[0] - hub)) / maxr * 4.4 + rng.uniform(0, 0.7)
+    if sys_ == "commissural":                                     # from left to right
+        if p[0, 0] > p[-1, 0]: p = p[::-1]
+        d = 0.9 + (p[0, 0] - X0) / (X1 - X0) * 4.4
+    elif sys_ == "projection":                                    # from top to bottom
+        if p[0, 1] > p[-1, 1]: p = p[::-1]
+        d = 0.9 + (p[0, 1] - Y0) / (Y1 - Y0) * 4.4
+    else:                                                         # association: from the centre outwards
+        if np.hypot(*(p[0] - hub)) > np.hypot(*(p[-1] - hub)): p = p[::-1]
+        d = 1.6 + np.hypot(*(p[0] - hub)) / maxr * 4.2
+    d += rng.uniform(0, 0.6)
     q = p * OUT_SCALE
     path = "M" + " ".join(f"{x:.0f} {y:.0f}" for x, y in q)
-    parts.append((d, f'<path d="{path}" stroke="rgb({r},{g_},{b_})" stroke-opacity="{0.92 - 0.2 * t:.2f}" '
-                     f'stroke-width="{0.35 + 0.35 * rng.random():.2f}" data-delay="{d:.2f}" data-dur="{1.6 + rng.uniform(0, 1.0):.2f}"/>'))
+    parts.append((d, f'<path d="{path}" stroke="rgb({r},{g_},{b_})" stroke-opacity="{0.9 - 0.35 * t:.2f}" '
+                     f'stroke-width="{0.7 + 0.8 * rng.random():.2f}" data-delay="{d:.2f}" data-dur="{1.6 + rng.uniform(0, 1.0):.2f}"/>'))
 parts.sort(key=lambda t: t[0])
 
 # plate: neutral grey engraving, transparent paper
