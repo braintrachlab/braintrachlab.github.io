@@ -204,6 +204,23 @@ for k in ("commissural", "projection"):
     for p in seed_lines(cross & near[k], 12, np.cos(th_k), np.sin(th_k), total=np.cos(np.radians(60)), minlen=14):
         xi = np.clip(p[:, 0].astype(int), 0, W - 1); yi = np.clip(p[:, 1].astype(int), 0, H - 1)
         lines.append((p, float(np.mean(shade_img[yi, xi])), k, 1.0))
+# c) inside the corrected rectangle the projection fibres must not stop where the engraving's
+#    hatching breaks off: a layer that follows the blue guides continuously (even across gaps)
+REG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "region-v4.txt")
+if os.path.exists(REG):
+    x0r, y0r, x1r, y1r = [int(float(v) * WORK) for v in open(REG).read().split("\n")[1].split()]
+    rect = np.zeros_like(wm_s); rect[y0r:y1r, x0r:x1r] = True
+    d, tg = FIELDS["projection"]
+    band = (d < 0.9 * SIG) & ndi.binary_dilation(rect, iterations=int(40 * WORK / 0.62)) & section
+    wg = np.clip(np.exp(-(d / SIG) ** 2 / 2) * 1.3, 0, 0.9)
+    cc = ndi.gaussian_filter(wg * np.cos(2 * tg) + (1 - wg) * np.cos(2 * theta), 3)
+    ss = ndi.gaussian_filter(wg * np.sin(2 * tg) + (1 - wg) * np.sin(2 * theta), 3)
+    th_k = 0.5 * np.arctan2(ss, cc)
+    n0 = len(lines)
+    for p in seed_lines(band, 10, np.cos(th_k), np.sin(th_k), total=np.cos(np.radians(80)), minlen=20):
+        xi = np.clip(p[:, 0].astype(int), 0, W - 1); yi = np.clip(p[:, 1].astype(int), 0, H - 1)
+        lines.append((p, float(np.mean(shade_img[yi, xi])), "projection", 1.0))
+    print("continuous projection strokes in the rectangle:", len(lines) - n0)
 print("streamlines", len(lines), {k: sum(1 for l in lines if l[2] == k) for k in list(FIELDS) + ["neutral"]})
 
 # ---------------- output ---------------------------------------------------

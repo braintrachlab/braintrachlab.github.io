@@ -13,3 +13,7 @@ The direction of every streamline is read from Gillet's hatching; the guides onl
 colour (fibre system) of each streamline. Fibres far from any guide stay neutral slate.
 
 Animation: commissural fibres grow left to right, projection fibres top to bottom, association fibres outwards.
+
+Local corrections: guides-v4-region.png replaces the guides only inside the rectangle in region-v4.txt
+(guides.png = guides-v3.png outside it). Inside that rectangle the projection fibres also follow the blue
+guides continuously, so they do not stop where the engraving's hatching breaks off.

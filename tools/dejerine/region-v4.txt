@@ -1,0 +1,2 @@
+# rectangle where guides-v4-region.png replaces the earlier guides, in plate-hires.png pixels: x0 y0 x1 y1
+918 1621 2210 2582

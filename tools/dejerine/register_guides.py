@@ -25,6 +25,7 @@ best = min(((ncc((s, tx, ty)), (s, tx, ty)) for s in np.linspace(s0 * 0.75, s0 *
             for tx in range(-80, 120, 8) for ty in range(-80, 100, 8)), key=lambda t: t[0])
 r = minimize(ncc, best[1], method="Powell"); s, tx, ty = r.x; tx *= k; ty *= k
 print("registration ncc", round(-r.fun, 3), "scale", round(s, 4), "shift", round(tx), round(ty))
+np.save(OUT + ".reg.npy", np.array([s, tx, ty]))
 H, W = b3.shape[:2]
 R, G, B = b3[..., 0], b3[..., 1], b3[..., 2]
 hue = np.degrees(np.arctan2(np.sqrt(3) * (G - B), 2 * R - G - B)) % 360
