@@ -35,7 +35,7 @@ home.button1: Our research
 home.button2: About us
 home.who.eyebrow: Who we are
 home.who.title: Anatomy as the foundation of brain function
-home.who.p1: TrachLab is a research group devoted to the description of the white matter connections of the human brain. By combining detailed anatomical study with the analysis of their functional role, we aim to understand how the networks support brain functions, in healthy individuals and in people with neurological conditions.
+home.who.p1: TraChLab is a research group devoted to the description of the white matter connections of the human brain. By combining detailed anatomical study with the analysis of their functional role, we aim to understand how the networks support brain functions, in healthy individuals and in people with neurological conditions.
 home.who.p2: Alongside this work, the lab cultivates a strong interest in the history of neuroscience, tracing how our knowledge of the brain's connections has taken shape over the centuries.
 home.who.link: Learn more about the lab
 home.who.photo: 
@@ -57,8 +57,8 @@ home.news.link: All news & events
 home.join.title: Interested in working with us?
 home.join.text: We welcome collaborations and enquiries from students and researchers.
 home.join.button: Get in touch
-home.page_title: TrachLab — White Matter Neuroanatomy
-home.page_description: TrachLab studies the white matter connections of the human brain, their functions in health and disease, and the history of neuroscience.
+home.page_title: TraChLab — White Matter Neuroanatomy
+home.page_description: TraChLab studies the white matter connections of the human brain, their functions in health and disease, and the history of neuroscience.
 
 # ---------------- ABOUT US PAGE (team members are in content/team.txt, collaborations in content/collaborations.txt)
 about.eyebrow: People
@@ -66,8 +66,8 @@ about.title: Our team
 about.intro: 
 about.network.eyebrow: Network
 about.network.title: Collaborations
-about.page_title: About us — TrachLab
-about.page_description: Team and collaborations of TrachLab.
+about.page_title: About us — TraChLab
+about.page_description: Team and collaborations of TraChLab.
 
 # ---------------- RESEARCH PAGE (an empty value hides the paragraph; images: file name in assets/img/)
 research.eyebrow: Research
@@ -89,20 +89,20 @@ research.history.caption: Coronal section from J. Dejerine, *Anatomie des centre
 research.history.title: History of neuroscience
 research.history.p1: The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain's connections.
 research.history.p2: 
-research.page_title: Research — TrachLab
-research.page_description: Research areas of TrachLab: white matter anatomy, comparative neuroanatomy, connections in disease, history of neuroscience.
+research.page_title: Research — TraChLab
+research.page_description: Research areas of TraChLab: white matter anatomy, comparative neuroanatomy, connections in disease, history of neuroscience.
 
 # ---------------- PUBLICATIONS PAGE (the list of DOIs is in content/publications.txt)
 publications.title: Publications
 publications.intro: Selected articles from the lab.
-publications.page_title: Publications — TrachLab
-publications.page_description: Publications of TrachLab.
+publications.page_title: Publications — TraChLab
+publications.page_description: Publications of TraChLab.
 
 # ---------------- NEWS & EVENTS PAGE (the items are in content/news.txt)
 news.title: News & Events
 news.intro: Seminars, conferences, new publications and life in the lab.
-news.page_title: News & Events — TrachLab
-news.page_description: News and events from TrachLab.
+news.page_title: News & Events — TraChLab
+news.page_description: News and events from TraChLab.
 
 # ---------------- CONTACTS PAGE (in the address, ' | ' starts a new line)
 contacts.eyebrow: Contacts
@@ -115,7 +115,7 @@ contacts.address.title: Address
 contacts.join.title: Join the lab
 contacts.join.text: We are always interested in hearing from motivated students and researchers. Send us a short presentation and your CV.
 contacts.photo: 
-contacts.page_title: Contacts — TrachLab
-contacts.page_description: How to contact TrachLab.
-notfound.page_title: Page not found — TrachLab
+contacts.page_title: Contacts — TraChLab
+contacts.page_description: How to contact TraChLab.
+notfound.page_title: Page not found — TraChLab
 notfound.page_description: Page not found.
