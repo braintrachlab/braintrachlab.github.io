@@ -197,7 +197,7 @@ p { margin: 0 0 1.1em; color: var(--ink-soft); }
 [data-brain].ready image.silhouette { opacity: 0.5; }
 [data-brain].ready image.plate-cool { opacity: 0.85; }
 [data-brain] image.plate-tint { opacity: 0; transition: opacity 2.2s ease var(--tint-delay, 2s); }
-[data-brain].ready image.plate-tint { opacity: 0.3; }
+[data-brain].ready image.plate-tint { opacity: 0.18; }
 .fat-row { display: grid; grid-template-columns: 457fr 514fr 576fr; gap: 32px; align-items: end; margin-top: 56px; }
 .fat-cell { margin: 0; }
 .fat-cell [data-brain] { width: 100%; }

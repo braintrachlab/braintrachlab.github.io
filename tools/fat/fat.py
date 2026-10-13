@@ -71,7 +71,7 @@ conf = np.hypot(c2, s2)
 CONF_MIN = 0.3 * np.median(conf[fibre])
 print('conf median', float(np.median(conf[fibre])))
 vx, vy = np.cos(theta), np.sin(theta)
-shade_img = ndi.gaussian_filter(lum, 1.5)
+shade_img = ndi.gaussian_filter(lum, 0.7)   # keep the light/dark of each rendered tube
 
 rng = np.random.default_rng(5)
 STEP, MAX_STEPS = 1.2, 150
@@ -105,12 +105,12 @@ def streamlines(mask, cell):
         L = trace(mask, x0, y0, -1)[::-1] + [(float(x0), float(y0))] + trace(mask, x0, y0, 1)
         if len(L) < 10: continue
         for (x, y) in L[::3]: occ[int(y) // cell, int(x) // cell] += 1
-        p = np.array(L[::3])
+        p = np.array(L[::4])
         if p[0, 1] < p[-1, 1]: p = p[::-1]          # grow upwards, from the frontal operculum
         out.append((p, float(np.mean(shade_img[p[:, 1].astype(int), p[:, 0].astype(int)]))))
     return out
 
-PAL = {"orange": ((150, 72, 24), (226, 150, 78)), "green": ((36, 92, 52), (120, 172, 112))}
+PAL = {"orange": ((120, 54, 18), (236, 170, 104)), "green": ((30, 78, 44), (140, 190, 130))}
 
 # split into the three species by the brain components (left to right)
 lab, n = ndi.label(ndi.binary_dilation(brain, iterations=25))

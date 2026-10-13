@@ -201,15 +201,15 @@ for k, (name, mo, mn) in enumerate(zip(names, old_groups, new_groups)):
             continue
         sl = streamlines(mm, 3)
         dk, lt = (np.array(v) for v in PAL[cname])
-        shs = np.array([v for _, v in sl]); lo, hi = np.percentile(shs, 5), np.percentile(shs, 95)
+        shs = np.array([v for _, v in sl]); lo, hi = np.percentile(shs, 3), np.percentile(shs, 97)
         for p, sh in sl:
             t = np.clip((sh - lo) / (hi - lo + 1e-6), 0, 1)
             r, g_, b = (dk * (1 - t) + lt * t).astype(int)
             q = (to_new(p)[0] - [x1, y1]) * OUT_SCALE
             d = 1.2 + k * 1.1 + (ybot - p[0, 1]) / (ybot - ytop + 1) * 2.4 + rng.uniform(0, 0.5)
-            path = "M" + " ".join(f"{x:.1f} {y:.1f}" for x, y in q)
-            parts.append((d, f'<path d="{path}" stroke="rgb({r},{g_},{b})" stroke-opacity="{0.92 - 0.2 * t:.2f}" '
-                             f'stroke-width="{0.5 + 0.45 * rng.random():.2f}" data-delay="{d:.2f}" data-dur="{1.6 + rng.uniform(0, 0.9):.2f}"/>'))
+            path = "M" + " ".join(f"{x:.0f} {y:.0f}" for x, y in q)
+            parts.append((d, f'<path d="{path}" stroke="rgb({r},{g_},{b})" stroke-opacity="{0.95 - 0.15 * t:.2f}" '
+                             f'stroke-width="{0.3 + 0.28 * rng.random():.2f}" data-delay="{d:.2f}" data-dur="{1.6 + rng.uniform(0, 0.9):.2f}"/>'))
     parts.sort(key=lambda t: t[0])
 
     # plate: the clean brain (no fascicles), box lines removed
