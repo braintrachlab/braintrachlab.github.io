@@ -35,7 +35,7 @@ link: https://doi.org/10.1038/s41467-026-73731-8
 date: 2025-11
 type: Gray's Anatomy 43rd edition launch
 title: at the launch of the latest edition of Gray's Anatomy, presented at the Royal College of Surgeons of England
-text: Prof. Marco Catani contributed as a section editor on neuroanatomy.
+text: Prof. Marco Catani served as section editor for the central nervous system.
 photo: Catani_Gray's.png
 link: 
 
