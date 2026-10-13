@@ -1,0 +1,8 @@
+# arrow tips of the areas marked 'Green' on guides-v2-annotated.png, in plate-hires.png pixels (x y)
+849 875
+1944 740
+2293 2085
+2121 2485
+1228 2364
+1517 2437
+1805 2364

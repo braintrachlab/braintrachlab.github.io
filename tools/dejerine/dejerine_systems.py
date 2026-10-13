@@ -21,6 +21,10 @@ from skimage import morphology
 
 PLATE, GUIDES, OUT = sys.argv[1], sys.argv[2], sys.argv[3]
 DEBUG = len(sys.argv) > 4
+# areas marked "Green" (arrow tips) on the annotated guide, in plate-hires pixels:
+# isolated frontal gyrus, isolated parietal gyrus, superior temporal, middle/inferior
+# temporal, and the three regions of the inferior temporal / parahippocampal lobe
+GREEN_TIPS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "green-areas.txt")
 WORK = 0.62                                   # working scale of the 300 dpi render
 
 def load(p):
@@ -140,33 +144,69 @@ def classify(p):
 rng = np.random.default_rng(13)
 STEP, MAX_STEPS = 1.3, 160
 TURN, TOTAL = np.cos(np.radians(7)), np.cos(np.radians(55))
-def trace(x0, y0, sgn):
+def trace(x0, y0, sgn, fx=None, fy=None, mask=None, total=TOTAL):
+    fx = vx if fx is None else fx; fy = vy if fy is None else fy; mask = wm_s if mask is None else mask
     x, y = float(x0), float(y0)
-    px, py = sgn * vx[y0, x0], sgn * vy[y0, x0]; d0 = (px, py)
+    px, py = sgn * fx[y0, x0], sgn * fy[y0, x0]; d0 = (px, py)
     pts = []
     for _ in range(MAX_STEPS):
-        ux, uy = vx[int(y), int(x)], vy[int(y), int(x)]
+        ux, uy = fx[int(y), int(x)], fy[int(y), int(x)]
         if ux * px + uy * py < 0: ux, uy = -ux, -uy
-        if ux * px + uy * py < TURN or ux * d0[0] + uy * d0[1] < TOTAL: break
+        if ux * px + uy * py < TURN or ux * d0[0] + uy * d0[1] < total: break
         x2, y2 = x + ux * STEP, y + uy * STEP
-        if not (0 <= int(x2) < W and 0 <= int(y2) < H) or not wm_s[int(y2), int(x2)]: break
+        if not (0 <= int(x2) < W and 0 <= int(y2) < H) or not mask[int(y2), int(x2)]: break
         x, y = x2, y2; pts.append((x, y)); px, py = ux, uy
     return pts
 
+def seed_lines(mask, cell, fx=None, fy=None, total=TOTAL, minlen=12):
+    occ = np.zeros((H // cell + 1, W // cell + 1), np.uint8)
+    cand = np.argwhere(mask); rng.shuffle(cand)
+    cand = cand[np.argsort(dt[cand[:, 0], cand[:, 1]] > 8, kind="stable")]      # thin gyri first
+    out = []
+    for (y0, x0) in cand:
+        if occ[y0 // cell, x0 // cell] >= 2: continue
+        L = trace(x0, y0, -1, fx, fy, mask, total)[::-1] + [(float(x0), float(y0))] + trace(x0, y0, 1, fx, fy, mask, total)
+        if len(L) < minlen: continue
+        for (x, y) in L[::3]: occ[int(y) // cell, int(x) // cell] += 1
+        out.append(np.array(L[::5]))
+    return out
+
 CELL = 4
-occ = np.zeros((H // CELL + 1, W // CELL + 1), np.uint8)
-cand = np.argwhere(wm_s); rng.shuffle(cand)
-cand = cand[np.argsort(dt[cand[:, 0], cand[:, 1]] > 8, kind="stable")]      # thin gyri first
+BAND = 2.2 * SIG
+# white matter reachable from the marked points within a short distance along the white matter
+tips = [tuple(map(float, l.split())) for l in open(GREEN_TIPS) if l.strip() and not l.startswith("#")]
+seed = np.zeros_like(wm_s)
+for x, y in tips:
+    xi, yi = int(x * WORK), int(y * WORK)
+    rr = int(25 * WORK / 0.62)
+    seed[max(0, yi - rr):yi + rr, max(0, xi - rr):xi + rr] = True
+green_area = ndi.binary_dilation(seed & wm_s, iterations=int(150 * WORK / 0.62), mask=wm_s)
+bands = {k: (FIELDS[k][0] < BAND) & wm_s for k in ("commissural", "projection")}
 lines = []
-for (y0, x0) in cand:
-    if occ[y0 // CELL, x0 // CELL] >= 2: continue
-    L = trace(x0, y0, -1)[::-1] + [(float(x0), float(y0))] + trace(x0, y0, 1)
-    if len(L) < 12: continue
-    for (x, y) in L[::3]: occ[int(y) // CELL, int(x) // CELL] += 1
-    p = np.array(L[::5])
+# a) base layer from the hatching: association everywhere, and commissural/projection only
+#    outside the bands of their dedicated layers
+for p in seed_lines(wm_s, CELL):
     sys_, sc = classify(p)
-    lines.append((p, float(np.mean(shade_img[p[:, 1].astype(int), p[:, 0].astype(int)])), sys_, sc))
-print("streamlines", len(lines), {k: sum(1 for l in lines if l[2] == k) for k in FIELDS})
+    if sc <= 0.08:
+        xi0 = np.clip(p[:, 0].astype(int), 0, W - 1); yi0 = np.clip(p[:, 1].astype(int), 0, H - 1)
+        sys_ = "association" if green_area[yi0, xi0].mean() > 0.5 else "neutral"
+    xi = np.clip(p[:, 0].astype(int), 0, W - 1); yi = np.clip(p[:, 1].astype(int), 0, H - 1)
+    if sys_ in bands and bands[sys_][yi, xi].mean() > 0.5:
+        continue
+    lines.append((p, float(np.mean(shade_img[yi, xi])), sys_, 1.0))
+# b) dedicated commissural and projection layers: near their guides the course follows the
+#    guide (drawn along the plate's fibres), so red and blue cross instead of stopping
+for k in ("commissural", "projection"):
+    d, tg = FIELDS[k]
+    wg = np.clip(np.exp(-(d / SIG) ** 2 / 2) * 1.2, 0, 0.9)
+    cc = wg * np.cos(2 * tg) + (1 - wg) * np.cos(2 * theta)
+    ss = wg * np.sin(2 * tg) + (1 - wg) * np.sin(2 * theta)
+    cc, ss = ndi.gaussian_filter(cc, 3), ndi.gaussian_filter(ss, 3)
+    th_k = 0.5 * np.arctan2(ss, cc)
+    for p in seed_lines(bands[k], CELL, np.cos(th_k), np.sin(th_k), total=np.cos(np.radians(80)), minlen=16):
+        xi = np.clip(p[:, 0].astype(int), 0, W - 1); yi = np.clip(p[:, 1].astype(int), 0, H - 1)
+        lines.append((p, float(np.mean(shade_img[yi, xi])), k, 1.0))
+print("streamlines", len(lines), {k: sum(1 for l in lines if l[2] == k) for k in list(FIELDS) + ["neutral"]})
 
 # ---------------- output ---------------------------------------------------
 PAL = {"commissural": ((112, 30, 42), (196, 112, 116)),     # garnet
@@ -181,7 +221,7 @@ shs = np.array([l[1] for l in lines]); lo, hi = np.percentile(shs, 3), np.percen
 parts = []
 for p, sh, sys_, sc in lines:
     t = 1.0 - np.clip((sh - lo) / (hi - lo + 1e-6), 0, 1)       # dense hatching -> dark
-    dk, lt = (np.array(c) for c in (PAL[sys_] if sc > 0.08 else NEUTRAL))
+    dk, lt = (np.array(c) for c in (PAL.get(sys_, NEUTRAL)))
     r, g_, b_ = (lt * t + dk * (1 - t)).astype(int)
     if np.hypot(*(p[0] - hub)) > np.hypot(*(p[-1] - hub)): p = p[::-1]
     d = 1.2 + np.hypot(*(p[0] - hub)) / maxr * 4.4 + rng.uniform(0, 0.7)
