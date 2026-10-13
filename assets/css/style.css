@@ -419,7 +419,10 @@ html.texts-loading [data-text] { visibility: hidden; }
 .pub-text { font-size: 0.9rem; margin: 6px 0 0; }
 @media (max-width: 700px) { .collab.has-photo, .pub.has-photo { grid-template-columns: 1fr; } }
 .collab h3 a:hover { color: var(--accent); }
-.person .portrait img { width: 100%; height: 100%; object-fit: cover; }
+.person .portrait img { width: 100%; height: 100%; object-fit: contain; object-position: bottom; }
+.person .portrait { background: #fff; }
+.person .portrait:not(:has(img)) { border: 1px solid var(--line); }
+.member-photo { background: #fff; object-fit: contain; object-position: bottom; }
 .member-photo { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; margin-bottom: 22px; }
 .member-links a { margin-right: 4px; }
 .news-item h3 a, .card h3 a { color: var(--ink); }
