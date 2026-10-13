@@ -92,8 +92,6 @@
         float diff = max(dot(n, L), 0.0);
         float spec = pow(max(dot(reflect(-L, n), vec3(0.0, 0.0, 1.0)), 0.0), 28.0);
         vec3 col = uColor * (0.32 + 0.8 * diff) + vec3(1.0) * 0.28 * spec;
-        float front = smoothstep(uProg - 0.025, uProg, vT);
-        col = mix(col, vec3(1.0, 0.82, 0.82), front * 0.7);
         gl_FragColor = vec4(col, uGhost > 0.5 ? 0.035 : 1.0);
       }`;
     const uniforms = () => ({ uProg: { value: 0 }, uColor: { value: new THREE.Color(...color) }, uGhost: { value: 0 } });

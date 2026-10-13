@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>About us — TrachLab</title>
-  <meta name="description" content="Mission, approach and team of TrachLab.">
+  <meta name="description" content="Team and collaborations of TrachLab.">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,110 +35,89 @@
 
     <header class="page-header">
       <div class="container">
-        <span class="eyebrow reveal">About us</span>
-        <h1 class="reveal d1">The lab</h1>
-        <p class="reveal d2">A research group dedicated to the anatomy and function of the brain's white matter, and to the history of the discipline that studies it.</p>
+        <span class="eyebrow reveal">People</span>
+        <h1 class="reveal d1">Our team</h1>
       </div>
     </header>
 
-    <section>
-      <div class="container grid-2">
-        <div>
-          <span class="eyebrow reveal">Mission</span>
-          <h2 class="reveal d1">Understanding how the brain is connected</h2>
-        </div>
-        <div>
-          <p class="reveal">The white matter makes up roughly half of the human brain. Its pathways connect distant regions into networks that support movement, perception, language, memory and behaviour. Describing these connections precisely is essential to understanding how the brain works, and what happens when it is damaged.</p>
-          <p class="reveal d1">Our work focuses on the description of white matter tracts and their functions, in healthy subjects and in individuals with pathological conditions, with the aim of contributing both to basic neuroscience and to clinical practice.</p>
-          <p class="reveal d2"><span class="placeholder">[Add a sentence on the institution, department and city where the lab is based.]</span></p>
-        </div>
-      </div>
-    </section>
-
-    <section class="soft">
-      <div class="container">
-        <div class="section-head">
-          <span class="eyebrow reveal">Approach</span>
-          <h2 class="reveal d1">How we work</h2>
-        </div>
-        <div class="grid-3">
-          <div class="card reveal">
-            <span class="num">i.</span>
-            <h3>Anatomy</h3>
-            <p><span class="placeholder">[Describe the anatomical methods used by the lab, e.g. dissection techniques.]</span></p>
-          </div>
-          <div class="card reveal d1">
-            <span class="num">ii.</span>
-            <h3>Imaging</h3>
-            <p><span class="placeholder">[Describe the neuroimaging methods used, e.g. diffusion MRI and tractography.]</span></p>
-          </div>
-          <div class="card reveal d2">
-            <span class="num">iii.</span>
-            <h3>Clinical studies</h3>
-            <p><span class="placeholder">[Describe how the lab relates white matter anatomy to symptoms in patients.]</span></p>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section id="team">
       <div class="container">
-        <div class="section-head">
-          <span class="eyebrow reveal">People</span>
-          <h2 class="reveal d1">Our team</h2>
-        </div>
         <div class="people">
-          <div class="person reveal">
-            <div class="figure">Photo</div>
-            <h3><span class="placeholder">[Name Surname]</span></h3>
-            <p class="role">Principal Investigator</p>
-          </div>
-          <div class="person reveal d1">
-            <div class="figure">Photo</div>
-            <h3><span class="placeholder">[Name Surname]</span></h3>
-            <p class="role">Researcher</p>
-          </div>
-          <div class="person reveal d2">
-            <div class="figure">Photo</div>
-            <h3><span class="placeholder">[Name Surname]</span></h3>
-            <p class="role">Postdoctoral Fellow</p>
-          </div>
-          <div class="person reveal d3">
-            <div class="figure">Photo</div>
-            <h3><span class="placeholder">[Name Surname]</span></h3>
-            <p class="role">PhD Student</p>
-          </div>
-          <div class="person reveal">
-            <div class="figure">Photo</div>
-            <h3><span class="placeholder">[Name Surname]</span></h3>
-            <p class="role">PhD Student</p>
-          </div>
-          <div class="person reveal d1">
-            <div class="figure">Photo</div>
-            <h3><span class="placeholder">[Name Surname]</span></h3>
-            <p class="role">Research Assistant</p>
-          </div>
-          <div class="person reveal d2">
-            <div class="figure">Photo</div>
-            <h3><span class="placeholder">[Name Surname]</span></h3>
-            <p class="role">Collaborator</p>
-          </div>
-          <div class="person reveal d3">
-            <div class="figure">Photo</div>
-            <h3><span class="placeholder">[Name Surname]</span></h3>
-            <p class="role">Student</p>
-          </div>
+          <button class="person reveal" data-member="m0" aria-haspopup="dialog">
+            <span class="figure portrait"><span class="initials">MC</span></span>
+            <span class="name">Marco Catani</span>
+            <span class="role">Principal Investigator</span>
+          </button>
+          <template id="m0">
+            <span class="eyebrow">Principal Investigator</span>
+            <h2>Marco Catani</h2>
+            <p><span class="placeholder">[Short biography: background, training, research interests and current projects.]</span></p>
+            <p><span class="placeholder">[Optional: selected publications, contact or profile links (ORCID, Google Scholar).]</span></p>
+          </template>
+          <button class="person reveal d1" data-member="m1" aria-haspopup="dialog">
+            <span class="figure portrait"><span class="initials">GB</span></span>
+            <span class="name">Giovanna Bubbico</span>
+            <span class="role">Researcher</span>
+          </button>
+          <template id="m1">
+            <span class="eyebrow">Researcher</span>
+            <h2>Giovanna Bubbico</h2>
+            <p><span class="placeholder">[Short biography: background, training, research interests and current projects.]</span></p>
+            <p><span class="placeholder">[Optional: selected publications, contact or profile links (ORCID, Google Scholar).]</span></p>
+          </template>
+          <button class="person reveal d2" data-member="m2" aria-haspopup="dialog">
+            <span class="figure portrait"><span class="initials">SC</span></span>
+            <span class="name">Salvatore Citro</span>
+            <span class="role">Research Fellow</span>
+          </button>
+          <template id="m2">
+            <span class="eyebrow">Research Fellow</span>
+            <h2>Salvatore Citro</h2>
+            <p><span class="placeholder">[Short biography: background, training, research interests and current projects.]</span></p>
+            <p><span class="placeholder">[Optional: selected publications, contact or profile links (ORCID, Google Scholar).]</span></p>
+          </template>
         </div>
       </div>
     </section>
+
+    <dialog class="member-panel" id="member-panel">
+      <button class="close" aria-label="Close">&times;</button>
+      <div class="member-body"></div>
+    </dialog>
 
     <section class="soft">
       <div class="container">
         <div class="section-head">
           <span class="eyebrow reveal">Network</span>
           <h2 class="reveal d1">Collaborations</h2>
-          <p class="reveal d2"><span class="placeholder">[List partner institutions, hospitals and research groups.]</span></p>
         </div>
+        <ul class="collabs">
+          <li class="collab reveal">
+            <h3>IRCCS Neuromed</h3>
+            
+            
+          </li>
+          <li class="collab reveal">
+            <h3>King's College London</h3>
+            <p>Neuroimaging &amp; Biophysics Lab (NBL)</p>
+            <p class="who">Flavio Dell'Acqua</p>
+          </li>
+          <li class="collab reveal">
+            <h3>Northwestern University, Chicago</h3>
+            <p>Mesulam Institute for Cognitive Neurology &amp; Alzheimer's Disease</p>
+            <p class="who">Marsel Mesulam</p>
+          </li>
+          <li class="collab reveal">
+            <h3>University of Chicago</h3>
+            <p>Healthy Aging &amp; Alzheimer's Research Care (HAARC) Center</p>
+            <p class="who">Emily Rogalski</p>
+          </li>
+          <li class="collab reveal">
+            <h3>University of Texas</h3>
+            <p>Michale E. Keeling Center for Comparative Medicine and Research</p>
+            <p class="who">William Hopkins</p>
+          </li>
+        </ul>
       </div>
     </section>
 

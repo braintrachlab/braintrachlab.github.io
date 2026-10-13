@@ -82,6 +82,24 @@
     });
   });
 
+  // Team member panels
+  const panel = document.getElementById("member-panel");
+  if (panel) {
+    const body = panel.querySelector(".member-body");
+    document.querySelectorAll("[data-member]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const tpl = document.getElementById(btn.dataset.member);
+        body.innerHTML = tpl ? tpl.innerHTML : "";
+        if (panel.showModal) panel.showModal(); else panel.setAttribute("open", "");
+      });
+    });
+    panel.querySelector(".close").addEventListener("click", () => panel.close());
+    panel.addEventListener("click", (e) => {
+      const r = panel.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) panel.close();
+    });
+  }
+
   // Footer year
   const y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
