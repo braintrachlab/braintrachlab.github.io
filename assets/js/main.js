@@ -22,11 +22,17 @@
     if (a.getAttribute("href") === page) a.classList.add("active");
   });
 
-  // Hero: prepare fibre paths for the drawing animation
-  document.querySelectorAll(".hero-art path").forEach((p, i) => {
-    const len = Math.ceil(p.getTotalLength());
-    p.style.setProperty("--len", len);
-    p.style.animationDelay = (i * 0.12) + "s";
+  // Hero: inject the brain line drawing and animate each fibre
+  document.querySelectorAll("[data-brain]").forEach((box) => {
+    fetch(box.dataset.brain).then((r) => r.text()).then((svg) => {
+      box.innerHTML = svg;
+      box.querySelectorAll("path").forEach((p) => {
+        p.style.setProperty("--len", Math.ceil(p.getTotalLength()) + 1);
+        p.style.setProperty("--delay", (p.dataset.delay || 0) + "s");
+        p.style.setProperty("--dur", (p.dataset.dur || 2) + "s");
+      });
+      box.classList.add("ready");
+    });
   });
 
   // Reveal elements as they scroll into view
