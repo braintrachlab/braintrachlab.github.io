@@ -16,7 +16,8 @@ Website of TrachLab, published with GitHub Pages at https://trachlab.github.io
 Text highlighted in yellow inside square brackets is placeholder content to replace.
 
 ## Home animation
-- `assets/img/white-matter.svg` — stylised white matter tracts that draw themselves (used on the home page).
+- Home hero: animated Dejerine plate (`assets/img/dejerine-lines.svg`), also on the Research page.
+- `assets/img/white-matter.svg` — stylised tract diagram (previous home animation, kept in reserve).
 - Archived: `hero-lab.html` + `assets/js/hero.js` + `assets/hero/` — tractography with the 3D arterial tree (ICA) growing from the carotid. Not linked.
 
 ## Publications
