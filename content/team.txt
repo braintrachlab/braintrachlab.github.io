@@ -13,7 +13,7 @@
 #  Lines starting with # are ignored.
 # ============================================================
 
-name: Marco Cattani
+name: Marco Catani
 role: Principal Investigator
 photo:
 bio:
