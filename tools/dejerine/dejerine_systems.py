@@ -224,7 +224,7 @@ if os.path.exists(REG):
 print("streamlines", len(lines), {k: sum(1 for l in lines if l[2] == k) for k in list(FIELDS) + ["neutral"]})
 
 # ---------------- output ---------------------------------------------------
-PAL = {"commissural": ((112, 30, 42), (196, 112, 116)),     # garnet
+PAL = {"commissural": ((128, 40, 38), (206, 104, 92)),      # same red as the arcuate long segment
        "association": ((40, 92, 58), (128, 176, 118)),     # same green as the arcuate anterior segment
        "projection": ((26, 44, 78), (124, 150, 190))}      # ink blue
 NEUTRAL = ((70, 78, 92), (170, 176, 186))
