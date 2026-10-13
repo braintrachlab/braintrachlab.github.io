@@ -192,6 +192,21 @@ p { margin: 0 0 1.1em; color: var(--ink-soft); }
 [data-brain].ready path { animation: draw var(--dur) cubic-bezier(.55,.1,.3,1) var(--delay) forwards; }
 [data-brain] image.plate { opacity: 0; transition: opacity 2.4s ease; filter: sepia(0.55); }
 [data-brain].ready image.plate { opacity: 0.5; }
+[data-brain] image.plate-cool { filter: none; }
+[data-brain].ready image.plate-cool { opacity: 0.85; }
+[data-brain] image.plate-tint { opacity: 0; transition: opacity 2.2s ease var(--tint-delay, 2s); }
+[data-brain].ready image.plate-tint { opacity: 0.3; }
+.fat-row { display: grid; grid-template-columns: 363fr 364fr 520fr; gap: 32px; align-items: end; margin-top: 56px; }
+.fat-cell { margin: 0; }
+.fat-cell [data-brain] { width: 100%; }
+.fat-species { text-align: center; font-family: var(--serif); font-style: italic; font-size: 1.15rem; color: var(--ink-soft); margin-top: 10px; }
+.fat-legend { display: flex; justify-content: center; align-items: center; gap: 10px 26px; flex-wrap: wrap; margin-top: 26px; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.fat-item { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+.fat-key { display: inline-block; width: 26px; height: 3px; border-radius: 2px; }
+.fat-key-orange { background: rgb(196, 112, 52); }
+.fat-key-green { background: rgb(70, 128, 82); }
+.fat-caption { text-align: center; max-width: 640px; margin: 14px auto 0; }
+@media (max-width: 760px) { .fat-row { grid-template-columns: 1fr; gap: 36px; max-width: 420px; margin-left: auto; margin-right: auto; } }
 .hero-plate {
   width: auto;
   height: min(calc(100vh - 150px), 760px);
@@ -540,6 +555,6 @@ form button { cursor: pointer; background: none; font: inherit; }
   html { scroll-behavior: auto; }
   .reveal { opacity: 1; transform: none; transition: none; }
   [data-brain] path, [data-brain].ready path { animation: none; stroke-dashoffset: 0; }
-  [data-brain] image.plate { transition: none; }
+  [data-brain] image.plate, [data-brain] image.plate-tint { transition: none; }
   .scroll-cue::after { animation: none; }
 }

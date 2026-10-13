@@ -79,10 +79,15 @@ research.anatomy.title: White matter anatomy
 research.anatomy.p1: We describe the course, organisation and cortical terminations of the white matter tracts of the human brain, building an accurate anatomical map of its association, projection and commissural connections.
 research.anatomy.p2: 
 research.anatomy.photo: 
+research.comparative.species1: Macaque
+research.comparative.species2: Chimpanzee
+research.comparative.species3: Human
 research.comparative.title: Comparative neuroanatomy
 research.comparative.p1: By comparing the white matter of the human brain with that of non-human primates, we study how connections have changed during evolution and how these changes relate to abilities such as language and vocal communication.
 research.comparative.p2: 
-research.comparative.photo: 
+research.comparative.legend1: Prefrontal FAT
+research.comparative.legend2: Precentral FAT
+research.comparative.caption: The frontal aslant tract (FAT) in the macaque, chimpanzee and human brain, redrawn as streamlines from [Citro et al., *Nature Communications* (2026)](https://doi.org/10.1038/s41467-026-73731-8).
 research.clinical.title: Connections in health and disease
 research.clinical.p1: By studying the functions of white matter pathways, we investigate how their damage or alteration contributes to the clinical picture of patients with neurological and psychiatric conditions.
 research.clinical.p2: 

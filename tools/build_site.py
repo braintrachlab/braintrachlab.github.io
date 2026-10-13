@@ -286,6 +286,38 @@ DEJ = lambda: f'''        <figure class="reveal d1" style="margin:0">
           {T("figcaption", "research.history.caption", "Coronal section from J. Dejerine, *Anatomie des centres nerveux* (1895–1901), drawing by H. Gillet, with the fibres of the white matter redrawn as streamlines.", "plate-caption")}
         </figure>'''
 
+def comparative():
+    key = "research.comparative"
+    species = [("macaque", "Macaque"), ("chimpanzee", "Chimpanzee"), ("human", "Human")]
+    cells = "\n".join(f'''          <figure class="fat-cell">
+            <div data-brain="assets/img/fat-{sp}.svg" role="img" aria-label="Frontal aslant tract of the {label.lower()} brain"></div>
+            {T("figcaption", f"{key}.species{i + 1}", label, "fat-species")}
+          </figure>''' for i, (sp, label) in enumerate(species))
+    return f'''    <section class="soft">
+      <div class="container">
+        <div class="grid-2" style="align-items:end">
+          <div>
+            <span class="eyebrow reveal">02</span>
+            {T("h2", key + ".title", "Comparative neuroanatomy", "reveal d1")}
+            <hr class="divider reveal d1">
+          </div>
+          <div>
+            {T("p", key + ".p1", "By comparing the white matter of the human brain with that of non-human primates, we study how connections have changed during evolution and how these changes relate to abilities such as language and vocal communication.", "reveal d2")}
+            {T("p", key + ".p2", "", "reveal d2")}
+          </div>
+        </div>
+        <div class="fat-row reveal">
+{cells}
+        </div>
+        <div class="fat-legend reveal">
+          <span class="fat-item"><span class="fat-key fat-key-orange"></span>{T("span", key + ".legend1", "Prefrontal FAT")}</span>
+          <span class="fat-item"><span class="fat-key fat-key-green"></span>{T("span", key + ".legend2", "Precentral FAT")}</span>
+        </div>
+        {T("p", key + ".caption", "The frontal aslant tract (FAT) in the macaque, chimpanzee and human brain, redrawn as streamlines from [Citro et al., *Nature Communications* (2026)](https://doi.org/10.1038/s41467-026-73731-8).", "plate-caption fat-caption reveal")}
+      </div>
+    </section>
+'''
+
 research = f'''
     <header class="page-header">
       <div class="container">
@@ -296,7 +328,7 @@ research = f'''
     </header>
 
 {rblock("01", "research.anatomy", "White matter anatomy", "We describe the course, organisation and cortical terminations of the white matter tracts of the human brain, building an accurate anatomical map of its association, projection and commissural connections.", "", "Image", False, True)}
-{rblock("02", "research.comparative", "Comparative neuroanatomy", "By comparing the white matter of the human brain with that of non-human primates, we study how connections have changed during evolution and how these changes relate to abilities such as language and vocal communication.", "", "Image", True, False)}
+{comparative()}
 {rblock("03", "research.clinical", "Connections in health and disease", "By studying the functions of white matter pathways, we investigate how their damage or alteration contributes to the clinical picture of patients with neurological and psychiatric conditions.", "", "Image", False, True)}
 {rblock("04", "research.history", "History of neuroscience", "The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain's connections.", "", "", True, False, figure=DEJ())}'''
 page("research.html", "research.page_title", "Research — TrachLab", "research.page_description",
