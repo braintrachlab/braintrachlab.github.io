@@ -1,39 +1,49 @@
-# ============================================================
-#  TEAM — one block per person, separated by an empty line.
+# ======================================================================
+#  HOW TO WRITE IN THIS FILE  (the same rules apply to every file in /content)
 #
-#  name:  full name                          (required)
-#  role:  e.g. Principal Investigator        (required)
-#  photo: file name of a photo uploaded to assets/img/team/
-#         (optional — without a photo the initials are shown)
-#  bio:   short biography, on one line       (optional)
-#  links: optional links, separated by " | ", written as
-#         Label = https://...
+#  - One field per line:            key: value
+#  - An empty line separates two entries.
+#  - Lines starting with # are comments and are ignored.
+#  - Text formatting, usable in any text:
+#        *italic*     **bold**     [label](https://...)     " | " = new line
+#  - photo:  file name of a picture uploaded to the folder assets/img/
+#            (e.g.  photo: seminar-2026.jpg)
+#  - link:   a web address; it makes the title clickable
+#  - text:   a paragraph of description
+#  - Leave a field empty, or delete the line, if you do not need it.
+# ======================================================================
 #
-#  The order here is the order on the website.
-#  Lines starting with # are ignored.
-# ============================================================
+#  TEAM — one entry per person. The order here is the order on the website.
+#
+#  name:   full name                                   (required)
+#  role:   e.g. Principal Investigator                 (required)
+#  photo:  portrait, ideally square                    (optional)
+#  text:   short biography                             (optional)
+#  links:  e.g. [ORCID](https://orcid.org/...) · [Google Scholar](https://...)
+#  link:   personal web page, makes the name clickable (optional)
+# ======================================================================
 
 name: Marco Catani
 role: Principal Investigator
 photo:
-bio:
+text:
 links:
 
 name: Giovanna Bubbico
 role: Researcher
 photo:
-bio:
+text:
 links:
 
 name: Salvatore Citro
 role: Research Fellow
 photo:
-bio:
+text:
 links:
 
-# Example of a complete entry (remove the # to use it):
+# Example of a complete entry (remove the # signs to use it):
 # name: Jane Doe
 # role: PhD Student
 # photo: jane-doe.jpg
-# bio: Jane studies the anatomy of the frontal aslant tract in humans and non-human primates.
-# links: ORCID = https://orcid.org/0000-0000-0000-0000 | Google Scholar = https://scholar.google.com/
+# text: Jane studies the *frontal aslant tract* in humans and non-human primates.
+# links: [ORCID](https://orcid.org/0000-0000-0000-0000) · [Google Scholar](https://scholar.google.com/)

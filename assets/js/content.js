@@ -1,39 +1,54 @@
-// TrachLab — renders the editable text files in /content
+// TrachLab — reads the editable files in /content and fills the pages.
+//
+// ONE SYNTAX FOR EVERY FILE
+//   key: value            one field per line
+//   (empty line)          separates two entries
+//   # ...                 comment, ignored
+//   repeating a key       also starts a new entry (handy for lists of DOIs)
+//
+// ONE MARKUP FOR EVERY TEXT
+//   *italic*   **bold**   [label](https://...)   " | " = new line
+//
+// COMMON FIELDS
+//   photo: file name of a picture in assets/img/   (e.g. photo: seminar-2026.jpg)
+//   link:  https://...   (makes the title clickable)
+//   text:  a paragraph of description
 (function () {
-  const esc = (s) => String(s || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const safeUrl = (u) => /^(https?:|mailto:)/i.test((u || "").trim()) ? u.trim() : "";
-
-  // "key: value" blocks separated by blank lines; lines starting with # are ignored
-  window.TrachContent = {
-    load(file) {
-      return fetch(file, { cache: "no-cache" }).then((r) => r.text()).then((txt) => {
-        const blocks = [];
-        let cur = null;
-        txt.split(/\r?\n/).forEach((line) => {
-          if (/^\s*#/.test(line)) return;
-          if (!line.trim()) { if (cur) blocks.push(cur); cur = null; return; }
-          const m = line.match(/^\s*([a-zA-Z]+)\s*:\s?(.*)$/);
-          if (!m) return;
-          cur = cur || {};
-          cur[m[1].toLowerCase()] = m[2].trim();
-        });
-        if (cur) blocks.push(cur);
-        return blocks;
-      });
-    },
-    lines(file) {
-      return fetch(file, { cache: "no-cache" }).then((r) => r.text()).then((txt) =>
-        txt.split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith("#")));
-    },
-  };
-  const { load } = window.TrachContent;
-
-  // ---------- Page texts (content/texts.txt) ----------
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const safeUrl = (u) => (/^(https?:|mailto:)/i.test((u || "").trim()) ? u.trim() : "");
   const md = (t) => esc(t)
-    .replace(/\[([^\]]+)\]\(((?:https?:|mailto:)[^)\s]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/\[([^\]]+)\]\(((?:https?:|mailto:)[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.+?)\*/g, "<em>$1</em>")
     .split(" | ").join("<br>");
+  const photoUrl = (name) => {
+    name = (name || "").trim();
+    if (!name) return "";
+    if (/^https?:\/\//i.test(name)) return name;
+    return "assets/img/" + name.replace(/^\/+/, "").replace(/^assets\/img\//, "");
+  };
+  const linked = (html, url) => (safeUrl(url) ? `<a href="${esc(safeUrl(url))}" target="_blank" rel="noopener">${html}</a>` : html);
+
+  function parse(txt) {
+    const blocks = [];
+    let cur = null;
+    txt.split(/\r?\n/).forEach((line) => {
+      if (/^\s*#/.test(line)) return;
+      if (!line.trim()) { if (cur) blocks.push(cur); cur = null; return; }
+      const m = line.match(/^\s*([a-zA-Z0-9_.]+)\s*:\s?(.*)$/);
+      if (!m) return;
+      const k = m[1].toLowerCase();
+      if (cur && k in cur) { blocks.push(cur); cur = null; }
+      cur = cur || {};
+      cur[k] = m[2].trim();
+    });
+    if (cur) blocks.push(cur);
+    return blocks;
+  }
+  const load = (file) => fetch(file, { cache: "no-cache" }).then((r) => r.text()).then(parse);
+  window.TrachContent = { load, parse, md, esc, safeUrl, photoUrl, linked };
+
+  // ---------- Page texts (content/texts.txt) ----------
   const done = () => document.documentElement.classList.remove("texts-loading");
   fetch("content/texts.txt", { cache: "no-cache" }).then((r) => r.text()).then((txt) => {
     const T = {};
@@ -53,7 +68,7 @@
       if (!(k in T)) return;
       const box = el.querySelector(".parallax-inner") || el;
       box.innerHTML = T[k]
-        ? `<img src="assets/img/${esc(T[k])}" alt="">`
+        ? `<img src="${esc(photoUrl(T[k]))}" alt="">`
         : `<span class="img-empty">${esc(el.dataset.label || "")}</span>`;
     });
     document.querySelectorAll(".contact-block").forEach((b) => {
@@ -64,72 +79,69 @@
     if (pg && T[pg + ".page_title"]) document.title = T[pg + ".page_title"];
   }).catch(() => {}).finally(done);
 
-  // ---------- Collaborations ----------
-  const collab = document.getElementById("collab-list");
-  if (collab) {
-    load("content/collaborations.txt").then((list) => {
-      collab.innerHTML = list.filter((c) => c.institution).map((c) => {
-        const name = safeUrl(c.link) ? `<a href="${esc(safeUrl(c.link))}" target="_blank" rel="noopener">${esc(c.institution)}</a>` : esc(c.institution);
-        return `<li class="collab">
-            <h3>${name}</h3>
-            ${c.unit ? `<p>${esc(c.unit)}</p>` : ""}
-            ${c.people ? `<p class="who">${esc(c.people)}</p>` : ""}
-          </li>`;
-      }).join("");
-    });
-  }
-
-  // ---------- Team ----------
+  // ---------- Team (content/team.txt) ----------
   const team = document.getElementById("team-list");
   if (team) {
     load("content/team.txt").then((people) => {
       people = people.filter((p) => p.name);
       team.innerHTML = people.map((p, i) => {
         const ini = p.name.split(/\s+/).map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
-        const pic = p.photo
-          ? `<img src="assets/img/team/${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy">`
-          : `<span class="initials">${esc(ini)}</span>`;
+        const pic = p.photo ? `<img src="${esc(photoUrl(p.photo))}" alt="${esc(p.name)}" loading="lazy">` : `<span class="initials">${esc(ini)}</span>`;
         return `<button class="person reveal visible" data-i="${i}" aria-haspopup="dialog">
             <span class="figure portrait">${pic}</span>
             <span class="name">${esc(p.name)}</span>
-            <span class="role">${esc(p.role)}</span>
+            <span class="role">${md(p.role)}</span>
           </button>`;
       }).join("");
       const panel = document.getElementById("member-panel");
       const body = panel.querySelector(".member-body");
       team.querySelectorAll(".person").forEach((btn) => btn.addEventListener("click", () => {
         const p = people[+btn.dataset.i];
-        const links = (p.links || "").split("|").map((s) => s.split("=")).filter((x) => x.length >= 2)
-          .map(([label, ...u]) => { const url = safeUrl(u.join("=")); return url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(label.trim())}</a>` : ""; })
-          .filter(Boolean).join(" · ");
+        const text = p.text || p.bio || "";
+        const links = p.links || "";
         body.innerHTML = `
-          ${p.photo ? `<img class="member-photo" src="assets/img/team/${esc(p.photo)}" alt="">` : ""}
-          <span class="eyebrow">${esc(p.role)}</span>
-          <h2>${esc(p.name)}</h2>
-          ${p.bio ? `<p>${esc(p.bio)}</p>` : `<p class="muted">Biography coming soon.</p>`}
-          ${links ? `<p class="member-links">${links}</p>` : ""}`;
+          ${p.photo ? `<img class="member-photo" src="${esc(photoUrl(p.photo))}" alt="">` : ""}
+          <span class="eyebrow">${md(p.role)}</span>
+          <h2>${linked(esc(p.name), p.link)}</h2>
+          ${text ? `<p>${md(text)}</p>` : `<p class="muted">Biography coming soon.</p>`}
+          ${links ? `<p class="member-links">${md(links)}</p>` : ""}`;
         if (panel.showModal) panel.showModal(); else panel.setAttribute("open", "");
       }));
     });
   }
 
-  // ---------- News ----------
+  // ---------- Collaborations (content/collaborations.txt) ----------
+  const collab = document.getElementById("collab-list");
+  if (collab) {
+    load("content/collaborations.txt").then((list) => {
+      collab.innerHTML = list.filter((c) => c.institution).map((c) => `<li class="collab${c.photo ? " has-photo" : ""}">
+          ${c.photo ? `<img class="collab-logo" src="${esc(photoUrl(c.photo))}" alt="">` : ""}
+          <h3>${linked(md(c.institution), c.link)}</h3>
+          ${c.unit ? `<p>${md(c.unit)}</p>` : ""}
+          ${c.people ? `<p class="who">${md(c.people)}</p>` : ""}
+          ${c.text ? `<p class="who">${md(c.text)}</p>` : ""}
+        </li>`).join("");
+    });
+  }
+
+  // ---------- News & events (content/news.txt) ----------
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const fmtDate = (d) => { const [y, m, day] = d.split("-").map(Number); return `${day ? day + " " : ""}${months[(m || 1) - 1]} ${y}`; };
+  const fmtDate = (d) => { const [y, m, day] = d.split("-").map(Number); return `${day ? day + " " : ""}${m ? months[m - 1] + " " : ""}${y}`; };
   const newsPage = document.getElementById("news-list");
   const newsHome = document.getElementById("news-latest");
   if (newsPage || newsHome) {
     load("content/news.txt").then((items) => {
       items = items.filter((n) => n.date && n.title).sort((a, b) => b.date.localeCompare(a.date));
       const today = new Date().toISOString().slice(0, 10);
-      const title = (n) => safeUrl(n.link) ? `<a href="${esc(safeUrl(n.link))}" target="_blank" rel="noopener">${esc(n.title)}</a>` : esc(n.title);
+      const pic = (n, cls) => (n.photo ? `<img class="${cls}" src="${esc(photoUrl(n.photo))}" alt="" loading="lazy">` : "");
       if (newsPage) {
-        const row = (n) => `<article class="news-item">
+        const row = (n) => `<article class="news-item${n.photo ? " has-photo" : ""}">
             <time datetime="${esc(n.date)}">${esc(fmtDate(n.date))}</time>
             <div>
               <span class="badge">${esc(n.type || "News")}</span>
-              <h3>${title(n)}</h3>
-              ${n.text ? `<p>${esc(n.text)}</p>` : ""}
+              <h3>${linked(md(n.title), n.link)}</h3>
+              ${n.text ? `<p>${md(n.text)}</p>` : ""}
+              ${pic(n, "news-photo")}
             </div>
           </article>`;
         const up = items.filter((n) => n.date > today).reverse();
@@ -143,9 +155,10 @@
         const latest = items.slice(0, 3);
         if (!latest.length) { newsHome.closest("section").style.display = "none"; return; }
         newsHome.innerHTML = latest.map((n) => `<div class="card">
+            ${pic(n, "card-photo")}
             <span class="badge">${esc(n.type || "News")}</span>
-            <h3>${title(n)}</h3>
-            <p><span class="muted">${esc(fmtDate(n.date))}</span>${n.text ? " — " + esc(n.text) : ""}</p>
+            <h3>${linked(md(n.title), n.link)}</h3>
+            <p><span class="muted">${esc(fmtDate(n.date))}</span>${n.text ? " — " + md(n.text) : ""}</p>
           </div>`).join("");
       }
     });

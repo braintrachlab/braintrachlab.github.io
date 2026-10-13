@@ -1,16 +1,30 @@
-# ============================================================
-#  NEWS & EVENTS — one block per item, separated by an empty line.
+# ======================================================================
+#  HOW TO WRITE IN THIS FILE  (the same rules apply to every file in /content)
 #
-#  date:  YYYY-MM-DD, or YYYY-MM if the day is not needed (required)
-#  type:  News, Event, Seminar, Publication, Award ... (required)
-#  title: headline                           (required)
-#  text:  short description, on one line     (optional)
-#  link:  https://...                        (optional)
+#  - One field per line:            key: value
+#  - An empty line separates two entries.
+#  - Lines starting with # are comments and are ignored.
+#  - Text formatting, usable in any text:
+#        *italic*     **bold**     [label](https://...)     " | " = new line
+#  - photo:  file name of a picture uploaded to the folder assets/img/
+#            (e.g.  photo: seminar-2026.jpg)
+#  - link:   a web address; it makes the title clickable
+#  - text:   a paragraph of description
+#  - Leave a field empty, or delete the line, if you do not need it.
+# ======================================================================
 #
-#  Items with a date in the future appear under "Upcoming events".
+#  NEWS & EVENTS — one entry per item.
+#
+#  date:   YYYY-MM-DD, or YYYY-MM                     (required)
+#  type:   News, Event, Seminar, Publication, Award... (required)
+#  title:  headline                                    (required)
+#  text:   short description                           (optional)
+#  photo:  picture shown with the item                 (optional)
+#  link:   web page of the event or article            (optional)
+#
+#  Items with a future date appear under "Upcoming events".
 #  The three most recent items are also shown on the home page.
-#  Lines starting with # are ignored.
-# ============================================================
+# ======================================================================
 
 date: 2026-06
 type: Publication
@@ -18,9 +32,10 @@ title: Evolution of the frontal aslant tract
 text: Our study on the evolution of the frontal aslant tract and its role in primate vocalization and human speech is out in Nature Communications.
 link: https://doi.org/10.1038/s41467-026-73731-8
 
-# Example (remove the # to use it):
+# Example (remove the # signs to use it):
 # date: 2026-11-20
 # type: Seminar
 # title: White matter anatomy seminar
-# text: Seminar at IRCCS Neuromed, Pozzilli.
+# text: Seminar at **IRCCS Neuromed**, Pozzilli.
+# photo: seminar-2026.jpg
 # link: https://example.org

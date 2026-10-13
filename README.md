@@ -27,14 +27,8 @@ Edit the DOI list in the generator; titles, authors and journals are loaded from
 - `assets/img/dejerine-lines.svg` + `assets/img/dejerine-1895.png` — coronal section from Dejerine's *Anatomie des centres nerveux* (drawing by H. Gillet), with the white matter redrawn as animated streamlines. Shown on the Research page.
 
 ## Editing content without touching code
-Edit these text files directly on GitHub (open the file → pencil icon → "Commit changes"):
-- `content/texts.txt` — every text on the pages (titles, paragraphs, buttons, menu, contacts, image file names)
-- `content/team.txt` — team members (photos go in `assets/img/team/`)
-- `content/collaborations.txt` — partner institutions
-- `content/publications.txt` — one DOI per line
-- `content/news.txt` — news and events
-Other pictures go in `assets/img/` and are referenced by file name in `texts.txt`.
-The site updates by itself about a minute after each commit.
+Everything is in the `content/` folder, which has its own guide: see `content/README.md`.
+Pictures go in `assets/img/` and are referenced by file name with `photo:`.
 
 ## For developers
 `tools/build_site.py` regenerates the HTML pages from its templates and keeps the values already in `content/texts.txt`.

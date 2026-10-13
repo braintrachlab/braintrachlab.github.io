@@ -30,7 +30,8 @@
     return f.length ? f : ["anatomy"];
   };
 
-  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const { esc, md, photoUrl, load } = window.TrachContent;
+  const TOPIC_KEYS = Object.keys(LABEL);
   const strip = (s) => String(s || "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 
   async function meta(doi) {
@@ -52,10 +53,29 @@
     }
   }
 
-  window.TrachContent.lines(box.dataset.src).then((dois) => Promise.all(dois.map(meta))).then((list) => {
+  // Entries: "doi:" plus optional fields that override or complete Crossref
+  const merge = (entry, m) => {
+    const o = { ...m };
+    if (entry.title) o.title = entry.title;
+    if (entry.authors) o.authors = entry.authors.split(/\s*,\s*/);
+    if (entry.journal) o.journal = entry.journal;
+    if (entry.year) { const [y, mo] = entry.year.split("-").map(Number); o.year = y; o.month = mo || 0; }
+    if (entry.topic) o.topics = entry.topic.toLowerCase().split(/[\s,]+/).filter((t) => TOPIC_KEYS.includes(t));
+    o.photo = entry.photo || "";
+    o.text = entry.text || "";
+    o.url = entry.link || (o.doi ? "https://doi.org/" + o.doi : "");
+    return o;
+  };
+  Promise.all([load(box.dataset.src), load("content/team.txt").catch(() => [])]).then(([entries, team]) => {
+    const names = team.map((p) => p.name).filter(Boolean);
+    window.__trachNames = names;
+    return Promise.all(entries.filter((e) => e.doi || e.title).map((e) =>
+      (e.doi ? meta(e.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, "")) : Promise.resolve({ doi: "", title: "", authors: [], journal: "", year: 0, month: 0 }))
+        .then((m) => merge(e, m))));
+  }).then((list) => {
     // drop duplicates
     const seen = new Set();
-    list = list.filter((p) => !seen.has(p.doi.toLowerCase()) && seen.add(p.doi.toLowerCase()));
+    list = list.filter((p) => { const k = (p.doi || p.title).toLowerCase(); return !seen.has(k) && seen.add(k); });
     list.sort((a, b) => (b.year - a.year) || (b.month - a.month));
     const groups = new Map();
     list.forEach((p) => {
@@ -67,15 +87,19 @@
     groups.forEach((items, y) => {
       html += `<div class="pub-group"><h2 class="pub-year">${y}</h2>`;
       items.forEach((p) => {
-        const topics = p.title ? topicsOf(p.title) : ["anatomy"];
-        const authors = esc(p.authors.join(", "))
-          .replace(/(Marco Catani|Giovanna Bubbico|Salvatore Citro)/g, "<strong>$1</strong>");
+        const topics = p.topics && p.topics.length ? p.topics : (p.title ? topicsOf(p.title) : ["anatomy"]);
+        let authors = esc(p.authors.join(", "));
+        (window.__trachNames || []).forEach((n) => { authors = authors.split(esc(n)).join(`<strong>${esc(n)}</strong>`); });
         const ref = [p.journal && `<em>${esc(p.journal)}</em>`, p.vol, p.page].filter(Boolean).join(", ");
-        html += `<article class="pub" data-topic="${topics.join(" ")}">
+        const url = esc(p.url);
+        const title = p.title ? md(p.title) : esc("doi.org/" + p.doi);
+        html += `<article class="pub${p.photo ? " has-photo" : ""}" data-topic="${topics.join(" ")}">
+          ${p.photo ? `<img class="pub-photo" src="${esc(photoUrl(p.photo))}" alt="" loading="lazy">` : ""}
           <div>
-            <h3><a href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener">${esc(p.title || "doi.org/" + p.doi)}</a></h3>
+            <h3>${url ? `<a href="${url}" target="_blank" rel="noopener">${title}</a>` : title}</h3>
             ${authors ? `<p class="authors">${authors}</p>` : ""}
-            ${p.title ? `<p class="journal">${ref ? ref + " · " : ""}<a href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener">doi:${esc(p.doi)}</a></p>` : ""}
+            ${(p.title && (ref || p.doi)) ? `<p class="journal">${ref}${ref && p.doi ? " · " : ""}${p.doi ? `<a href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener">doi:${esc(p.doi)}</a>` : ""}</p>` : ""}
+            ${p.text ? `<p class="pub-text">${md(p.text)}</p>` : ""}
           </div>
           <span class="tag">${p.title ? topics.map((t) => LABEL[t]).join(" · ") : ""}</span>
         </article>`;

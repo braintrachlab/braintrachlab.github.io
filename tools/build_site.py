@@ -24,6 +24,7 @@ def read_texts():
             k, v = line.split(":", 1)
             k = k.strip()
             if re.fullmatch(r"[a-z0-9_.]+", k):
+                k = re.sub(r"\.image$", ".photo", k)   # old name of the image keys
                 vals[k] = v.strip()
     return vals
 
@@ -177,7 +178,7 @@ home = f'''
           {T("p", "home.who.p2", "Alongside this work, the lab cultivates a strong interest in the history of neuroscience, tracing how our knowledge of the brain's connections has taken shape over the centuries.", "reveal d2")}
           <a class="link-arrow reveal d3" href="about.html" data-text="home.who.link">{md(val("home.who.link", "Learn more about the lab"))}</a>
         </div>
-        {IMG("home.who.image", "Lab image", "figure reveal d2")}
+        {IMG("home.who.photo", "Lab image", "figure reveal d2")}
       </div>
     </section>
 
@@ -269,7 +270,7 @@ def rblock(n, key, title, p1, p2, image_label, soft, image_left, figure=None):
           {T("p", key + ".p1", p1, "reveal d2")}
           {T("p", key + ".p2", p2, "reveal d2")}
         </div>'''
-    fig = figure or "        " + IMG(key + ".image", image_label, "figure reveal" + ("" if image_left else " d1"))
+    fig = figure or "        " + IMG(key + ".photo", image_label, "figure reveal" + ("" if image_left else " d1"))
     inner = (fig + "\n" + text) if image_left else (text + "\n" + fig)
     return f'''    <section{' class="soft"' if soft else ''}>
       <div class="container grid-2" style="align-items:center">
@@ -370,7 +371,7 @@ contacts = f'''
             {T("p", "contacts.join.text", "We are always interested in hearing from motivated students and researchers. Send us a short presentation and your CV.")}
           </div>
         </div>
-        {IMG("contacts.image", "Map or building image", "figure reveal d1", "aspect-ratio:1/1", parallax=False)}
+        {IMG("contacts.photo", "Map or building image", "figure reveal d1", "aspect-ratio:1/1", parallax=False)}
       </div>
     </section>
 '''
@@ -391,18 +392,23 @@ page("404.html", "notfound.page_title", "Page not found — TrachLab", "notfound
 
 # ================================================================= write texts.txt
 HEADER = """# ======================================================================
-#  TEXTS OF THE WEBSITE
+#  HOW TO WRITE IN THIS FILE  (the same rules apply to every file in /content)
 #
-#  Each line is   key: text
-#  - Change only the part after the colon; never change the key.
-#  - Write each text on a single line.
-#  - *word*  -> italic        **word** -> bold
-#  - [label](https://...)  -> link
-#  - " | " (space, bar, space) -> new line
-#  - Leave a text empty to hide it.
-#  - image keys (ending in .image): file name of a picture uploaded to
-#    assets/img/  (e.g.  home.who.image: lab-photo.jpg)
-#  Lines starting with # are comments.
+#  - One field per line:            key: value
+#  - An empty line separates two entries.
+#  - Lines starting with # are comments and are ignored.
+#  - Text formatting, usable in any text:
+#        *italic*     **bold**     [label](https://...)     " | " = new line
+#  - photo:  file name of a picture uploaded to the folder assets/img/
+#            (e.g.  photo: seminar-2026.jpg)
+#  - link:   a web address; it makes the title clickable
+#  - text:   a paragraph of description
+#  - Leave a field empty, or delete the line, if you do not need it.
+# ======================================================================
+#
+#  TEXTS OF THE PAGES — one line per text, grouped by page.
+#  Change only the part after the colon; never change the key on the left.
+#  An empty text hides that element; keys ending in .photo take a picture.
 # ======================================================================
 """
 keys = list(REG.keys())

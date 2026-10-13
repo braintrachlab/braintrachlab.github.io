@@ -1,13 +1,21 @@
 # ======================================================================
-#  TEXTS OF THE WEBSITE
+#  HOW TO WRITE IN THIS FILE  (the same rules apply to every file in /content)
 #
-#  Each line is   key: text
-#  - *word*  -> italic        **word** -> bold
-#  - [label](https://...)  -> link
-#  - " | " (space, bar, space) -> new line
-#  - Leave a text empty to hide it.
-#  - image keys (ending in .image): file name of a picture uploaded to
-#    assets/img/  (e.g.  home.who.image: lab-photo.jpg)
+#  - One field per line:            key: value
+#  - An empty line separates two entries.
+#  - Lines starting with # are comments and are ignored.
+#  - Text formatting, usable in any text:
+#        *italic*     **bold**     [label](https://...)     " | " = new line
+#  - photo:  file name of a picture uploaded to the folder assets/img/
+#            (e.g.  photo: seminar-2026.jpg)
+#  - link:   a web address; it makes the title clickable
+#  - text:   a paragraph of description
+#  - Leave a field empty, or delete the line, if you do not need it.
+# ======================================================================
+#
+#  TEXTS OF THE PAGES — one line per text, grouped by page.
+#  Change only the part after the colon; never change the key on the left.
+#  An empty text hides that element; keys ending in .photo take a picture.
 # ======================================================================
 
 # ---------------- GENERAL — menu and footer (shown on every page)
@@ -30,7 +38,7 @@ home.who.title: Anatomy as the foundation of brain function
 home.who.p1: TrachLab is a research group devoted to the description of the white matter connections of the human brain. By combining detailed anatomical study with the analysis of their functional role, we aim to understand how the networks support brain functions, in healthy individuals and in people with neurological conditions.
 home.who.p2: Alongside this work, the lab cultivates a strong interest in the history of neuroscience, tracing how our knowledge of the brain's connections has taken shape over the centuries.
 home.who.link: Learn more about the lab
-home.who.image: 
+home.who.photo: 
 home.areas.eyebrow: Research areas
 home.areas.title: What we study
 home.area1.title: White matter anatomy
@@ -68,15 +76,15 @@ research.intro: From the detailed anatomy of single pathways and their evolution
 research.anatomy.title: White matter anatomy
 research.anatomy.p1: We describe the course, organisation and cortical terminations of the white matter tracts of the human brain, building an accurate anatomical map of its association, projection and commissural connections.
 research.anatomy.p2: 
-research.anatomy.image: 
+research.anatomy.photo: 
 research.comparative.title: Comparative neuroanatomy
 research.comparative.p1: By comparing the white matter of the human brain with that of non-human primates, we study how connections have changed during evolution and how these changes relate to abilities such as language and vocal communication.
 research.comparative.p2: 
-research.comparative.image: 
+research.comparative.photo: 
 research.clinical.title: Connections in health and disease
 research.clinical.p1: By studying the functions of white matter pathways, we investigate how their damage or alteration contributes to the clinical picture of patients with neurological and psychiatric conditions.
 research.clinical.p2: 
-research.clinical.image: 
+research.clinical.photo: 
 research.history.caption: Coronal section from J. Dejerine, *Anatomie des centres nerveux* (1895–1901), drawing by H. Gillet, with the fibres of the white matter redrawn as streamlines.
 research.history.title: History of neuroscience
 research.history.p1: The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain's connections.
@@ -106,7 +114,7 @@ contacts.address:
 contacts.address.title: Address
 contacts.join.title: Join the lab
 contacts.join.text: We are always interested in hearing from motivated students and researchers. Send us a short presentation and your CV.
-contacts.image: 
+contacts.photo: 
 contacts.page_title: Contacts — TrachLab
 contacts.page_description: How to contact TrachLab.
 notfound.page_title: Page not found — TrachLab

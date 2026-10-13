@@ -1,14 +1,27 @@
-# ============================================================
-#  COLLABORATIONS — one block per partner, separated by an empty line.
+# ======================================================================
+#  HOW TO WRITE IN THIS FILE  (the same rules apply to every file in /content)
 #
-#  institution: name of the institution        (required)
-#  unit:        lab, centre or department       (optional)
-#  people:      contact person(s)               (optional)
-#  link:        https://...                     (optional)
+#  - One field per line:            key: value
+#  - An empty line separates two entries.
+#  - Lines starting with # are comments and are ignored.
+#  - Text formatting, usable in any text:
+#        *italic*     **bold**     [label](https://...)     " | " = new line
+#  - photo:  file name of a picture uploaded to the folder assets/img/
+#            (e.g.  photo: seminar-2026.jpg)
+#  - link:   a web address; it makes the title clickable
+#  - text:   a paragraph of description
+#  - Leave a field empty, or delete the line, if you do not need it.
+# ======================================================================
 #
-#  The order here is the order on the website.
-#  Lines starting with # are ignored.
-# ============================================================
+#  COLLABORATIONS — one entry per partner. The order here is the order on the website.
+#
+#  institution:  name of the institution               (required)
+#  unit:         lab, centre or department             (optional)
+#  people:       contact person(s)                     (optional)
+#  text:         short description                     (optional)
+#  photo:        logo                                  (optional)
+#  link:         website, makes the name clickable     (optional)
+# ======================================================================
 
 institution: IRCCS Neuromed
 
@@ -27,3 +40,10 @@ people: Emily Rogalski
 institution: University of Texas
 unit: Michale E. Keeling Center for Comparative Medicine and Research
 people: William Hopkins
+
+# Example (remove the # signs to use it):
+# institution: University of Somewhere
+# unit: Department of Neuroscience
+# people: Jane Doe
+# photo: somewhere-logo.png
+# link: https://example.org
