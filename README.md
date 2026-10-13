@@ -28,7 +28,14 @@ Edit the DOI list in the generator; titles, authors and journals are loaded from
 
 ## Editing content without touching code
 Edit these text files directly on GitHub (open the file → pencil icon → "Commit changes"):
+- `content/texts.txt` — every text on the pages (titles, paragraphs, buttons, menu, contacts, image file names)
 - `content/team.txt` — team members (photos go in `assets/img/team/`)
+- `content/collaborations.txt` — partner institutions
 - `content/publications.txt` — one DOI per line
 - `content/news.txt` — news and events
+Other pictures go in `assets/img/` and are referenced by file name in `texts.txt`.
 The site updates by itself about a minute after each commit.
+
+## For developers
+`tools/build_site.py` regenerates the HTML pages from its templates and keeps the values already in `content/texts.txt`.
+Run `python3 tools/build_site.py` from the repository root after changing the layout.

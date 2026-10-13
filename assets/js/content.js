@@ -28,6 +28,57 @@
   };
   const { load } = window.TrachContent;
 
+  // ---------- Page texts (content/texts.txt) ----------
+  const md = (t) => esc(t)
+    .replace(/\[([^\]]+)\]\(((?:https?:|mailto:)[^)\s]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .split(" | ").join("<br>");
+  const done = () => document.documentElement.classList.remove("texts-loading");
+  fetch("content/texts.txt", { cache: "no-cache" }).then((r) => r.text()).then((txt) => {
+    const T = {};
+    txt.split(/\r?\n/).forEach((line) => {
+      if (/^\s*#/.test(line)) return;
+      const m = line.match(/^\s*([a-z0-9_.]+)\s*:\s?(.*)$/);
+      if (m) T[m[1]] = m[2].trim();
+    });
+    document.querySelectorAll("[data-text]").forEach((el) => {
+      const k = el.dataset.text;
+      if (!(k in T)) return;
+      el.innerHTML = md(T[k]);
+      el.hidden = !T[k];
+    });
+    document.querySelectorAll("[data-image]").forEach((el) => {
+      const k = el.dataset.image;
+      if (!(k in T)) return;
+      const box = el.querySelector(".parallax-inner") || el;
+      box.innerHTML = T[k]
+        ? `<img src="assets/img/${esc(T[k])}" alt="">`
+        : `<span class="img-empty">${esc(el.dataset.label || "")}</span>`;
+    });
+    document.querySelectorAll(".contact-block").forEach((b) => {
+      const ps = [...b.querySelectorAll("p[data-text]")];
+      if (ps.length) b.hidden = ps.every((p) => p.hidden);
+    });
+    const pg = document.body.dataset.page;
+    if (pg && T[pg + ".page_title"]) document.title = T[pg + ".page_title"];
+  }).catch(() => {}).finally(done);
+
+  // ---------- Collaborations ----------
+  const collab = document.getElementById("collab-list");
+  if (collab) {
+    load("content/collaborations.txt").then((list) => {
+      collab.innerHTML = list.filter((c) => c.institution).map((c) => {
+        const name = safeUrl(c.link) ? `<a href="${esc(safeUrl(c.link))}" target="_blank" rel="noopener">${esc(c.institution)}</a>` : esc(c.institution);
+        return `<li class="collab">
+            <h3>${name}</h3>
+            ${c.unit ? `<p>${esc(c.unit)}</p>` : ""}
+            ${c.people ? `<p class="who">${esc(c.people)}</p>` : ""}
+          </li>`;
+      }).join("");
+    });
+  }
+
   // ---------- Team ----------
   const team = document.getElementById("team-list");
   if (team) {

@@ -1,0 +1,29 @@
+# ============================================================
+#  COLLABORATIONS — one block per partner, separated by an empty line.
+#
+#  institution: name of the institution        (required)
+#  unit:        lab, centre or department       (optional)
+#  people:      contact person(s)               (optional)
+#  link:        https://...                     (optional)
+#
+#  The order here is the order on the website.
+#  Lines starting with # are ignored.
+# ============================================================
+
+institution: IRCCS Neuromed
+
+institution: King's College London
+unit: Neuroimaging & Biophysics Lab (NBL)
+people: Flavio Dell'Acqua
+
+institution: Northwestern University, Chicago
+unit: Mesulam Institute for Cognitive Neurology & Alzheimer's Disease
+people: Marsel Mesulam
+
+institution: University of Chicago
+unit: Healthy Aging & Alzheimer's Research Care (HAARC) Center
+people: Emily Rogalski
+
+institution: University of Texas
+unit: Michale E. Keeling Center for Comparative Medicine and Research
+people: William Hopkins

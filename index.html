@@ -10,8 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
+  <script>document.documentElement.classList.add("texts-loading");setTimeout(function(){document.documentElement.classList.remove("texts-loading")},1500);</script>
 </head>
-<body>
+<body data-page="home">
   <header class="site-header">
     <div class="container nav">
       <a class="brand" href="index.html">Trach<span>Lab</span></a>
@@ -20,12 +21,12 @@
       </button>
       <nav>
         <ul class="nav-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About us</a></li>
-          <li><a href="research.html">Research</a></li>
-          <li><a href="publications.html">Publications</a></li>
-          <li><a href="news.html">News &amp; Events</a></li>
-          <li><a href="contacts.html">Contacts</a></li>
+          <li><a href="index.html" data-text="nav.home">Home</a></li>
+          <li><a href="about.html" data-text="nav.about">About us</a></li>
+          <li><a href="research.html" data-text="nav.research">Research</a></li>
+          <li><a href="publications.html" data-text="nav.publications">Publications</a></li>
+          <li><a href="news.html" data-text="nav.news">News &amp; Events</a></li>
+          <li><a href="contacts.html" data-text="nav.contacts">Contacts</a></li>
         </ul>
       </nav>
     </div>
@@ -36,12 +37,12 @@
     <section class="hero">
       <div class="container">
         <div class="hero-content">
-          <span class="eyebrow reveal">Neuroanatomy lab</span>
-          <h1 class="reveal d1">Mapping the <em>connections</em> of the human brain</h1>
-          <p class="lead reveal d2">We study the white matter pathways that link brain regions: their anatomy in the human brain and, through comparative studies, in non-human primates; their functions; and how they change in health and disease.</p>
+          <span class="eyebrow reveal" data-text="home.eyebrow">Neuroanatomy lab</span>
+          <h1 class="reveal d1" data-text="home.title">Mapping the <em>connections</em> of the human brain</h1>
+          <p class="lead reveal d2" data-text="home.lead">We study the white matter pathways that link brain regions: their anatomy in the human brain and, through comparative studies, in non-human primates; their functions; and how they change in health and disease.</p>
           <div class="reveal d3">
-            <a class="btn" href="research.html">Our research</a>
-            <a class="btn ghost" href="about.html">About us</a>
+            <a class="btn" href="research.html" data-text="home.button1">Our research</a>
+            <a class="btn ghost" href="about.html" data-text="home.button2">About us</a>
           </div>
         </div>
       </div>
@@ -52,73 +53,71 @@
     <section class="soft">
       <div class="container grid-2" style="align-items:center">
         <div>
-          <span class="eyebrow reveal">Who we are</span>
-          <h2 class="reveal d1">Anatomy as the foundation of brain function</h2>
+          <span class="eyebrow reveal" data-text="home.who.eyebrow">Who we are</span>
+          <h2 class="reveal d1" data-text="home.who.title">Anatomy as the foundation of brain function</h2>
           <hr class="divider reveal d1">
-          <p class="reveal d2">TrachLab is a research group devoted to the description of the white matter connections of the human brain. By combining detailed anatomical study with the analysis of their functional role, we aim to understand how the networks support brain functions, in healthy individuals and in people with neurological conditions.</p>
-          <p class="reveal d2">Alongside this work, the lab cultivates a strong interest in the history of neuroscience, tracing how our knowledge of the brain's connections has taken shape over the centuries.</p>
-          <a class="link-arrow reveal d3" href="about.html">Learn more about the lab</a>
+          <p class="reveal d2" data-text="home.who.p1">TrachLab is a research group devoted to the description of the white matter connections of the human brain. By combining detailed anatomical study with the analysis of their functional role, we aim to understand how the networks support brain functions, in healthy individuals and in people with neurological conditions.</p>
+          <p class="reveal d2" data-text="home.who.p2">Alongside this work, the lab cultivates a strong interest in the history of neuroscience, tracing how our knowledge of the brain&#x27;s connections has taken shape over the centuries.</p>
+          <a class="link-arrow reveal d3" href="about.html" data-text="home.who.link">Learn more about the lab</a>
         </div>
-        <div class="figure parallax reveal d2">
-          <div data-speed="0.08" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"><span class="placeholder">[Lab image]</span></div>
-        </div>
+        <div class="figure reveal d2 parallax" data-image="home.who.image" data-label="Lab image"><div data-speed="0.08" class="parallax-inner"><span class="img-empty">Lab image</span></div></div>
       </div>
     </section>
 
     <section>
       <div class="container">
         <div class="section-head">
-          <span class="eyebrow reveal">Research areas</span>
-          <h2 class="reveal d1">What we study</h2>
+          <span class="eyebrow reveal" data-text="home.areas.eyebrow">Research areas</span>
+          <h2 class="reveal d1" data-text="home.areas.title">What we study</h2>
         </div>
         <div class="grid-4">
           <div class="card reveal">
             <span class="num">i.</span>
-            <h3>White matter anatomy</h3>
-            <p>Detailed description of the course, organisation and terminations of the brain's association, projection and commissural pathways.</p>
+            <h3 data-text="home.area1.title">White matter anatomy</h3>
+            <p data-text="home.area1.text">Detailed description of the course, organisation and terminations of the brain&#x27;s association, projection and commissural pathways.</p>
           </div>
           <div class="card reveal d1">
             <span class="num">ii.</span>
-            <h3>Comparative neuroanatomy</h3>
-            <p>Comparing white matter pathways in humans and non-human primates to understand how brain connections evolved and what is distinctive about the human brain.</p>
+            <h3 data-text="home.area2.title">Comparative neuroanatomy</h3>
+            <p data-text="home.area2.text">Comparing white matter pathways in humans and non-human primates to understand how brain connections evolved and what is distinctive about the human brain.</p>
           </div>
           <div class="card reveal d2">
             <span class="num">iii.</span>
-            <h3>Connections &amp; disease</h3>
-            <p>How the disruption of white matter pathways relates to clinical symptoms in patients with neurological and psychiatric conditions.</p>
+            <h3 data-text="home.area3.title">Connections &amp; disease</h3>
+            <p data-text="home.area3.text">How the disruption of white matter pathways relates to clinical symptoms in patients with neurological and psychiatric conditions.</p>
           </div>
           <div class="card reveal d3">
             <span class="num">iv.</span>
-            <h3>History of neuroscience</h3>
-            <p>The figures, ideas and discoveries that shaped our understanding of brain anatomy and connectivity, from early anatomists to the present.</p>
+            <h3 data-text="home.area4.title">History of neuroscience</h3>
+            <p data-text="home.area4.text">The figures, ideas and discoveries that shaped our understanding of brain anatomy and connectivity, from early anatomists to the present.</p>
           </div>
         </div>
-        <p class="reveal" style="margin-top:48px"><a class="link-arrow" href="research.html">Explore our research</a></p>
+        <p class="reveal" style="margin-top:48px"><a class="link-arrow" href="research.html" data-text="home.areas.link">Explore our research</a></p>
       </div>
     </section>
 
     <section class="soft">
       <div class="container">
-        <p class="quote reveal">Every function of the brain depends on the pathways that carry information from one region to another.</p>
+        <p class="quote reveal" data-text="home.quote">Every function of the brain depends on the pathways that carry information from one region to another.</p>
       </div>
     </section>
 
     <section>
       <div class="container">
         <div class="section-head">
-          <span class="eyebrow reveal">Latest</span>
-          <h2 class="reveal d1">News &amp; Events</h2>
+          <span class="eyebrow reveal" data-text="home.news.eyebrow">Latest</span>
+          <h2 class="reveal d1" data-text="home.news.title">News &amp; Events</h2>
         </div>
         <div class="grid-3" id="news-latest"></div>
-        <p class="reveal" style="margin-top:48px"><a class="link-arrow" href="news.html">All news &amp; events</a></p>
+        <p class="reveal" style="margin-top:48px"><a class="link-arrow" href="news.html" data-text="home.news.link">All news &amp; events</a></p>
       </div>
     </section>
 
     <section class="soft">
       <div class="container narrow" style="text-align:center">
-        <h2 class="reveal">Interested in working with us?</h2>
-        <p class="reveal d1">We welcome collaborations and enquiries from students and researchers.</p>
-        <a class="btn reveal d2" href="contacts.html">Get in touch</a>
+        <h2 class="reveal" data-text="home.join.title">Interested in working with us?</h2>
+        <p class="reveal d1" data-text="home.join.text">We welcome collaborations and enquiries from students and researchers.</p>
+        <a class="btn reveal d2" href="contacts.html" data-text="home.join.button">Get in touch</a>
       </div>
     </section>
 
@@ -128,7 +127,7 @@
     <div class="container footer-grid">
       <div>
         <a class="brand" href="index.html">Trach<span>Lab</span></a>
-        <p>White matter neuroanatomy &amp; history of neuroscience</p>
+        <p data-text="footer.tagline">White matter neuroanatomy &amp; history of neuroscience</p>
         <p>&copy; <span id="year"></span> TrachLab</p>
       </div>
       <nav>

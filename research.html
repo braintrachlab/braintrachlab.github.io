@@ -10,8 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
+  <script>document.documentElement.classList.add("texts-loading");setTimeout(function(){document.documentElement.classList.remove("texts-loading")},1500);</script>
 </head>
-<body>
+<body data-page="research">
   <header class="site-header">
     <div class="container nav">
       <a class="brand" href="index.html">Trach<span>Lab</span></a>
@@ -20,12 +21,12 @@
       </button>
       <nav>
         <ul class="nav-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About us</a></li>
-          <li><a href="research.html">Research</a></li>
-          <li><a href="publications.html">Publications</a></li>
-          <li><a href="news.html">News &amp; Events</a></li>
-          <li><a href="contacts.html">Contacts</a></li>
+          <li><a href="index.html" data-text="nav.home">Home</a></li>
+          <li><a href="about.html" data-text="nav.about">About us</a></li>
+          <li><a href="research.html" data-text="nav.research">Research</a></li>
+          <li><a href="publications.html" data-text="nav.publications">Publications</a></li>
+          <li><a href="news.html" data-text="nav.news">News &amp; Events</a></li>
+          <li><a href="contacts.html" data-text="nav.contacts">Contacts</a></li>
         </ul>
       </nav>
     </div>
@@ -35,23 +36,21 @@
 
     <header class="page-header">
       <div class="container">
-        <span class="eyebrow reveal">Research</span>
-        <h1 class="reveal d1">Our research</h1>
-        <p class="reveal d2">From the detailed anatomy of single pathways and their evolution across primates, to their role in disease and the history of how they were discovered.</p>
+        <span class="eyebrow reveal" data-text="research.eyebrow">Research</span>
+        <h1 class="reveal d1" data-text="research.title">Our research</h1>
+        <p class="reveal d2" data-text="research.intro">From the detailed anatomy of single pathways and their evolution across primates, to their role in disease and the history of how they were discovered.</p>
       </div>
     </header>
 
     <section>
       <div class="container grid-2" style="align-items:center">
-        <div class="figure parallax reveal">
-          <div data-speed="0.08" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"><span class="placeholder">[Image]</span></div>
-        </div>
+        <div class="figure reveal parallax" data-image="research.anatomy.image" data-label="Image"><div data-speed="0.08" class="parallax-inner"><span class="img-empty">Image</span></div></div>
         <div>
           <span class="eyebrow reveal">01</span>
-          <h2 class="reveal d1">White matter anatomy</h2>
+          <h2 class="reveal d1" data-text="research.anatomy.title">White matter anatomy</h2>
           <hr class="divider reveal d1">
-          <p class="reveal d2">We describe the course, organisation and cortical terminations of the white matter tracts of the human brain, building an accurate anatomical map of its association, projection and commissural connections.</p>
-          <p class="reveal d2"><span class="placeholder">[Add details on specific tracts or projects.]</span></p>
+          <p class="reveal d2" data-text="research.anatomy.p1">We describe the course, organisation and cortical terminations of the white matter tracts of the human brain, building an accurate anatomical map of its association, projection and commissural connections.</p>
+          <p class="reveal d2" data-text="research.anatomy.p2" hidden></p>
         </div>
       </div>
     </section>
@@ -60,28 +59,24 @@
       <div class="container grid-2" style="align-items:center">
         <div>
           <span class="eyebrow reveal">02</span>
-          <h2 class="reveal d1">Comparative neuroanatomy</h2>
+          <h2 class="reveal d1" data-text="research.comparative.title">Comparative neuroanatomy</h2>
           <hr class="divider reveal d1">
-          <p class="reveal d2">By comparing the white matter of the human brain with that of non-human primates, we study how connections have changed during evolution and how these changes relate to abilities such as language and vocal communication.</p>
-          <p class="reveal d2"><span class="placeholder">[Add details on species, datasets or projects.]</span></p>
+          <p class="reveal d2" data-text="research.comparative.p1">By comparing the white matter of the human brain with that of non-human primates, we study how connections have changed during evolution and how these changes relate to abilities such as language and vocal communication.</p>
+          <p class="reveal d2" data-text="research.comparative.p2" hidden></p>
         </div>
-        <div class="figure parallax reveal d1">
-          <div data-speed="0.08" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"><span class="placeholder">[Image]</span></div>
-        </div>
+        <div class="figure reveal d1 parallax" data-image="research.comparative.image" data-label="Image"><div data-speed="0.08" class="parallax-inner"><span class="img-empty">Image</span></div></div>
       </div>
     </section>
 
     <section>
       <div class="container grid-2" style="align-items:center">
-        <div class="figure parallax reveal">
-          <div data-speed="0.08" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"><span class="placeholder">[Image]</span></div>
-        </div>
+        <div class="figure reveal parallax" data-image="research.clinical.image" data-label="Image"><div data-speed="0.08" class="parallax-inner"><span class="img-empty">Image</span></div></div>
         <div>
           <span class="eyebrow reveal">03</span>
-          <h2 class="reveal d1">Connections in health and disease</h2>
+          <h2 class="reveal d1" data-text="research.clinical.title">Connections in health and disease</h2>
           <hr class="divider reveal d1">
-          <p class="reveal d2">By studying the functions of white matter pathways, we investigate how their damage or alteration contributes to the clinical picture of patients with neurological and psychiatric conditions.</p>
-          <p class="reveal d2"><span class="placeholder">[Add details on clinical populations or projects.]</span></p>
+          <p class="reveal d2" data-text="research.clinical.p1">By studying the functions of white matter pathways, we investigate how their damage or alteration contributes to the clinical picture of patients with neurological and psychiatric conditions.</p>
+          <p class="reveal d2" data-text="research.clinical.p2" hidden></p>
         </div>
       </div>
     </section>
@@ -90,14 +85,14 @@
       <div class="container grid-2" style="align-items:center">
         <div>
           <span class="eyebrow reveal">04</span>
-          <h2 class="reveal d1">History of neuroscience</h2>
+          <h2 class="reveal d1" data-text="research.history.title">History of neuroscience</h2>
           <hr class="divider reveal d1">
-          <p class="reveal d2">The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain's connections.</p>
-          <p class="reveal d2"><span class="placeholder">[Add details on historical projects, archives or collections.]</span></p>
+          <p class="reveal d2" data-text="research.history.p1">The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain&#x27;s connections.</p>
+          <p class="reveal d2" data-text="research.history.p2" hidden></p>
         </div>
         <figure class="reveal d1" style="margin:0">
           <div class="plate-figure" data-brain="assets/img/dejerine-lines.svg" role="img" aria-label="Coronal section of the human brain from Dejerine's atlas, with the white matter fibres redrawn as streamlines"></div>
-          <figcaption class="plate-caption">Coronal section from J. Dejerine, <em>Anatomie des centres nerveux</em> (1895–1901), drawing by H. Gillet, with the fibres of the white matter redrawn as streamlines.</figcaption>
+          <figcaption class="plate-caption" data-text="research.history.caption">Coronal section from J. Dejerine, <em>Anatomie des centres nerveux</em> (1895–1901), drawing by H. Gillet, with the fibres of the white matter redrawn as streamlines.</figcaption>
         </figure>
       </div>
     </section>
@@ -108,7 +103,7 @@
     <div class="container footer-grid">
       <div>
         <a class="brand" href="index.html">Trach<span>Lab</span></a>
-        <p>White matter neuroanatomy &amp; history of neuroscience</p>
+        <p data-text="footer.tagline">White matter neuroanatomy &amp; history of neuroscience</p>
         <p>&copy; <span id="year"></span> TrachLab</p>
       </div>
       <nav>
@@ -125,5 +120,6 @@
   </footer>
 
   <script src="assets/js/main.js"></script>
+  <script src="assets/js/content.js"></script>
 </body>
 </html>

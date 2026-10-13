@@ -1,0 +1,116 @@
+# ======================================================================
+#  TEXTS OF THE WEBSITE
+#
+#  Each line is   key: text
+#  - Change only the part after the colon; never change the key.
+#  - Write each text on a single line.
+#  - *word*  -> italic        **word** -> bold
+#  - [label](https://...)  -> link
+#  - " | " (space, bar, space) -> new line
+#  - Leave a text empty to hide it.
+#  - image keys (ending in .image): file name of a picture uploaded to
+#    assets/img/  (e.g.  home.who.image: lab-photo.jpg)
+#  Lines starting with # are comments.
+# ======================================================================
+
+# ---------------- GENERAL — menu and footer (shown on every page)
+nav.home: Home
+nav.about: About us
+nav.research: Research
+nav.publications: Publications
+nav.news: News & Events
+nav.contacts: Contacts
+footer.tagline: White matter neuroanatomy & history of neuroscience
+
+# ---------------- HOME PAGE
+home.eyebrow: Neuroanatomy lab
+home.title: Mapping the *connections* of the human brain
+home.lead: We study the white matter pathways that link brain regions: their anatomy in the human brain and, through comparative studies, in non-human primates; their functions; and how they change in health and disease.
+home.button1: Our research
+home.button2: About us
+home.who.eyebrow: Who we are
+home.who.title: Anatomy as the foundation of brain function
+home.who.p1: TrachLab is a research group devoted to the description of the white matter connections of the human brain. By combining detailed anatomical study with the analysis of their functional role, we aim to understand how the networks support brain functions, in healthy individuals and in people with neurological conditions.
+home.who.p2: Alongside this work, the lab cultivates a strong interest in the history of neuroscience, tracing how our knowledge of the brain's connections has taken shape over the centuries.
+home.who.link: Learn more about the lab
+home.who.image: 
+home.areas.eyebrow: Research areas
+home.areas.title: What we study
+home.area1.title: White matter anatomy
+home.area1.text: Detailed description of the course, organisation and terminations of the brain's association, projection and commissural pathways.
+home.area2.title: Comparative neuroanatomy
+home.area2.text: Comparing white matter pathways in humans and non-human primates to understand how brain connections evolved and what is distinctive about the human brain.
+home.area3.title: Connections & disease
+home.area3.text: How the disruption of white matter pathways relates to clinical symptoms in patients with neurological and psychiatric conditions.
+home.area4.title: History of neuroscience
+home.area4.text: The figures, ideas and discoveries that shaped our understanding of brain anatomy and connectivity, from early anatomists to the present.
+home.areas.link: Explore our research
+home.quote: Every function of the brain depends on the pathways that carry information from one region to another.
+home.news.eyebrow: Latest
+home.news.title: News & Events
+home.news.link: All news & events
+home.join.title: Interested in working with us?
+home.join.text: We welcome collaborations and enquiries from students and researchers.
+home.join.button: Get in touch
+home.page_title: TrachLab — White Matter Neuroanatomy
+home.page_description: TrachLab studies the white matter connections of the human brain, their functions in health and disease, and the history of neuroscience.
+
+# ---------------- ABOUT US PAGE (team members are in content/team.txt, collaborations in content/collaborations.txt)
+about.eyebrow: People
+about.title: Our team
+about.intro: 
+about.network.eyebrow: Network
+about.network.title: Collaborations
+about.page_title: About us — TrachLab
+about.page_description: Team and collaborations of TrachLab.
+
+# ---------------- RESEARCH PAGE (an empty value hides the paragraph; images: file name in assets/img/)
+research.eyebrow: Research
+research.title: Our research
+research.intro: From the detailed anatomy of single pathways and their evolution across primates, to their role in disease and the history of how they were discovered.
+research.anatomy.title: White matter anatomy
+research.anatomy.p1: We describe the course, organisation and cortical terminations of the white matter tracts of the human brain, building an accurate anatomical map of its association, projection and commissural connections.
+research.anatomy.p2: 
+research.anatomy.image: 
+research.comparative.title: Comparative neuroanatomy
+research.comparative.p1: By comparing the white matter of the human brain with that of non-human primates, we study how connections have changed during evolution and how these changes relate to abilities such as language and vocal communication.
+research.comparative.p2: 
+research.comparative.image: 
+research.clinical.title: Connections in health and disease
+research.clinical.p1: By studying the functions of white matter pathways, we investigate how their damage or alteration contributes to the clinical picture of patients with neurological and psychiatric conditions.
+research.clinical.p2: 
+research.clinical.image: 
+research.history.caption: Coronal section from J. Dejerine, *Anatomie des centres nerveux* (1895–1901), drawing by H. Gillet, with the fibres of the white matter redrawn as streamlines.
+research.history.title: History of neuroscience
+research.history.p1: The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain's connections.
+research.history.p2: 
+research.page_title: Research — TrachLab
+research.page_description: Research areas of TrachLab: white matter anatomy, comparative neuroanatomy, connections in disease, history of neuroscience.
+
+# ---------------- PUBLICATIONS PAGE (the list of DOIs is in content/publications.txt)
+publications.title: Publications
+publications.intro: Selected articles from the lab.
+publications.page_title: Publications — TrachLab
+publications.page_description: Publications of TrachLab.
+
+# ---------------- NEWS & EVENTS PAGE (the items are in content/news.txt)
+news.title: News & Events
+news.intro: Seminars, conferences, new publications and life in the lab.
+news.page_title: News & Events — TrachLab
+news.page_description: News and events from TrachLab.
+
+# ---------------- CONTACTS PAGE (in the address, ' | ' starts a new line)
+contacts.eyebrow: Contacts
+contacts.title: Get in touch
+contacts.intro: For collaborations, student enquiries or information about our research.
+contacts.email: 
+contacts.email.title: Email
+contacts.address: 
+contacts.address.title: Address
+contacts.join.title: Join the lab
+contacts.join.text: We are always interested in hearing from motivated students and researchers. Send us a short presentation and your CV.
+contacts.image: 
+contacts.page_title: Contacts — TrachLab
+contacts.page_description: How to contact TrachLab.
+notfound.page_title: Page not found — TrachLab
+notfound.page_description: Page not found.
