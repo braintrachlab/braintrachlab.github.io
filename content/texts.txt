@@ -2,15 +2,12 @@
 #  TEXTS OF THE WEBSITE
 #
 #  Each line is   key: text
-#  - Change only the part after the colon; never change the key.
-#  - Write each text on a single line.
 #  - *word*  -> italic        **word** -> bold
 #  - [label](https://...)  -> link
 #  - " | " (space, bar, space) -> new line
 #  - Leave a text empty to hide it.
 #  - image keys (ending in .image): file name of a picture uploaded to
 #    assets/img/  (e.g.  home.who.image: lab-photo.jpg)
-#  Lines starting with # are comments.
 # ======================================================================
 
 # ---------------- GENERAL — menu and footer (shown on every page)
