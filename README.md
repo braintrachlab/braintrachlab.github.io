@@ -21,3 +21,6 @@ Text highlighted in yellow inside square brackets is placeholder content to repl
 
 ## Publications
 Edit the DOI list in the generator; titles, authors and journals are loaded from Crossref in the visitor's browser.
+
+## History of neuroscience figure
+- `assets/img/dejerine-lines.svg` + `assets/img/dejerine-1895.png` — coronal section from Dejerine's *Anatomie des centres nerveux* (drawing by H. Gillet), with the white matter redrawn as animated streamlines. Shown on the Research page.

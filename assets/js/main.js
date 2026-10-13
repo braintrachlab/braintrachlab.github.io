@@ -31,7 +31,13 @@
         p.style.setProperty("--delay", (p.dataset.delay || 0) + "s");
         p.style.setProperty("--dur", (p.dataset.dur || 2) + "s");
       });
-      box.classList.add("ready");
+      // start drawing when the figure scrolls into view
+      if ("IntersectionObserver" in window) {
+        const io = new IntersectionObserver((es) => {
+          if (es.some((e) => e.isIntersecting)) { box.classList.add("ready"); io.disconnect(); }
+        }, { threshold: 0.25 });
+        io.observe(box);
+      } else box.classList.add("ready");
     });
   });
 
