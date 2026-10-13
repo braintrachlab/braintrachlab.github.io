@@ -1,9 +1,10 @@
 Regenerates the animated Dejerine plate (assets/img/dejerine-lines.svg and dejerine-1895.png):
 
-    python3 tools/dejerine/streamlines.py tools/dejerine/source-plate.png assets/img/dejerine-lines.svg assets/img/dejerine-1895.png
+    python3 tools/dejerine/dejerine_systems.py tools/dejerine/plate-hires.png tools/dejerine/guides.png assets/img
+    python3 tools/build_site.py      # updates the version stamps
 
-The direction of every streamline is read from Gillet's own hatching (structure tensor of the
-engraving). Where the hatching is unreadable, the direction of the white-matter band is used.
-Strokes stop as soon as they would bend more than ~9° per step or ~55° in total, so no fibre
-loops or jumps into another bundle. dejerine.py provides the section mask and removes the
-label leader lines.
+- plate-hires.png: the original engraving (high resolution)
+- guides.png: the same plate with guide lines — red commissural, green association, blue projection
+
+The direction of every streamline is read from Gillet's hatching; the guides only decide the
+colour (fibre system) of each streamline. Fibres far from any guide stay neutral slate.

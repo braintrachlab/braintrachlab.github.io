@@ -1,6 +1,6 @@
 # TrachLab website
 
-Website of TrachLab, published with GitHub Pages at https://trachlab.github.io
+Website of BrainTraCh Lab, published with GitHub Pages at https://braintrachlab.github.io
 
 ## Structure
 - `index.html` — Home
