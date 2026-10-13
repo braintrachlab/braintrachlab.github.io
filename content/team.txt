@@ -1,0 +1,39 @@
+# ============================================================
+#  TEAM — one block per person, separated by an empty line.
+#
+#  name:  full name                          (required)
+#  role:  e.g. Principal Investigator        (required)
+#  photo: file name of a photo uploaded to assets/img/team/
+#         (optional — without a photo the initials are shown)
+#  bio:   short biography, on one line       (optional)
+#  links: optional links, separated by " | ", written as
+#         Label = https://...
+#
+#  The order here is the order on the website.
+#  Lines starting with # are ignored.
+# ============================================================
+
+name: Marco Catani
+role: Principal Investigator
+photo:
+bio:
+links:
+
+name: Giovanna Bubbico
+role: Researcher
+photo:
+bio:
+links:
+
+name: Salvatore Citro
+role: Research Fellow
+photo:
+bio:
+links:
+
+# Example of a complete entry (remove the # to use it):
+# name: Jane Doe
+# role: PhD Student
+# photo: jane-doe.jpg
+# bio: Jane studies the anatomy of the frontal aslant tract in humans and non-human primates.
+# links: ORCID = https://orcid.org/0000-0000-0000-0000 | Google Scholar = https://scholar.google.com/

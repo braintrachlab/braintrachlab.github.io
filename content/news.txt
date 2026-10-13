@@ -1,0 +1,26 @@
+# ============================================================
+#  NEWS & EVENTS — one block per item, separated by an empty line.
+#
+#  date:  YYYY-MM-DD, or YYYY-MM if the day is not needed (required)
+#  type:  News, Event, Seminar, Publication, Award ... (required)
+#  title: headline                           (required)
+#  text:  short description, on one line     (optional)
+#  link:  https://...                        (optional)
+#
+#  Items with a date in the future appear under "Upcoming events".
+#  The three most recent items are also shown on the home page.
+#  Lines starting with # are ignored.
+# ============================================================
+
+date: 2026-06
+type: Publication
+title: Evolution of the frontal aslant tract
+text: Our study on the evolution of the frontal aslant tract and its role in primate vocalization and human speech is out in Nature Communications.
+link: https://doi.org/10.1038/s41467-026-73731-8
+
+# Example (remove the # to use it):
+# date: 2026-11-20
+# type: Seminar
+# title: White matter anatomy seminar
+# text: Seminar at IRCCS Neuromed, Pozzilli.
+# link: https://example.org

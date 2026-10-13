@@ -25,3 +25,10 @@ Edit the DOI list in the generator; titles, authors and journals are loaded from
 
 ## History of neuroscience figure
 - `assets/img/dejerine-lines.svg` + `assets/img/dejerine-1895.png` — coronal section from Dejerine's *Anatomie des centres nerveux* (drawing by H. Gillet), with the white matter redrawn as animated streamlines. Shown on the Research page.
+
+## Editing content without touching code
+Edit these text files directly on GitHub (open the file → pencil icon → "Commit changes"):
+- `content/team.txt` — team members (photos go in `assets/img/team/`)
+- `content/publications.txt` — one DOI per line
+- `content/news.txt` — news and events
+The site updates by itself about a minute after each commit.

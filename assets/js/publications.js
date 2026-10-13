@@ -2,7 +2,6 @@
 (function () {
   const box = document.getElementById("pub-list");
   if (!box) return;
-  const dois = box.dataset.dois.split(/\s+/).filter(Boolean);
 
   // Used when Crossref cannot be reached
   const FALLBACK = {
@@ -53,7 +52,7 @@
     }
   }
 
-  Promise.all(dois.map(meta)).then((list) => {
+  window.TrachContent.lines(box.dataset.src).then((dois) => Promise.all(dois.map(meta))).then((list) => {
     // drop duplicates
     const seen = new Set();
     list = list.filter((p) => !seen.has(p.doi.toLowerCase()) && seen.add(p.doi.toLowerCase()));
