@@ -225,7 +225,7 @@ print("streamlines", len(lines), {k: sum(1 for l in lines if l[2] == k) for k in
 
 # ---------------- output ---------------------------------------------------
 PAL = {"commissural": ((112, 30, 42), (196, 112, 116)),     # garnet
-       "association": ((34, 84, 56), (132, 178, 128)),     # sage
+       "association": ((40, 92, 58), (128, 176, 118)),     # same green as the arcuate anterior segment
        "projection": ((26, 44, 78), (124, 150, 190))}      # ink blue
 NEUTRAL = ((70, 78, 92), (170, 176, 186))
 OUT_SCALE = 0.75
