@@ -37,7 +37,7 @@ links:
 
 name: Salvatore Citro
 role: Research Fellow
-photo:
+photo: team/salvatore-citro.jpg
 text:
 links:
 
