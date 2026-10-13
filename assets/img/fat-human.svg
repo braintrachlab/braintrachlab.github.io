@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 378" fill="none" stroke-linecap="round" stroke-linejoin="round">
-<image class="silhouette" href="assets/img/fat-human-silhouette.png" x="0" y="0" width="576" height="378"/>
-<image class="plate plate-cool" href="assets/img/fat-human.png" x="0" y="0" width="576" height="378"/>
-<image class="plate-tint" href="assets/img/fat-human-tint.png" x="0" y="0" width="576" height="378" style="--tint-delay:4.4s"/>
+<image class="silhouette" href="assets/img/fat-human-silhouette.png?v=0ea3559c" x="0" y="0" width="576" height="378"/>
+<image class="plate plate-cool" href="assets/img/fat-human.png?v=3bf41d6e" x="0" y="0" width="576" height="378"/>
+<image class="plate-tint" href="assets/img/fat-human-tint.png?v=4abdc715" x="0" y="0" width="576" height="378" style="--tint-delay:4.4s"/>
 <path d="M248.9 239.9 247.5 238.0 246.0 236.1 244.4 234.3 242.7 232.7 240.9 231.0 239.1 229.5" stroke="rgb(226,150,78)" stroke-opacity="0.72" stroke-width="0.81" data-delay="4.25" data-dur="2.15"/>
 <path d="M283.1 230.8 285.3 229.9 287.6 229.1 289.9 228.4 292.2 228.0 294.6 227.6 297.0 227.4 299.4 227.4 301.8 227.5 304.2 227.7 306.5 228.0 308.9 228.4" stroke="rgb(205,129,63)" stroke-opacity="0.77" stroke-width="0.85" data-delay="4.27" data-dur="2.14"/>
 <path d="M252.8 232.9 251.2 231.2 249.4 229.6 247.6 228.1 245.6 226.7 243.6 225.3 241.6 224.0 239.6 222.8 237.6 221.5 235.6 220.1 233.7 218.6 231.8 217.2 229.9 215.7 228.0 214.3" stroke="rgb(226,150,78)" stroke-opacity="0.72" stroke-width="0.71" data-delay="4.27" data-dur="1.97"/>

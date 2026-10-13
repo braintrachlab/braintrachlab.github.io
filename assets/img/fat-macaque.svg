@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 457 351" fill="none" stroke-linecap="round" stroke-linejoin="round">
-<image class="silhouette" href="assets/img/fat-macaque-silhouette.png" x="0" y="0" width="457" height="351"/>
-<image class="plate plate-cool" href="assets/img/fat-macaque.png" x="0" y="0" width="457" height="351"/>
-<image class="plate-tint" href="assets/img/fat-macaque-tint.png" x="0" y="0" width="457" height="351" style="--tint-delay:2.2s"/>
+<image class="silhouette" href="assets/img/fat-macaque-silhouette.png?v=0d2d91dc" x="0" y="0" width="457" height="351"/>
+<image class="plate plate-cool" href="assets/img/fat-macaque.png?v=57c3ab62" x="0" y="0" width="457" height="351"/>
+<image class="plate-tint" href="assets/img/fat-macaque-tint.png?v=9a543887" x="0" y="0" width="457" height="351" style="--tint-delay:2.2s"/>
 <path d="M205.9 147.8 205.1 145.4 204.3 143.0 203.7 140.6 203.2 138.1 202.8 135.6 202.4 133.2 202.0 130.7 201.8 128.2 201.5 125.7 201.3 123.2 201.0 120.7 200.5 118.2" stroke="rgb(80,134,83)" stroke-opacity="0.81" stroke-width="0.56" data-delay="2.09" data-dur="1.67"/>
 <path d="M194.6 147.1 194.1 144.6 193.7 142.1 193.3 139.6 193.2 137.1" stroke="rgb(212,136,68)" stroke-opacity="0.75" stroke-width="0.86" data-delay="2.09" data-dur="2.26"/>
 <path d="M194.7 147.1 194.2 144.6 193.8 142.1 193.5 139.6 193.3 137.1" stroke="rgb(210,134,67)" stroke-opacity="0.76" stroke-width="0.66" data-delay="2.10" data-dur="1.68"/>

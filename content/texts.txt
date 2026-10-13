@@ -75,10 +75,13 @@ about.page_description: Team and collaborations of TraChLab.
 research.eyebrow: Research
 research.title: Our research
 research.intro: From the detailed anatomy of single pathways and their evolution across primates, to their role in disease and the history of how they were discovered.
+research.anatomy.legend1: Long segment
+research.anatomy.legend2: Anterior segment
+research.anatomy.legend3: Posterior segment
+research.anatomy.caption: The three segments of the arcuate fasciculus, redrawn as streamlines.
 research.anatomy.title: White matter anatomy
 research.anatomy.p1: We describe the course, organisation and cortical terminations of the white matter tracts of the human brain, building an accurate anatomical map of its association, projection and commissural connections.
 research.anatomy.p2: 
-research.anatomy.photo: 
 research.comparative.species1: Macaque
 research.comparative.species2: Chimpanzee
 research.comparative.species3: Human

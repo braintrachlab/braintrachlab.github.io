@@ -205,6 +205,12 @@ p { margin: 0 0 1.1em; color: var(--ink-soft); }
 .fat-legend { display: flex; justify-content: center; align-items: center; gap: 10px 26px; flex-wrap: wrap; margin-top: 26px; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .fat-item { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
 .fat-key { display: inline-block; width: 26px; height: 3px; border-radius: 2px; }
+.arc-figure { position: relative; max-width: 560px; margin: 0 auto; }
+.arc-legend { margin-top: 18px; gap: 8px 20px; font-size: 0.72rem; }
+.arc-caption { text-align: center; }
+.arc-key-long { background: rgb(176, 78, 70); }
+.arc-key-anterior { background: rgb(76, 128, 88); }
+.arc-key-posterior { background: rgb(196, 156, 62); }
 .fat-key-orange { background: rgb(196, 112, 52); }
 .fat-key-green { background: rgb(70, 128, 82); }
 .fat-caption { text-align: center; max-width: 640px; margin: 14px auto 0; }

@@ -73,6 +73,34 @@ NAV = [("index.html", "nav.home", "Home"), ("about.html", "nav.about", "About us
        ("research.html", "nav.research", "Research"), ("publications.html", "nav.publications", "Publications"),
        ("news.html", "nav.news", "News & Events"), ("contacts.html", "nav.contacts", "Contacts")]
 
+# ---------------------------------------------------------------- cache busting
+# Every asset reference gets ?v=<hash of the file>, so a browser can never combine an
+# old cached file with a new one (e.g. an old figure layout with a new picture).
+import hashlib, glob
+def _ver(rel):
+    path = os.path.join(ROOT, rel)
+    if not os.path.exists(path):
+        return None
+    return hashlib.md5(open(path, "rb").read()).hexdigest()[:8]
+
+def _stamp(text, attr_re):
+    def rep(m):
+        rel = m.group(2)
+        v = _ver(rel)
+        return m.group(1) + rel + (f"?v={v}" if v else "") + m.group(4)
+    return re.sub(attr_re, rep, text)
+
+ASSET_RE = r'((?:href|src|data-brain)=")(assets/[^"?]+)(\?v=[0-9a-f]+)?(")'
+
+def stamp_svgs():
+    # pictures inside the animated figures first, then the figures themselves are hashed
+    for svg in glob.glob(os.path.join(ROOT, "assets", "img", "*.svg")):
+        t = open(svg, encoding="utf-8").read()
+        t2 = _stamp(t, ASSET_RE)
+        if t2 != t:
+            open(svg, "w", encoding="utf-8").write(t2)
+stamp_svgs()
+
 def page(filename, title_key, title_default, desc_key, desc_default, body, extra=""):
     pagekey = title_key.split(".")[0]
     title = html.escape(val(title_key, title_default))
@@ -132,6 +160,7 @@ def page(filename, title_key, title_default, desc_key, desc_default, body, extra
 {extra}</body>
 </html>
 '''
+    out = _stamp(out, ASSET_RE)
     with open(os.path.join(ROOT, filename), "w", encoding="utf-8") as f:
         f.write(out)
 
@@ -281,6 +310,16 @@ def rblock(n, key, title, p1, p2, image_label, soft, image_left, figure=None):
     </section>
 '''
 
+ARC = lambda: f'''        <figure class="reveal" style="margin:0">
+          <div class="arc-figure" data-brain="assets/img/arcuate.svg" role="img" aria-label="The three segments of the arcuate fasciculus redrawn as streamlines"></div>
+          <div class="fat-legend arc-legend">
+            <span class="fat-item"><span class="fat-key arc-key-long"></span>{T("span", "research.anatomy.legend1", "Long segment")}</span>
+            <span class="fat-item"><span class="fat-key arc-key-anterior"></span>{T("span", "research.anatomy.legend2", "Anterior segment")}</span>
+            <span class="fat-item"><span class="fat-key arc-key-posterior"></span>{T("span", "research.anatomy.legend3", "Posterior segment")}</span>
+          </div>
+          {T("figcaption", "research.anatomy.caption", "The three segments of the arcuate fasciculus, redrawn as streamlines.", "plate-caption arc-caption")}
+        </figure>'''
+
 DEJ = lambda: f'''        <figure class="reveal d1" style="margin:0">
           <div class="plate-figure" data-brain="assets/img/dejerine-lines.svg" role="img" aria-label="Coronal section of the human brain from Dejerine's atlas, with the white matter fibres redrawn as streamlines"></div>
           {T("figcaption", "research.history.caption", "Coronal section from J. Dejerine, *Anatomie des centres nerveux* (1895–1901), drawing by H. Gillet, with the fibres of the white matter redrawn as streamlines.", "plate-caption")}
@@ -327,7 +366,7 @@ research = f'''
       </div>
     </header>
 
-{rblock("01", "research.anatomy", "White matter anatomy", "We describe the course, organisation and cortical terminations of the white matter tracts of the human brain, building an accurate anatomical map of its association, projection and commissural connections.", "", "Image", False, True)}
+{rblock("01", "research.anatomy", "White matter anatomy", "We describe the course, organisation and cortical terminations of the white matter tracts of the human brain, building an accurate anatomical map of its association, projection and commissural connections.", "", "Image", False, True, figure=ARC())}
 {comparative()}
 {rblock("03", "research.clinical", "Connections in health and disease", "By studying the functions of white matter pathways, we investigate how their damage or alteration contributes to the clinical picture of patients with neurological and psychiatric conditions.", "", "Image", False, True)}
 {rblock("04", "research.history", "History of neuroscience", "The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain's connections.", "", "", True, False, figure=DEJ())}'''

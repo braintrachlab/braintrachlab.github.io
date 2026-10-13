@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Research — TraChLab</title>
   <meta name="description" content="Research areas of TraChLab: white matter anatomy, comparative neuroanatomy, connections in disease, history of neuroscience.">
-  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/img/favicon.svg?v=bc8f8c1f" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/style.css?v=bd6d1860">
   <script>document.documentElement.classList.add("texts-loading");setTimeout(function(){document.documentElement.classList.remove("texts-loading")},1500);</script>
 </head>
 <body data-page="research">
@@ -44,7 +44,15 @@
 
     <section>
       <div class="container grid-2" style="align-items:center">
-        <div class="figure reveal parallax" data-image="research.anatomy.photo" data-label="Image"><div data-speed="0.08" class="parallax-inner"><span class="img-empty">Image</span></div></div>
+        <figure class="reveal" style="margin:0">
+          <div class="arc-figure" data-brain="assets/img/arcuate.svg?v=85e15a26" role="img" aria-label="The three segments of the arcuate fasciculus redrawn as streamlines"></div>
+          <div class="fat-legend arc-legend">
+            <span class="fat-item"><span class="fat-key arc-key-long"></span><span data-text="research.anatomy.legend1">Long segment</span></span>
+            <span class="fat-item"><span class="fat-key arc-key-anterior"></span><span data-text="research.anatomy.legend2">Anterior segment</span></span>
+            <span class="fat-item"><span class="fat-key arc-key-posterior"></span><span data-text="research.anatomy.legend3">Posterior segment</span></span>
+          </div>
+          <figcaption class="plate-caption arc-caption" data-text="research.anatomy.caption">The three segments of the arcuate fasciculus, redrawn as streamlines.</figcaption>
+        </figure>
         <div>
           <span class="eyebrow reveal">01</span>
           <h2 class="reveal d1" data-text="research.anatomy.title">White matter anatomy</h2>
@@ -70,15 +78,15 @@
         </div>
         <div class="fat-row reveal">
           <figure class="fat-cell">
-            <div data-brain="assets/img/fat-macaque.svg" role="img" aria-label="Frontal aslant tract of the macaque brain"></div>
+            <div data-brain="assets/img/fat-macaque.svg?v=e421560d" role="img" aria-label="Frontal aslant tract of the macaque brain"></div>
             <figcaption class="fat-species" data-text="research.comparative.species1">Macaque</figcaption>
           </figure>
           <figure class="fat-cell">
-            <div data-brain="assets/img/fat-chimpanzee.svg" role="img" aria-label="Frontal aslant tract of the chimpanzee brain"></div>
+            <div data-brain="assets/img/fat-chimpanzee.svg?v=27f5610f" role="img" aria-label="Frontal aslant tract of the chimpanzee brain"></div>
             <figcaption class="fat-species" data-text="research.comparative.species2">Chimpanzee</figcaption>
           </figure>
           <figure class="fat-cell">
-            <div data-brain="assets/img/fat-human.svg" role="img" aria-label="Frontal aslant tract of the human brain"></div>
+            <div data-brain="assets/img/fat-human.svg?v=0075016f" role="img" aria-label="Frontal aslant tract of the human brain"></div>
             <figcaption class="fat-species" data-text="research.comparative.species3">Human</figcaption>
           </figure>
         </div>
@@ -113,7 +121,7 @@
           <p class="reveal d2" data-text="research.history.p2" hidden></p>
         </div>
         <figure class="reveal d1" style="margin:0">
-          <div class="plate-figure" data-brain="assets/img/dejerine-lines.svg" role="img" aria-label="Coronal section of the human brain from Dejerine's atlas, with the white matter fibres redrawn as streamlines"></div>
+          <div class="plate-figure" data-brain="assets/img/dejerine-lines.svg?v=2451fb96" role="img" aria-label="Coronal section of the human brain from Dejerine's atlas, with the white matter fibres redrawn as streamlines"></div>
           <figcaption class="plate-caption" data-text="research.history.caption">Coronal section from J. Dejerine, <em>Anatomie des centres nerveux</em> (1895–1901), drawing by H. Gillet, with the fibres of the white matter redrawn as streamlines.</figcaption>
         </figure>
       </div>
@@ -141,7 +149,7 @@
     </div>
   </footer>
 
-  <script src="assets/js/main.js"></script>
-  <script src="assets/js/content.js"></script>
+  <script src="assets/js/main.js?v=70d3df95"></script>
+  <script src="assets/js/content.js?v=66e8b7d2"></script>
 </body>
 </html>
