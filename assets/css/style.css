@@ -193,10 +193,12 @@ p { margin: 0 0 1.1em; color: var(--ink-soft); }
 [data-brain] image.plate { opacity: 0; transition: opacity 2.4s ease; filter: sepia(0.55); }
 [data-brain].ready image.plate { opacity: 0.5; }
 [data-brain] image.plate-cool { filter: none; }
+[data-brain] image.silhouette { opacity: 0; transition: opacity 1.6s ease; }
+[data-brain].ready image.silhouette { opacity: 0.5; }
 [data-brain].ready image.plate-cool { opacity: 0.85; }
 [data-brain] image.plate-tint { opacity: 0; transition: opacity 2.2s ease var(--tint-delay, 2s); }
 [data-brain].ready image.plate-tint { opacity: 0.3; }
-.fat-row { display: grid; grid-template-columns: 363fr 364fr 520fr; gap: 32px; align-items: end; margin-top: 56px; }
+.fat-row { display: grid; grid-template-columns: 457fr 514fr 576fr; gap: 32px; align-items: end; margin-top: 56px; }
 .fat-cell { margin: 0; }
 .fat-cell [data-brain] { width: 100%; }
 .fat-species { text-align: center; font-family: var(--serif); font-style: italic; font-size: 1.15rem; color: var(--ink-soft); margin-top: 10px; }
@@ -555,6 +557,6 @@ form button { cursor: pointer; background: none; font: inherit; }
   html { scroll-behavior: auto; }
   .reveal { opacity: 1; transform: none; transition: none; }
   [data-brain] path, [data-brain].ready path { animation: none; stroke-dashoffset: 0; }
-  [data-brain] image.plate, [data-brain] image.plate-tint { transition: none; }
+  [data-brain] image.plate, [data-brain] image.plate-tint, [data-brain] image.silhouette { transition: none; }
   .scroll-cue::after { animation: none; }
 }
