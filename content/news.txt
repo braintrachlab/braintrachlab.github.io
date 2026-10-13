@@ -30,6 +30,7 @@ date: 2026-06
 type: Publication
 title: Evolution of the frontal aslant tract
 text: Our study on the evolution of the frontal aslant tract and its role in primate vocalization and human speech is out in Nature Communications.
+photo: FAT.pdf
 link: https://doi.org/10.1038/s41467-026-73731-8
 
 date: 2025-11
