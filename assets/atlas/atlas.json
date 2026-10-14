@@ -1,0 +1,31 @@
+{
+ "tracts": [
+  {
+   "id": "cc",
+   "lines": 1700,
+   "points": 116508
+  },
+  {
+   "id": "atr",
+   "lines": 158,
+   "points": 6996
+  },
+  {
+   "id": "fat",
+   "lines": 368,
+   "points": 17359
+  },
+  {
+   "id": "ifof",
+   "lines": 900,
+   "points": 87959
+  },
+  {
+   "id": "uf",
+   "lines": 445,
+   "points": 23367
+  }
+ ],
+ "scale": 0.1,
+ "radius": 91.39135308987579
+}

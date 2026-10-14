@@ -571,3 +571,31 @@ form button { cursor: pointer; background: none; font: inherit; }
   [data-brain] image.plate, [data-brain] image.plate-tint, [data-brain] image.silhouette { transition: none; }
   .scroll-cue::after { animation: none; }
 }
+
+/* ---------- Atlas ---------- */
+.atlas-section { padding-top: 40px; }
+.atlas-view { position: relative; width: 100%; height: min(72vh, 720px); min-height: 420px; background: radial-gradient(circle at 50% 45%, #ffffff 0%, var(--bg-soft) 75%); border: 1px solid var(--line); overflow: hidden; touch-action: none; cursor: grab; }
+.atlas-view:active { cursor: grabbing; }
+.atlas-view canvas { display: block; width: 100%; height: 100%; }
+.atlas-reset { position: absolute; left: 16px; bottom: 16px; z-index: 2; background: rgba(255,255,255,0.85); border: 1px solid var(--line); font: inherit; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); padding: 7px 12px; cursor: pointer; }
+.atlas-reset:hover { color: var(--ink); border-color: var(--ink); }
+.tract-panel { position: absolute; top: 0; right: 0; bottom: 0; width: min(400px, 92%); background: rgba(255,255,255,0.97); border-left: 1px solid var(--line); padding: 44px 30px 30px; overflow-y: auto; transform: translateX(105%); transition: transform 0.45s cubic-bezier(.2,.65,.3,1); z-index: 3; cursor: auto; box-shadow: -18px 0 40px rgba(27,29,34,0.06); }
+.tract-panel.open { transform: none; }
+.tract-panel .close { position: absolute; top: 10px; right: 14px; background: none; border: 0; font-size: 1.8rem; color: var(--muted); cursor: pointer; }
+.tract-panel h3 { font-size: 1.9rem; margin: 2px 0 12px; }
+.tract-panel h4 { font-family: var(--sans); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 22px 0 6px; }
+.tract-panel p { font-size: 0.93rem; line-height: 1.65; margin: 0; }
+.tract-panel .tract-lead { font-size: 1.02rem; color: var(--ink); }
+.tract-swatch { display: block; width: 34px; height: 3px; border-radius: 2px; margin-bottom: 16px; }
+.tract-links a { display: inline-block; margin-bottom: 4px; }
+.tract-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 10px; margin-top: 22px; }
+.tract-list button { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line); font: inherit; font-size: 0.82rem; color: var(--ink-soft); padding: 7px 14px; cursor: pointer; transition: all 0.2s; }
+.tract-list button:hover { border-color: var(--ink); color: var(--ink); }
+.tract-list button.active { border-color: var(--ink); color: var(--ink); background: var(--bg-soft); }
+.tract-list .dot { width: 9px; height: 9px; border-radius: 50%; }
+.atlas-caption { text-align: center; max-width: 680px; margin: 16px auto 0; }
+@media (max-width: 700px) {
+  .atlas-view { height: 70vh; }
+  .tract-panel { width: 100%; top: auto; height: 62%; border-left: 0; border-top: 1px solid var(--line); transform: translateY(105%); }
+  .tract-panel.open { transform: none; }
+}

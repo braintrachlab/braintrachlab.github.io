@@ -70,7 +70,7 @@ def IMG(key, label, cls="figure", style="", parallax=True):
 
 # ---------------------------------------------------------------- layout
 NAV = [("index.html", "nav.home", "Home"), ("about.html", "nav.about", "About us"),
-       ("research.html", "nav.research", "Research"), ("publications.html", "nav.publications", "Publications"),
+       ("research.html", "nav.research", "Research"), ("atlas.html", "nav.atlas", "Atlas"), ("publications.html", "nav.publications", "Publications"),
        ("news.html", "nav.news", "News & Events"), ("contacts.html", "nav.contacts", "Contacts")]
 
 # ---------------------------------------------------------------- cache busting
@@ -373,6 +373,33 @@ research = f'''
 {rblock("04", "research.history", "History of neuroscience", "The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain's connections.", "", "", True, False, figure=DEJ())}'''
 page("research.html", "research.page_title", "Research — TrachLab", "research.page_description",
      "Research areas of TrachLab: white matter anatomy, comparative neuroanatomy, connections in disease, history of neuroscience.", research)
+
+# ================================================================= ATLAS
+section("ATLAS PAGE (the cards of the tracts are in content/tracts.txt)")
+atlas = f'''
+    <header class="page-header">
+      <div class="container">
+        {T("span", "atlas.eyebrow", "Atlas", "eyebrow reveal")}
+        {T("h1", "atlas.title", "The white matter in three dimensions", "reveal d1")}
+        {T("p", "atlas.intro", "Drag to rotate the brain, scroll or pinch to zoom, and click on a tract to discover its history, anatomy and functions.", "reveal d2")}
+      </div>
+    </header>
+
+    <section class="atlas-section">
+      <div class="container atlas-wrap">
+        <div id="atlas-view" class="atlas-view" data-meta="assets/atlas/atlas.json" data-bin="assets/atlas/atlas.bin">
+          <button class="atlas-reset" type="button" aria-label="Reset view">Reset view</button>
+          <aside id="tract-panel" class="tract-panel" aria-live="polite">
+            <button class="close" type="button" aria-label="Close">&times;</button>
+            <div class="tract-body"></div>
+          </aside>
+        </div>
+        <div id="tract-list" class="tract-list" aria-label="Tracts"></div>
+        {T("p", "atlas.caption", "Tractography reconstructions of the right hemisphere and of the corpus callosum. Colours follow the fibre system: red commissural, blue projection, green association.", "plate-caption atlas-caption")}
+      </div>
+    </section>
+'''
+page("atlas.html", "atlas.page_title", "Atlas — BrainTraCh Lab", "atlas.page_description", "Interactive 3D atlas of white matter tracts.", atlas, '  <script src="assets/js/atlas.js"></script>\n')
 
 # ================================================================= PUBLICATIONS
 section("PUBLICATIONS PAGE (the list of DOIs is in content/publications.txt)")

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atlas — BrainTraCh Lab</title>
+  <meta name="description" content="Interactive 3D atlas of white matter tracts.">
+  <link rel="icon" href="assets/img/favicon.svg?v=bc8f8c1f" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css?v=7918fbf0">
+  <script>document.documentElement.classList.add("texts-loading");setTimeout(function(){document.documentElement.classList.remove("texts-loading")},1500);</script>
+</head>
+<body data-page="atlas">
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html" data-text="site.logo">BrainTraCh <em>Lab</em></a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+      </button>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" data-text="nav.home">Home</a></li>
+          <li><a href="about.html" data-text="nav.about">About us</a></li>
+          <li><a href="research.html" data-text="nav.research">Research</a></li>
+          <li><a href="atlas.html" data-text="nav.atlas">Atlas</a></li>
+          <li><a href="publications.html" data-text="nav.publications">Publications</a></li>
+          <li><a href="news.html" data-text="nav.news">News &amp; Events</a></li>
+          <li><a href="contacts.html" data-text="nav.contacts">Contacts</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <header class="page-header">
+      <div class="container">
+        <span class="eyebrow reveal" data-text="atlas.eyebrow">Atlas</span>
+        <h1 class="reveal d1" data-text="atlas.title">The white matter in three dimensions</h1>
+        <p class="reveal d2" data-text="atlas.intro">Drag to rotate the brain, scroll or pinch to zoom, and click on a tract to discover its history, anatomy and functions.</p>
+      </div>
+    </header>
+
+    <section class="atlas-section">
+      <div class="container atlas-wrap">
+        <div id="atlas-view" class="atlas-view" data-meta="assets/atlas/atlas.json" data-bin="assets/atlas/atlas.bin">
+          <button class="atlas-reset" type="button" aria-label="Reset view">Reset view</button>
+          <aside id="tract-panel" class="tract-panel" aria-live="polite">
+            <button class="close" type="button" aria-label="Close">&times;</button>
+            <div class="tract-body"></div>
+          </aside>
+        </div>
+        <div id="tract-list" class="tract-list" aria-label="Tracts"></div>
+        <p class="plate-caption atlas-caption" data-text="atlas.caption">Tractography reconstructions of the right hemisphere and of the corpus callosum. Colours follow the fibre system: red commissural, blue projection, green association.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand" href="index.html" data-text="site.logo">BrainTraCh <em>Lab</em></a>
+        <p data-text="footer.tagline">White matter neuroanatomy &amp; history of neuroscience</p>
+        <p>&copy; <span id="year"></span> <span data-text="site.name">BrainTraCh Lab</span></p>
+      </div>
+      <nav>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About us</a></li>
+          <li><a href="research.html">Research</a></li>
+          <li><a href="atlas.html">Atlas</a></li>
+          <li><a href="publications.html">Publications</a></li>
+          <li><a href="news.html">News &amp; Events</a></li>
+          <li><a href="contacts.html">Contacts</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js?v=49ba73e7"></script>
+  <script src="assets/js/content.js?v=66e8b7d2"></script>
+  <script src="assets/js/atlas.js?v=9dace5ff"></script>
+</body>
+</html>

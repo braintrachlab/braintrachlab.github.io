@@ -19,13 +19,13 @@
 # ======================================================================
 
 # ---------------- GENERAL — logo, menu and footer (shown on every page). In the logo, the part between *stars* is shown in blue italics
-# site.animation_speed: pace of the animated figures — 1 = original, smaller = faster (0.75 = a bit faster), larger = slower
 site.logo: BrainTraCh *Lab*
 site.name: BrainTraCh Lab
 site.animation_speed: 0.75
 nav.home: Home
 nav.about: About us
 nav.research: Research
+nav.atlas: Atlas
 nav.publications: Publications
 nav.news: News & Events
 nav.contacts: Contacts
@@ -103,6 +103,14 @@ research.history.p1: The lab explores the history of brain anatomy and neuroscie
 research.history.p2: 
 research.page_title: Research — BrainTraCh Lab
 research.page_description: Research areas of BrainTraCh Lab: white matter anatomy, comparative neuroanatomy, connections in disease, history of neuroscience.
+
+# ---------------- ATLAS PAGE (the cards of the tracts are in content/tracts.txt)
+atlas.eyebrow: Atlas
+atlas.title: The white matter in three dimensions
+atlas.intro: Drag to rotate the brain, scroll or pinch to zoom, and click on a tract to discover its history, anatomy and functions.
+atlas.caption: Tractography reconstructions of the right hemisphere and of the corpus callosum. Colours follow the fibre system: red commissural, blue projection, green association.
+atlas.page_title: Atlas — BrainTraCh Lab
+atlas.page_description: Interactive 3D atlas of white matter tracts.
 
 # ---------------- PUBLICATIONS PAGE (the list of DOIs is in content/publications.txt)
 publications.title: Publications
