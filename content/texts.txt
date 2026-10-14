@@ -19,8 +19,10 @@
 # ======================================================================
 
 # ---------------- GENERAL — logo, menu and footer (shown on every page). In the logo, the part between *stars* is shown in blue italics
+# site.animation_speed: pace of the animated figures — 1 = original, smaller = faster (0.75 = a bit faster), larger = slower
 site.logo: BrainTraCh *Lab*
 site.name: BrainTraCh Lab
+site.animation_speed: 0.75
 nav.home: Home
 nav.about: About us
 nav.research: Research

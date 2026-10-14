@@ -175,6 +175,7 @@ def card(n, key, title, text, d=""):
 section("GENERAL — logo, menu and footer (shown on every page). In the logo, the part between *stars* is shown in blue italics")
 val("site.logo", "Trach*Lab*")
 val("site.name", "TrachLab")
+val("site.animation_speed", "0.75")
 for _, k, d in NAV:
     val(k, d)
 val("footer.tagline", "White matter neuroanatomy & history of neuroscience")

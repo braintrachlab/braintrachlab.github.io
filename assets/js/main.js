@@ -23,13 +23,23 @@
   });
 
   // Hero: inject the brain line drawing and animate each fibre
+  // Animation speed: "site.animation_speed" in content/texts.txt (1 = original pace, 0.75 = a bit faster)
+  const speedP = fetch("content/texts.txt", { cache: "no-cache" }).then((r) => r.text()).then((t) => {
+    const m = t.match(/^\s*site\.animation_speed\s*:\s*([0-9.]+)/m);
+    const v = m ? parseFloat(m[1]) : NaN;
+    return v > 0.1 && v < 5 ? v : 0.75;
+  }).catch(() => 0.75);
   document.querySelectorAll("[data-brain]").forEach((box) => {
-    fetch(box.dataset.brain).then((r) => r.text()).then((svg) => {
+    Promise.all([fetch(box.dataset.brain).then((r) => r.text()), speedP]).then(([svg, ANIMATION_SPEED]) => {
       box.innerHTML = svg;
       box.querySelectorAll("path").forEach((p) => {
         p.style.setProperty("--len", Math.ceil(p.getTotalLength()) + 1);
-        p.style.setProperty("--delay", (p.dataset.delay || 0) + "s");
-        p.style.setProperty("--dur", (p.dataset.dur || 2) + "s");
+        p.style.setProperty("--delay", (p.dataset.delay || 0) * ANIMATION_SPEED + "s");
+        p.style.setProperty("--dur", (p.dataset.dur || 2) * ANIMATION_SPEED + "s");
+      });
+      box.querySelectorAll("image.plate-tint").forEach((im) => {
+        const d = parseFloat(getComputedStyle(im).getPropertyValue("--tint-delay")) || 2;
+        im.style.setProperty("--tint-delay", d * ANIMATION_SPEED + "s");
       });
       // start drawing when the figure scrolls into view
       if ("IntersectionObserver" in window) {
