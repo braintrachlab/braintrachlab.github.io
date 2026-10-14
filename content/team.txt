@@ -31,7 +31,7 @@ links:
 
 name: Giovanna Bubbico
 role: Researcher
-photo:
+photo: team/giovanna-bubbico.png
 text:
 links:
 
