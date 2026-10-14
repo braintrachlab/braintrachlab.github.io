@@ -83,6 +83,15 @@
         float front = smoothstep(uProg - 0.03, uProg, vt);
         gl_FragColor = vec4(col, uAlpha * (1.0 - 0.6 * front));
       }`;
+    // growth direction of each tract (x = left→right, y = back→front, z = bottom→top)
+    const GROW = {
+      cc: [1, 0, 0.2],          // from the left to the right hemisphere
+      atr: [0.2, 1, 0.1],       // from the thalamus to the frontal lobe
+      fat: [-0.7, -0.3, 0.65],  // from the inferior frontal gyrus up to SMA / pre-SMA
+      ifof: [0, 1, 0.2],        // from the occipital to the frontal lobe
+      uf: [-0.5, 0.7, 0.5],     // from the temporal pole to the orbitofrontal cortex
+    };
+    const meshes = {};
     for (const t of tracts) {
       let nseg = 0;
       for (let n = 0; n < t.lines; n++) nseg += counts[li + n] - 1;
@@ -95,12 +104,16 @@
         const c = counts[li];
         const P = (k) => [q[(off + k) * 3] * sc, q[(off + k) * 3 + 1] * sc, q[(off + k) * 3 + 2] * sc];
         const s = Math.random();
+        // grow from one extremity to the other, every streamline of a tract in the same direction
+        const h = GROW[t.id] || [0, 1, 0], p0 = P(0), p1 = P(c - 1);
+        const flip = (p1[0] - p0[0]) * h[0] + (p1[1] - p0[1]) * h[1] + (p1[2] - p0[2]) * h[2] < 0;
+        const U = (k) => (flip ? 1 - k / (c - 1) : k / (c - 1));
         for (let k = 0; k < c - 1; k++) {
           const a = P(k), b = P(k + 1);
           const ka = Math.max(0, k - 1), kb = Math.min(c - 1, k + 2);
           const pa = P(ka), pb = P(kb);                       // smooth tangents at the joints
           const ta = [b[0] - pa[0], b[1] - pa[1], b[2] - pa[2]], tb = [pb[0] - a[0], pb[1] - a[1], pb[2] - a[2]];
-          const u0 = Math.abs(k / (c - 1) - 0.5) * 2, u1 = Math.abs((k + 1) / (c - 1) - 0.5) * 2;
+          const u0 = U(k), u1 = U(k + 1);
           const g0 = u0 * 0.85 + s * 0.15, g1 = u1 * 0.85 + s * 0.15;
           const quad = [[a, ta, -1, g0], [a, ta, 1, g0], [b, tb, -1, g1], [b, tb, 1, g1]];
           for (const [p, d, sd, g] of quad) {
@@ -127,7 +140,7 @@
       });
       mats[t.id] = m;
       pickPts[t.id] = pick;
-      const mesh = new THREE.Mesh(g, m); mesh.renderOrder = 1; mesh.frustumCulled = false;
+      const mesh = new THREE.Mesh(g, m); mesh.renderOrder = 1; mesh.frustumCulled = false; meshes[t.id] = mesh;
       group.add(mesh);
     }
 
@@ -214,7 +227,11 @@
     function select(id) {
       selected = id && id !== selected ? id : (id === selected ? null : null);
       tracts.forEach((t) => (target[t.id] = !selected || t.id === selected ? 1.0 : 0.12));
-      tracts.forEach((t) => { mats[t.id].depthWrite = !selected || t.id === selected; });
+      // the faded tracts are drawn first, without writing depth, and the selected one last, on top of them
+      tracts.forEach((t) => {
+        mats[t.id].depthWrite = !selected || t.id === selected;
+        meshes[t.id].renderOrder = selected && t.id === selected ? 2 : 1;
+      });
       if (selected) {                     // keep the whole view visible below the sticky header
         const r = box.getBoundingClientRect(); const hdr = 90;
         if (r.top < hdr) window.scrollBy({ top: r.top - hdr, behavior: "smooth" });
