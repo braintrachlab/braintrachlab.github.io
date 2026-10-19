@@ -45,16 +45,14 @@ home.who.link: Learn more about the lab
 home.who.photo: 
 home.areas.eyebrow: Research areas
 home.areas.title: What we study
-home.area1.title: White matter anatomy
-home.area1.text: Description of the course and organisation of the brain's association, projection and commissural pathways.
-home.area2.title: Comparative neuroanatomy
-home.area2.text: Comparing white matter pathways in humans and non-human primates to understand how brain connections evolved and what is distinctive about the human brain.
-home.area3.title: Connections & disease
-home.area3.text: How the disruption of white matter pathways relates to clinical symptoms in patients with neurological and psychiatric conditions.
+home.area1.title: Methods
+home.area1.text:
+home.area2.title: Neuroanatomy
+home.area2.text: 
+home.area3.title: Brain disorders
+home.area3.text: 
 home.area4.title: History of neuroscience
 home.area4.text: The figures, ideas and discoveries that shaped our understanding of brain anatomy and connectivity, from early anatomists to the present.
-home.area5.title: Methods
-home.area5.text:
 home.areas.link: Explore our research
 home.quote: Every function of the brain depends on the pathways that carry information from one region to another.
 home.news.eyebrow: Latest
