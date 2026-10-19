@@ -4,19 +4,24 @@
   "axial",
   "sagittal"
  ],
- "space": "HCP 102109 DTI (1.25 mm)",
+ "space": "HCP 102109 ACPC",
  "brain_box": [
   [
-   25.0,
-   15.046508312225342,
-   3.75
+   -66.09999734163284,
+   -112.70000022649765,
+   -69.20000004768372
   ],
   [
-   157.5,
-   206.29650831222534,
-   150.0
+   66.20000040531158,
+   78.39999651908875,
+   72.8999975323677
   ]
  ],
- "style": "Dejerine (Weigert stain) drawings from the T1 and the whole-brain tractogram: tools/sections/dejerine_render.py",
- "note": "world = RAS mm of the DTI space; atlas tracts in the same space align exactly"
+ "dti_to_acpc_mm": [
+  -91.25,
+  -127.25,
+  -73.25
+ ],
+ "style": "Dejerine (Weigert stain) drawings from T1w, wmparc and the whole-brain tractogram: tools/sections/dejerine_acpc.py",
+ "note": "world = AC-PC RAS mm of subject 102109; atlas tracts in the same space align exactly"
 }

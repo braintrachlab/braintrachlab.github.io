@@ -416,6 +416,7 @@ atlas = f'''
                 <option value="dejerine">Dejerine (Weigert stain)</option>
                 <option value="fa">FA map</option>
                 <option value="t1">T1</option>
+                <option value="t2">T2</option>
               </select>
             </label>
             <button type="button">Hide section</button>

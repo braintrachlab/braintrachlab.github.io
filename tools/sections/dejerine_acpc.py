@@ -1,0 +1,212 @@
+"""Sections of the atlas from the high-resolution data of the same subject (HCP 102109, AC-PC space, 0.7 mm):
+T1w and T2w (brain), FreeSurfer wmparc (tissue classes), the whole-brain tractogram and FA (diffusion space).
+
+Diffusion space -> AC-PC: acpc = dti_world - (91.25, 127.25, 73.25) mm   (found by registration, r = 0.975)
+
+usage:
+  python3 dejerine_acpc.py --t1 T1w_brain.nii.gz --t2 T2w_brain.nii.gz --parc wmparc.nii.gz \
+      --trk wholebrain.trk --fa FA.nii.gz --out assets/atlas/planes --web coronal,axial,sagittal [--index]
+  python3 dejerine_acpc.py ... --preview out_dir --at coronal:0.3,axial:0.5
+"""
+import sys, os, json
+import numpy as np, cv2, nibabel as nib
+from scipy import ndimage as ndi
+from PIL import Image
+sys.path.insert(0, os.path.dirname(__file__))
+from dejerine_render import Tracts, splat, smoothstep
+
+DTI2ACPC = np.array([-91.25, -127.25, -73.25], np.float32)
+UP = 3                        # 0.7 mm voxels -> 0.23 mm pixels
+STEP = 2                      # one section every 2 voxels (1.4 mm)
+FIB_GAIN = 0.75
+WIDTH = 640
+
+# FreeSurfer labels
+VENT = {4, 5, 14, 15, 43, 44, 72, 24, 31, 63, 30, 62, 80, 85}           # ventricles, CSF, choroid plexus, vessels
+CTX_EXTRA = {3, 42, 8, 47, 17, 53, 18, 54}                               # cortex, cerebellar cortex, hippocampus, amygdala
+DEEP = {10, 11, 12, 13, 26, 28, 49, 50, 51, 52, 58, 60}                  # thalamus, caudate, putamen, pallidum, accumbens, ventral DC
+
+def classes(p):
+    p = p.astype(np.int32)
+    tissue = (p > 0) & ~np.isin(p, list(VENT))
+    ctx = np.isin(p, list(CTX_EXTRA)) | ((p >= 1000) & (p < 3000))
+    deep = np.isin(p, list(DEEP))
+    wm = tissue & ~ctx & ~deep                                           # white matter, brainstem, CC, cerebellar WM
+    return tissue, ctx, deep, wm
+
+PLANES = {
+    "coronal":  {"axis": 1, "cols": 0, "rows": 2, "reverse": True,  "labels": ["Front", "Back"], "from": "from the frontal pole"},
+    "axial":    {"axis": 2, "cols": 0, "rows": 1, "reverse": False, "labels": ["Bottom", "Top"], "from": "from the lowest point"},
+    "sagittal": {"axis": 0, "cols": 1, "rows": 2, "reverse": True,  "labels": ["Right", "Left"], "from": "from the right surface"},
+}
+
+def to_ras(img):
+    img = nib.as_closest_canonical(img)
+    return np.asarray(img.dataobj), img.affine
+
+def cut(vol, P, j):
+    sl = [slice(None)] * 3; sl[P["axis"]] = j
+    a = vol[tuple(sl)]
+    ax = [d for d in range(3) if d != P["axis"]]
+    if ax.index(P["cols"]) == 0: a = a.T
+    return np.ascontiguousarray(a[::-1, ::-1])
+
+def up_mask(m, sigma=0.6):
+    """binary mask -> smooth upsampled mask (no voxel steps)"""
+    f = cv2.resize(m.astype(np.float32), None, fx=UP, fy=UP, interpolation=cv2.INTER_LINEAR)
+    return cv2.GaussianBlur(f, (0, 0), UP * sigma)
+
+def draw(t1s, labs, fib, seed=0):
+    """Dejerine (Weigert) drawing of one section. Returns ink (with fibres), ink (without), tissue alpha."""
+    rng = np.random.default_rng(seed)
+    tissue, ctx, deep, wm = labs
+    T = up_mask(tissue); C = up_mask(ctx); Dp = up_mask(deep); W = up_mask(wm)
+    alpha = smoothstep(0.42, 0.58, T)
+    tis = alpha > 0.5
+    wmb = (W > 0.5) & tis
+    mmpx = 0.7 / UP
+    dwm = ndi.distance_transform_edt(~wmb).astype(np.float32) * mmpx       # mm from the white matter
+    # myelin from the T1 (smooth), for a light wash under the fibres
+    t = cv2.GaussianBlur(cv2.resize(t1s, None, fx=UP, fy=UP, interpolation=cv2.INTER_CUBIC), (0, 0), UP * 0.5)
+    vals = t[tis]; lo, hi = (np.percentile(vals, 5), np.percentile(vals, 98)) if vals.size else (0, 1)
+    n = np.clip((t - lo) / (hi - lo + 1e-6), 0, 1)
+    # cortex: pale at the surface, darker in the deep layers, fine stipple near the white matter
+    cm = np.clip(C, 0, 1) * tis
+    deepl = np.exp(-dwm / 0.9)
+    tone_c = (0.08 + 0.42 * deepl) * cm
+    tone_c = cv2.GaussianBlur(tone_c, (0, 0), 1.0)
+    dots = (rng.random(t.shape) < 0.09 * deepl * cm).astype(np.float32)
+    dots = np.clip(cv2.GaussianBlur(dots, (0, 0), 0.4) * 3.0, 0, 1)
+    ctxink = np.maximum(tone_c, dots * 0.65)
+    # deep grey nuclei: light grey with a sparse stipple
+    dm = np.clip(Dp, 0, 1) * tis
+    dd = (rng.random(t.shape) < 0.035 * dm).astype(np.float32)
+    deepink = np.maximum(0.10 * dm, np.clip(cv2.GaussianBlur(dd, (0, 0), 0.4) * 2.4, 0, 1) * 0.5)
+    # white matter: a light wash, the fibres are the real streamlines
+    wash = 0.09 * np.clip(W, 0, 1) * (0.6 + 0.4 * n)
+    base = np.maximum(np.maximum(ctxink, deepink), wash)
+    if fib is not None:
+        fl = cv2.GaussianBlur(fib, (0, 0), 0.30)
+        fibink = 0.88 * (1.0 - np.exp(-fl * FIB_GAIN)) * tis
+    else:
+        fibink = np.zeros_like(base)
+    full = np.maximum(base, fibink)
+    # thin contour of the brain and of the ventricles (border of the tissue)
+    canvas = np.zeros(t.shape, np.uint8)
+    cs, _ = cv2.findContours(tis.astype(np.uint8), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+    cs = [c for c in cs if cv2.arcLength(c, True) > UP * 10]
+    cv2.drawContours(canvas, cs, -1, 150, 1, cv2.LINE_AA)
+    line = canvas.astype(np.float32) / 255
+    out = []
+    for x in (full, base):
+        x = np.maximum(x, line * 0.85) * alpha
+        out.append(np.clip(x, 0, 1))
+    return out[0], out[1], alpha
+
+def main():
+    A = lambda k: sys.argv[sys.argv.index(k) + 1] if k in sys.argv else None
+    t1, aff = to_ras(nib.load(A("--t1"))); t1 = t1.astype(np.float32)
+    t2, _ = to_ras(nib.load(A("--t2"))); t2 = t2.astype(np.float32)
+    parc, _ = to_ras(nib.load(A("--parc")))
+    tissue, ctx, deep, wm = classes(parc)
+    vx = abs(aff[0, 0])
+    # FA (diffusion space) resampled on the AC-PC grid
+    FA = None
+    if A("--fa"):
+        fi = nib.as_closest_canonical(nib.load(A("--fa"))); fa = np.asarray(fi.dataobj, np.float32)
+        ii, jj, kk = np.mgrid[0:t1.shape[0], 0:t1.shape[1], 0:t1.shape[2]].astype(np.float32)
+        acpc = np.stack([ii, jj, kk, np.ones_like(ii)]).reshape(4, -1)
+        w = (aff @ acpc)[:3] - DTI2ACPC[:, None]                   # -> diffusion world
+        c = (np.linalg.inv(fi.affine) @ np.vstack([w, np.ones((1, w.shape[1]))]))[:3]
+        FA = ndi.map_coordinates(fa, c, order=1, cval=0).reshape(t1.shape)
+        del ii, jj, kk, acpc, w, c
+    TR = None
+    if A("--trk"):
+        TR = Tracts(A("--trk"), keep=float(A("--keep") or 0.15))
+        TR.a += DTI2ACPC; TR.b += DTI2ACPC; TR.lo += DTI2ACPC; TR.hi += DTI2ACPC
+    sh = t1.shape
+    world = lambda d, i: float(aff[d, d] * i + aff[d, 3])
+    norm = lambda v, lo, hi: np.clip((v - lo) / (hi - lo), 0, 1)
+    t1lo, t1hi = np.percentile(t1[tissue], [1, 99.5]); t2lo, t2hi = np.percentile(t2[tissue], [1, 99.5])
+
+    def section(P, j, c0, c1, r0, r1, want_fib=True):
+        sec = cut(t1, P, j)[r0:r1, c0:c1]
+        labs = [cut(m, P, j)[r0:r1, c0:c1] for m in (tissue, ctx, deep, wm)]
+        fib = None
+        if TR is not None and want_fib:
+            w0 = world(P["axis"], j)
+            pa, pb = TR.slab(w0, vx / 2 + 0.3, P["axis"])
+            def px(p):
+                ic = (p[:, P["cols"]] - aff[P["cols"], 3]) / aff[P["cols"], P["cols"]]
+                ir = (p[:, P["rows"]] - aff[P["rows"], 3]) / aff[P["rows"], P["rows"]]
+                c = (sh[P["cols"]] - 1 - ic) - c0; r = (sh[P["rows"]] - 1 - ir) - r0
+                return np.stack([(c + 0.5) * UP - 0.5, (r + 0.5) * UP - 0.5], 1)
+            fib = splat((sec.shape[0] * UP, sec.shape[1] * UP), px(pa), px(pb))
+        return sec, labs, fib
+
+    def crop(P):
+        cc = np.where(tissue.any(tuple(d for d in range(3) if d != P["cols"])))[0]
+        rr = np.where(tissue.any(tuple(d for d in range(3) if d != P["rows"])))[0]
+        c0, c1 = max(sh[P["cols"]] - 1 - cc.max() - 4, 0), min(sh[P["cols"]] - 1 - cc.min() + 5, sh[P["cols"]])
+        r0, r1 = max(sh[P["rows"]] - 1 - rr.max() - 4, 0), min(sh[P["rows"]] - 1 - rr.min() + 5, sh[P["rows"]])
+        return c0, c1, r0, r1
+
+    if A("--preview"):
+        od = A("--preview"); os.makedirs(od, exist_ok=True)
+        for spec in A("--at").split(","):
+            pl, f = spec.split(":"); P = PLANES[pl]; f = float(f)
+            idx = np.where(tissue.any(tuple(d for d in range(3) if d != P["axis"])))[0]
+            j = int(round(idx.max() - f * (idx.max() - idx.min()))) if P["reverse"] else int(round(idx.min() + f * (idx.max() - idx.min())))
+            c0, c1, r0, r1 = crop(P)
+            sec, labs, fib = section(P, j, c0, c1, r0, r1)
+            full, base, alpha = draw(sec, labs, fib, seed=j)
+            for nm, x in (("full", full), ("base", base)):
+                rgb = (247 * (1 - x[..., None]) + 60 * x[..., None]).astype(np.uint8).repeat(3, -1)
+                Image.fromarray(rgb).save(os.path.join(od, f"{pl}_{f}_{nm}.png"))
+            print(pl, j, full.shape, flush=True)
+        return
+
+    out = A("--out")
+    planes = A("--web").split(",")
+    for name in planes:
+        P = PLANES[name]; od = os.path.join(out, name)
+        for sub in ("", "base", "t1", "t2", "fa"): os.makedirs(os.path.join(od, sub), exist_ok=True)
+        idx = np.where(tissue.any(tuple(d for d in range(3) if d != P["axis"])))[0]
+        js = list(range(idx.max(), idx.min() - 1, -STEP)) if P["reverse"] else list(range(idx.min(), idx.max() + 1, STEP))
+        c0, c1, r0, r1 = crop(P)
+        for k, j in enumerate(js):
+            sec, labs, fib = section(P, j, c0, c1, r0, r1)
+            full, base, alpha = draw(sec, labs, fib, seed=j)
+            h = int(round(full.shape[0] * WIDTH / full.shape[1]))
+            fname = f"s{k:03d}.webp"
+            for sub, x in (("", full), ("base", base)):
+                la = np.stack([(x * 255).astype(np.uint8), (alpha * 255).astype(np.uint8)], -1)
+                Image.fromarray(la, "LA").resize((WIDTH, h), Image.LANCZOS).save(os.path.join(od, sub, fname), quality=74, method=4)
+            # T1, T2, FA: brain only (the parcellation), at their own resolution
+            sw = WIDTH // 2; hs = int(round(sec.shape[0] * sw / sec.shape[1]))
+            mk = cv2.resize(cv2.GaussianBlur(labs[0].astype(np.float32), (0, 0), 0.7), (sw, hs), interpolation=cv2.INTER_CUBIC)
+            mk = smoothstep(0.4, 0.6, mk)
+            for sub, vol, lo, hi in (("t1", t1, t1lo, t1hi), ("t2", t2, t2lo, t2hi), ("fa", FA, 0.0, 0.85)):
+                if vol is None: continue
+                v = cv2.resize(norm(cut(vol, P, j)[r0:r1, c0:c1], lo, hi), (sw, hs), interpolation=cv2.INTER_AREA)
+                la = np.stack([(v * 255).astype(np.uint8), (np.clip(mk, 0, 1) * 255).astype(np.uint8)], -1)
+                Image.fromarray(la, "LA").save(os.path.join(od, sub, fname), quality=82, method=4)
+            print(name, k, j, flush=True)
+        O = [0.0] * 3; U = [0.0] * 3; V = [0.0] * 3
+        O[P["cols"]] = world(P["cols"], sh[P["cols"]] - 1 - c0 + 0.5); U[P["cols"]] = -(c1 - c0) * vx
+        O[P["rows"]] = world(P["rows"], sh[P["rows"]] - 1 - r0 + 0.5); V[P["rows"]] = -(r1 - r0) * vx
+        meta = {"n": len(js), "axis": P["axis"], "labels": P["labels"], "from": P["from"], "step_mm": STEP * vx,
+                "pos": [world(P["axis"], j) for j in js], "O": O, "U": U, "V": V,
+                "modes": {"dejerine": "", "base": "base/", "t1": "t1/", "t2": "t2/", "fa": "fa/" if FA is not None else None}}
+        json.dump(meta, open(os.path.join(od, "plane.json"), "w"), indent=1)
+    if "--index" in sys.argv:
+        xs, ys, zs = [np.where(tissue.any(tuple(d for d in range(3) if d != a)))[0] for a in range(3)]
+        meta = {"planes": list(PLANES), "space": "HCP 102109 ACPC",
+                "brain_box": [[world(0, xs.min()), world(1, ys.min()), world(2, zs.min())], [world(0, xs.max()), world(1, ys.max()), world(2, zs.max())]],
+                "dti_to_acpc_mm": DTI2ACPC.tolist(),
+                "style": "Dejerine (Weigert stain) drawings from T1w, wmparc and the whole-brain tractogram: tools/sections/dejerine_acpc.py",
+                "note": "world = AC-PC RAS mm of subject 102109; atlas tracts in the same space align exactly"}
+        json.dump(meta, open(os.path.join(out, "sections.json"), "w"), indent=1)
+
+if __name__ == "__main__":
+    main()

@@ -247,7 +247,9 @@
       if (P.sets[md]) return P.sets[md].ready;
       const dir = `assets/atlas/planes/${p}/` + (P.modes[md] || "");
       const imgs = [];
-      const ready = Promise.all(P.pos.map((_, i) => new Promise((res) => {
+      const first = Math.max(0, Math.min(P.n - 1, kNow || 0));
+      const order = P.pos.map((_, i) => i).sort((a, b) => Math.abs(a - first) - Math.abs(b - first));   // nearest first
+      const ready = Promise.all(order.map((i) => new Promise((res) => {
         const im = new Image(); im.onload = im.onerror = res; im.src = dir + "s" + String(i).padStart(3, "0") + ".webp"; imgs[i] = im;
       })));
       P.sets[md] = { imgs, ready };
@@ -259,7 +261,15 @@
       k = Math.max(0, Math.min(P.n - 1, Math.round(k))); kNow = k;
       const set = P.sets[setName()] || P.sets.dejerine; if (!set) return;
       const im = set.imgs[k], key = plane + setName() + k;
-      if (key === mriShown || !im || !im.complete || !im.naturalWidth) return;
+      if (key === mriShown || !im) return;
+      if (!im.complete || !im.naturalWidth) {            // not downloaded yet: ask for it first, show it when it arrives
+        if (!im.__urgent) {
+          im.__urgent = true;
+          const now = new Image(); now.fetchPriority = "high"; now.src = im.src;
+          now.onload = () => { set.imgs[k] = now; if (kNow === k) { mriShown = null; showSlice(k); } };
+        }
+        return;
+      }
       mriShown = key; secTex.image = im; secTex.needsUpdate = true;
     }
     const nrm = (p) => new THREE.Vector3(...[0, 1, 2].map((d) => (d === PL[p].axis ? 1 : 0)));
@@ -359,7 +369,7 @@
         mriPlane.visible = true; mriMat.uniforms.uOpacity.value = 1;
         for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 2;
         placeSection(+slider.value);
-        out.textContent = `${Math.round(+slider.value * 1.25)} mm ${FROM[plane]}`;
+        out.textContent = `${Math.round(+slider.value * (PL[plane].step_mm || 1.25))} mm ${PL[plane].from || FROM[plane]}`;
         sliderBox.classList.add("active");
       };
       slider.addEventListener("input", () => openSection(false));
