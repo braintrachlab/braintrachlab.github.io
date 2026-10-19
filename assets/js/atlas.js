@@ -92,7 +92,7 @@
         float k = clamp(0.12 + 0.88 * diff, 0.0, 1.0) * (0.85 + 0.15 * vShade);
         vec3 col = mix(cDark, cLight, k) + vec3(0.32) * spec;
         col *= 0.62 + 0.38 * nz;                        // darker rims: the tube outline
-        vec3 inkCol = mix(vec3(0.12, 0.125, 0.095), vec3(0.34, 0.34, 0.27), vShade);  // ink of the old plates
+        vec3 inkCol = mix(vec3(0.22), vec3(0.42), vShade);  // ink of the old plates
         inkCol *= 1.0 - 0.45 * nearPlane;                                          // fresh ink where the fibres emerge
         col = mix(col, inkCol, vInk);
         col = mix(col, vec3(0.86, 0.87, 0.88), uFade * 0.92);      // non-selected tracts: pale grey ghost
@@ -287,8 +287,8 @@
           void main() {
             vec4 tx = texture2D(uA, vUv);
             if (tx.a < 0.05) discard;                                          // no tissue: the background shows
-            vec3 paper = vec3(0.969, 0.969, 0.961), inkc = vec3(0.12, 0.125, 0.095);
-            vec3 col = uMode < 0.5 ? mix(paper, inkc, tx.r) : vec3(tx.r);        // Dejerine drawing, or T1 / FA
+            vec3 paper = vec3(0.975), inkc = vec3(0.235);                       // grey ink of the home-page plate
+            vec3 col = uMode < 0.5 ? mix(paper, inkc, tx.r * 0.92) : vec3(tx.r);  // Dejerine drawing, or T1 / FA
             gl_FragColor = vec4(col, uOpacity * smoothstep(0.05, 0.6, tx.a));
           }`,
       });
@@ -305,8 +305,8 @@
     }
 
     // ---------- the selected tract on the section: its streamlines within the slice (lines or dots) ----------
-    const ovLines = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x1e1f18, transparent: true, depthTest: false }));
-    const ovDots = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0x1e1f18, size: 2.6, sizeAttenuation: false, transparent: true, depthTest: false }));
+    const ovLines = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x3c3c3c, transparent: true, depthTest: false }));
+    const ovDots = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0x3c3c3c, size: 2.6, sizeAttenuation: false, transparent: true, depthTest: false }));
     ovLines.renderOrder = ovDots.renderOrder = 6; ovLines.frustumCulled = ovDots.frustumCulled = false;
     group.add(ovLines); group.add(ovDots);
     let ovSide = 1;
@@ -331,7 +331,7 @@
       }
       ovLines.geometry.setAttribute("position", new THREE.Float32BufferAttribute(L, 3));
       ovDots.geometry.setAttribute("position", new THREE.Float32BufferAttribute(D, 3));
-      const col = mode === "dejerine" ? 0x1e1f18 : new THREE.Color(...rgb((PAL[selected] || [[200, 60, 60], [230, 120, 110]])[1])).getHex();
+      const col = mode === "dejerine" ? 0x3c3c3c : new THREE.Color(...rgb((PAL[selected] || [[200, 60, 60], [230, 120, 110]])[1])).getHex();
       ovLines.material.color.set(col); ovDots.material.color.set(col);
       ovLines.position.set(0, 0, 0); ovLines.position.setComponent(ax, w + ovSide * 0.4);
       ovDots.position.copy(ovLines.position);
@@ -355,6 +355,7 @@
         if (!PL[plane]) return;
         if (turn || !sliderOn) { viewTo = Object.assign({}, VIEW[plane]); auto = false; lastInteract = performance.now(); }
         skip = true; sliderOn = true; secOn = true; group.position.set(0, 0, 0);
+        if (!introReady) { intro = "none"; introReady = true; }        // using the controls ends the opening at once
         mriPlane.visible = true; mriMat.uniforms.uOpacity.value = 1;
         for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 2;
         placeSection(+slider.value);
@@ -528,6 +529,7 @@
     fetch("content/texts.txt", { cache: "no-cache" }).then((r) => r.text()).then((t) => {
       const m = t.match(/^\s*atlas\.opening\s*:\s*([a-z]+)/m); if (m) intro = m[1];
     }).catch(() => {}).then(() => Promise.race([mriLoaded, new Promise((r) => setTimeout(r, 9000))])).finally(() => {
+      if (introReady) return;                                           // the visitor already took over
       const q = new URLSearchParams(location.search).get("intro"); if (q) intro = q;
       if (intro === "mri" && (!mriPlane || !PL.coronal)) intro = "a";
       if (intro === "mri") { buildPlane("coronal"); pivot.rotation.set(0, Math.PI / 2, 0); dist = R * 3.3; mriPlane.visible = true; }
