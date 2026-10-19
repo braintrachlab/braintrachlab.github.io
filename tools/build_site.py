@@ -423,6 +423,8 @@ atlas = f'''
                 <option value="fa">FA map</option>
                 <option value="t1">T1</option>
                 <option value="t2">T2</option>
+                <option value="kb">Klüver–Barrera (Luxol fast blue)</option>
+                <option value="silver">Silver stain (Gallyas)</option>
               </select>
             </label>
             <button type="button">Hide section</button>

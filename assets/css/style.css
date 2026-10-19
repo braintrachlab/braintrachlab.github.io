@@ -578,7 +578,7 @@ form button { cursor: pointer; background: none; font: inherit; }
 .atlas-section { padding-top: 40px; }
 .atlas-view { position: relative; width: 100%; height: min(72vh, 720px); min-height: 420px; background: radial-gradient(circle at 50% 45%, #ffffff 0%, var(--bg-soft) 75%); border: 1px solid var(--line); overflow: hidden; touch-action: none; cursor: grab; }
 .atlas-view:active { cursor: grabbing; }
-.atlas-view canvas { display: block; width: 100%; height: 100%; position: relative; z-index: 1; }
+.atlas-view canvas { display: block; position: relative; z-index: 1; }
 /* intro: warm paper of the old anatomical plates, fading to the normal background */
 .atlas-view::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: var(--paper, 0);
   background: radial-gradient(circle at 50% 45%, #ffffff 0%, #f6f6f4 80%, #efefec 100%); }

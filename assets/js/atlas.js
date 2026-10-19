@@ -263,7 +263,8 @@
       P.sets[md] = { imgs, ready };
       return ready;
     }
-    const setName = () => (mode === "dejerine" && selected ? "base" : mode);   // a selected tract: only its fibres
+    const STAIN = { kb: 2, silver: 3 };                // kb: from the T1 of the slice; silver: from the fibre drawing
+    const setName = () => ((mode === "dejerine" || mode === "silver") ? (selected ? "base" : "dejerine") : mode === "kb" ? "t1" : mode);   // a selected tract: only its fibres
     function showSlice(k) {                       // one section on screen: swap the image of the single texture
       const P = PL[plane]; if (!P) return;
       k = Math.max(0, Math.min(P.n - 1, Math.round(k))); kNow = k;
@@ -292,6 +293,7 @@
       g.setIndex([0, 1, 2, 0, 2, 3]);
       if (mriPlane.geometry) mriPlane.geometry.dispose();
       mriPlane.geometry = g; mriPlane.position.set(0, 0, 0);
+      mriMat.uniforms.uRes.value.set(U.length() / 0.11, V.length() / 0.11);
       for (const t of tracts) mats[t.id].uniforms.uN.value.copy(nrm(p));
     }
     const atlasPos = (p, k) => PL[p].pos[k] + T.getComponent(PL[p].axis);
@@ -299,14 +301,39 @@
     if (mri) {
       mriMat = new THREE.ShaderMaterial({
         transparent: true, depthWrite: false, side: THREE.DoubleSide,
-        uniforms: { uA: { value: secTex }, uOpacity: { value: 0 }, uMode: { value: 0 } },
+        uniforms: { uA: { value: secTex }, uOpacity: { value: 0 }, uMode: { value: 0 }, uRes: { value: new THREE.Vector2(1400, 1400) } },
         vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-        fragmentShader: `uniform sampler2D uA; uniform float uOpacity; uniform float uMode; varying vec2 vUv;
+        fragmentShader: `uniform sampler2D uA; uniform float uOpacity; uniform float uMode; uniform vec2 uRes; varying vec2 vUv;
+          float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+          // stained cells: small round dots on a fine grid (density d, size r in cells)
+          float cells(vec2 p, float d, float r) {
+            vec2 g = floor(p), f = fract(p);
+            float h = hash(g); if (h > d) return 0.0;
+            vec2 c = vec2(hash(g + 7.1), hash(g + 3.7)) * 0.6 + 0.2;
+            return 1.0 - smoothstep(r * 0.6, r, length(f - c));
+          }
           void main() {
             vec4 tx = texture2D(uA, vUv);
             if (tx.a < 0.05) discard;                                          // no tissue: the background shows
             vec3 paper = vec3(0.975), inkc = vec3(0.235);                       // grey ink of the home-page plate
-            vec3 col = uMode < 0.5 ? mix(paper, inkc, tx.r * 0.92) : vec3(tx.r);  // Dejerine drawing, or T1 / FA
+            vec3 col = uMode < 0.5 ? mix(paper, inkc, tx.r * 0.92) : vec3(tx.r);  // Dejerine drawing, or T1 / FA / T2
+            if (uMode > 1.5 && uMode < 2.5) {                                 // Kluver-Barrera: Luxol fast blue + cresyl violet
+              vec2 o = vec2(0.0025);
+              float v = (tx.r * 2.0 + texture2D(uA, vUv + vec2(o.x, 0.0)).r + texture2D(uA, vUv - vec2(o.x, 0.0)).r
+                         + texture2D(uA, vUv + vec2(0.0, o.y)).r + texture2D(uA, vUv - vec2(0.0, o.y)).r) / 6.0;   // T1, smoothed
+              float my = smoothstep(0.47, 0.66, v);                             // myelin: white matter
+              float gm = smoothstep(0.10, 0.24, v) * (1.0 - my);               // grey matter
+              vec2 p = vUv * uRes;                                              // ~0.1 mm cells
+              vec3 wmc = mix(vec3(0.55, 0.68, 0.86), vec3(0.13, 0.29, 0.60), my);
+              col = mix(vec3(0.88, 0.75, 0.86), wmc, my);
+              col = mix(vec3(0.97, 0.95, 0.97), col, clamp(gm + my, 0.0, 1.0));
+              float c = cells(p, 0.30 * gm + 0.04 * my, 0.32) * (0.8 + 0.2 * hash(floor(p) + 1.3));
+              col = mix(col, vec3(0.38, 0.17, 0.42), c * 0.85);               // neurons and glia, violet
+            } else if (uMode > 2.5) {                                           // silver impregnation (Gallyas / Bielschowsky)
+              float ink = tx.r;                                                 // the drawing of the real fibres
+              vec3 amber = vec3(0.93, 0.83, 0.60), gold = vec3(0.68, 0.45, 0.20), black = vec3(0.11, 0.07, 0.04);
+              col = ink < 0.35 ? mix(amber, gold, ink / 0.35) : mix(gold, black, (ink - 0.35) / 0.65);
+            }
             gl_FragColor = vec4(col, uOpacity * smoothstep(0.05, 0.6, tx.a));
           }`,
       });
@@ -355,7 +382,7 @@
       }
       ovLines.geometry.setAttribute("position", new THREE.Float32BufferAttribute(L, 3));
       ovDots.geometry.setAttribute("position", new THREE.Float32BufferAttribute(D, 3));
-      const col = mode === "dejerine" ? 0x3c3c3c : new THREE.Color(...rgb((PAL[selected] || [[200, 60, 60], [230, 120, 110]])[1])).getHex();
+      const col = mode === "dejerine" ? 0x3c3c3c : mode === "silver" ? 0x1c120a : STAIN[mode] ? new THREE.Color(...rgb((PAL[selected] || [[60, 60, 60]])[0])).getHex() : new THREE.Color(...rgb((PAL[selected] || [[200, 60, 60], [230, 120, 110]])[1])).getHex();
       ovLines.material.color.set(col); ovDots.material.color.set(col);
       ovLines.position.set(0, 0, 0); ovLines.position.setComponent(ax, w + ovSide * 0.4);
       ovDots.position.copy(ovLines.position);
@@ -400,7 +427,7 @@
         });
       });
       selMode.addEventListener("change", () => {
-        mode = selMode.value; mriMat.uniforms.uMode.value = mode === "dejerine" ? 0 : 1;
+        mode = selMode.value; mriMat.uniforms.uMode.value = mode === "dejerine" ? 0 : STAIN[mode] || 1;
         loadSet(plane, setName()).then(() => { mriShown = null; showSlice(+slider.value); });
         openSection(false); drawOverlay();
       });
@@ -454,10 +481,21 @@
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     box.appendChild(renderer.domElement);
-    const fit = () => {
-      const r = box.getBoundingClientRect();
-      renderer.setSize(r.width, r.height, false); cam.aspect = r.width / r.height; cam.updateProjectionMatrix();
+    // the view shrinks to the free space when the card of a tract is open (beside it, or above it on phones)
+    let viewW = 0, viewH = 0;
+    const freeSize = () => {
+      const r = box.getBoundingClientRect(), pnl = document.getElementById("tract-panel");
+      const open = pnl && pnl.classList.contains("open");
+      if (!open) return [r.width, r.height];
+      return r.width > 700 ? [Math.max(200, r.width - pnl.offsetWidth), r.height] : [r.width, Math.max(160, r.height - pnl.offsetHeight)];
     };
+    const setView = (w, h) => {
+      viewW = w; viewH = h;
+      renderer.setSize(w, h, false); el0.style.width = w + "px"; el0.style.height = h + "px";
+      cam.aspect = w / h; cam.updateProjectionMatrix();
+    };
+    const el0 = renderer.domElement;
+    const fit = () => { const [w, h] = freeSize(); setView(w, h); };
     fit(); new ResizeObserver(fit).observe(box);
 
     // ---------- interaction: rotate, zoom, auto-turn ----------
@@ -689,8 +727,8 @@
         if (Math.abs(viewTo.y - pivot.rotation.y) < 0.002) viewTo = null;
       }
       // when the card is open, slide the brain into the free part of the view
-      const shiftTo = selected && box.clientWidth > 700 ? -R * 0.55 * (dist / (R * 3.6)) : 0;
-      pivot.position.x += (shiftTo - pivot.position.x) * k;
+      { const [tw, th] = freeSize();                     // ease the view to the free space
+        if (Math.abs(tw - viewW) > 0.5 || Math.abs(th - viewH) > 0.5) setView(viewW + (tw - viewW) * Math.min(1, k * 1.6) + Math.sign(tw - viewW) * 0.5, viewH + (th - viewH) * Math.min(1, k * 1.6) + Math.sign(th - viewH) * 0.5); }
       if (!auto && now - lastInteract > 12000 && !selected && !sliderOn) auto = true;
       cam.position.set(0, 0, dist); cam.lookAt(0, 0, 0);
       stepStyle(k);
