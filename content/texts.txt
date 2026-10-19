@@ -33,8 +33,9 @@ footer.tagline: White matter neuroanatomy & history of neuroscience
 
 # ---------------- HOME PAGE
 home.eyebrow: Neuroanatomy lab
-home.title: Mapping the *connections* of the human brain
-home.lead: We study the white matter pathways that link brain regions: their anatomy in the human brain and, through comparative studies, in non-human primates; their functions; and how they change in health and disease.
+home.title: Mapping the brain *connections*
+home.lead: In 1999, the development of tractography revolutionized the study of brain connections. Since, we have discovered with tractography how connections develop in the human brain, the functional correlates and what is unique to humans compared to other species.
+The application of tractography to neurological and psychiatric disorders has revealed symptoms associated with damage to specific tracts and has opened the possibility of describing novel disconnection syndromes.
 home.button1: Our research
 home.button2: About us
 home.who.eyebrow: Who we are
