@@ -131,7 +131,7 @@ news.page_description: News and events from BrainTraCh Lab.
 
 # ---------------- NOMINA ANATOMICA PAGE (the terms are in content/nomina.txt)
 nomina.eyebrow: Nomina Anatomica
-nomina.title: The names of the white matter
+nomina.title: Nomenclature of the white matter
 nomina.intro: A glossary of white matter tracts: their names, synonyms and the history of their description.
 nomina.page_title: Nomina Anatomica — BrainTraCh Lab
 nomina.page_description: A glossary of white matter tracts: names, synonyms and history.
