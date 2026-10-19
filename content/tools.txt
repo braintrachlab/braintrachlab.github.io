@@ -1,0 +1,26 @@
+# ======================================================================
+#  HOW TO WRITE IN THIS FILE  (the same rules apply to every file in /content)
+#
+#  - One field per line:            key: value
+#  - An empty line separates two entries.
+#  - Lines starting with # are comments and are ignored.
+#  - Text formatting, usable in any text:
+#        *italic*     **bold**     [label](https://...)     " | " = new line
+#  - photo:  file name of a picture uploaded to the folder assets/img/
+#            (e.g.  photo: seminar-2026.jpg)
+#  - Leave a field empty, or delete the line, if you do not need it.
+# ======================================================================
+#
+#  TOOLS — one entry per tool, atlas, software or dataset.
+#
+#  name:   name of the tool                                   (required)
+#  type:   Atlas, Software, Dataset, Template...
+#  text:   short description
+#  link:   web page, download or repository (it makes the card clickable)
+#  photo:  picture or logo, file name in assets/img/
+# ======================================================================
+
+name: 3D Tract Atlas
+type: Interactive atlas
+text: Rotate the brain, click a tract and read its anatomy, history and function. Tractography reconstructions shown with the style of the classical anatomical plates.
+link: atlas.html

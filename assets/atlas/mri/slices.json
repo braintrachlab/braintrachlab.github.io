@@ -1,0 +1,19 @@
+{
+ "n": 151,
+ "cols": 13,
+ "rows": 12,
+ "w": 154,
+ "h": 168,
+ "px_mm": 0.9,
+ "slice_mm": 1.25,
+ "brain": {
+  "width_mm": 133.787,
+  "height_mm": 146.294,
+  "length_mm": 188.75,
+  "center_px": [
+   76.85277777777777,
+   83.80111111111111
+  ]
+ },
+ "note": "slice 0 = most anterior; image left = subject's right (radiological, as in FSLeyes)"
+}

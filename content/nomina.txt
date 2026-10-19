@@ -1,0 +1,88 @@
+# ======================================================================
+#  HOW TO WRITE IN THIS FILE  (the same rules apply to every file in /content)
+#
+#  - One field per line:            key: value
+#  - An empty line separates two entries.
+#  - Lines starting with # are comments and are ignored.
+#  - Text formatting, usable in any text:
+#        *italic*     **bold**     [label](https://...)     " | " = new line
+#  - photo:  file name of a picture uploaded to the folder assets/img/
+#            (e.g.  photo: seminar-2026.jpg)
+#  - Leave a field empty, or delete the line, if you do not need it.
+# ======================================================================
+#
+#  NOMINA ANATOMICA — one entry per term (shown in alphabetical order).
+#
+#  term:      name of the tract or structure                  (required)
+#  latin:     Latin name
+#  synonyms:  other names, separated by commas
+#  system:    Association, Commissural, Projection or Limbic   (used by the filter buttons)
+#  text:      definition: course and connections
+#  history:   who described or named it, and when
+#  links:     further reading, e.g. [Author, Journal (Year)](https://doi.org/...)
+#
+#  NOTE: first draft, to be reviewed by the lab before publication.
+# ======================================================================
+
+term: Arcuate fasciculus
+latin: Fasciculus arcuatus
+synonyms: Superior longitudinal fasciculus (in part, in older texts)
+system: Association
+text: A perisylvian association tract that arches around the Sylvian fissure, connecting the temporal lobe with the frontal and parietal lobes. It is a key pathway of the language network.
+history: Described by Reil at the beginning of the 19th century and named *fasciculus arcuatus* by Burdach (1822) for its arched course.
+links: [Catani & Thiebaut de Schotten, *Cortex* (2008)](https://doi.org/10.1016/j.cortex.2008.05.004)
+
+term: Anterior commissure
+latin: Commissura anterior
+system: Commissural
+text: A compact bundle crossing the midline in front of the fornix columns, connecting parts of the temporal lobes and the olfactory regions of the two hemispheres.
+
+term: Anterior thalamic radiations
+latin: Radiatio thalami anterior
+synonyms: Anterior thalamic peduncle
+system: Projection
+text: Fibres linking the anterior and medial thalamic nuclei with the prefrontal and anterior cingulate cortex through the anterior limb of the internal capsule.
+
+term: Cingulum
+latin: Cingulum
+system: Limbic
+text: A long association tract running within the white matter of the cingulate gyrus, from the orbitofrontal region around the corpus callosum to the parahippocampal gyrus and the temporal pole.
+history: The name, from the Latin for "girdle", was given by Burdach (1822).
+
+term: Corpus callosum
+latin: Corpus callosum
+synonyms: Great commissure
+system: Commissural
+text: The largest commissure of the brain, linking the two cerebral hemispheres. Its parts are the rostrum, genu, body and splenium; the forceps minor and forceps major are its frontal and occipital radiations.
+history: Known since antiquity and described by Galen; illustrated by Vesalius in the *De humani corporis fabrica* (1543).
+
+term: Fornix
+latin: Fornix
+system: Limbic
+text: The main output pathway of the hippocampus, arching under the corpus callosum to the mammillary bodies, the septal region and the anterior thalamus.
+
+term: Frontal aslant tract
+synonyms: FAT
+system: Association
+text: A short frontal tract linking the posterior inferior frontal gyrus with the supplementary and pre-supplementary motor areas, involved in speech initiation and verbal fluency.
+history: Named in the tractography era, as one of the short frontal lobe connections of the human brain.
+links: [Citro et al., *Nature Communications* (2026)](https://doi.org/10.1038/s41467-026-73731-8)
+
+term: Inferior fronto-occipital fasciculus
+latin: Fasciculus fronto-occipitalis inferior
+synonyms: IFOF, inferior occipito-frontal fasciculus
+system: Association
+text: A long ventral pathway from the occipital and posterior temporal cortex to the frontal lobe, passing through the temporal stem and the extreme/external capsule.
+
+term: Inferior longitudinal fasciculus
+latin: Fasciculus longitudinalis inferior
+synonyms: ILF
+system: Association
+text: A ventral association tract connecting the occipital lobe with the anterior temporal lobe, along the lateral wall of the temporal horn of the lateral ventricle.
+
+term: Uncinate fasciculus
+latin: Fasciculus uncinatus
+synonyms: UF
+system: Association
+text: A hook-shaped tract connecting the anterior temporal lobe with the orbitofrontal cortex through the limen insulae.
+history: The name refers to its hooked course (Latin *uncus*, hook).

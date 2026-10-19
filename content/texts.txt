@@ -25,9 +25,11 @@ site.animation_speed: 0.75
 nav.home: Home
 nav.about: About us
 nav.research: Research
-nav.atlas: Atlas
 nav.publications: Publications
 nav.news: News & Events
+nav.atlas: Atlas
+nav.nomina: Nomina Anatomica
+nav.tools: Tools
 nav.contacts: Contacts
 footer.tagline: White matter neuroanatomy & history of neuroscience
 
@@ -104,6 +106,9 @@ research.history.p2:
 research.page_title: Research — BrainTraCh Lab
 research.page_description: Research areas of BrainTraCh Lab: white matter anatomy, comparative neuroanatomy, connections in disease, history of neuroscience.
 
+# ---------------- ATLAS OPENING ANIMATION — mri = the MRI sections drawn like Dejerine's plates, then the streamlines; a, b, c = a pen drawing that turns into streamlines; d = Dejerine's section lines I-XII; none = no animation
+atlas.opening: mri
+
 # ---------------- ATLAS PAGE (the cards of the tracts are in content/tracts.txt)
 atlas.eyebrow: Atlas
 atlas.title: The white matter in three dimensions
@@ -123,6 +128,20 @@ news.title: News & Events
 news.intro: Seminars, conferences, new publications and life in the lab.
 news.page_title: News & Events — BrainTraCh Lab
 news.page_description: News and events from BrainTraCh Lab.
+
+# ---------------- NOMINA ANATOMICA PAGE (the terms are in content/nomina.txt)
+nomina.eyebrow: Nomina Anatomica
+nomina.title: The names of the white matter
+nomina.intro: A glossary of white matter tracts: their names, synonyms and the history of their description.
+nomina.page_title: Nomina Anatomica — BrainTraCh Lab
+nomina.page_description: A glossary of white matter tracts: names, synonyms and history.
+
+# ---------------- TOOLS PAGE (the tools are in content/tools.txt)
+tools.eyebrow: Tools
+tools.title: Tools and resources
+tools.intro: Atlases, software and data developed or used by the lab, freely available to the community.
+tools.page_title: Tools — BrainTraCh Lab
+tools.page_description: Atlases, software and data of the BrainTraCh Lab.
 
 # ---------------- CONTACTS PAGE (in the address, ' | ' starts a new line)
 contacts.eyebrow: Contacts

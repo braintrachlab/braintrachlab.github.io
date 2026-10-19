@@ -15,7 +15,8 @@
 //   text:  a paragraph of description
 (function () {
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const safeUrl = (u) => (/^(https?:|mailto:)/i.test((u || "").trim()) ? u.trim() : "");
+  // web addresses, e-mails, or pages of this site (e.g. atlas.html)
+  const safeUrl = (u) => { u = (u || "").trim(); return /^(https?:|mailto:)/i.test(u) || /^[\w\-./#?=&]+$/.test(u) ? u : ""; };
   const md = (t) => esc(t)
     .replace(/\[([^\]]+)\]\(((?:https?:|mailto:)[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
@@ -121,6 +122,64 @@
           ${c.people ? `<p class="who">${md(c.people)}</p>` : ""}
           ${c.text ? `<p class="who">${md(c.text)}</p>` : ""}
         </li>`).join("");
+    });
+  }
+
+
+  // ---------- Nomina Anatomica (content/nomina.txt) ----------
+  const nomList = document.getElementById("nomina-list");
+  if (nomList) {
+    load("content/nomina.txt").then((items) => {
+      items = items.filter((n) => n.term).sort((a, b) => a.term.localeCompare(b.term));
+      const search = document.getElementById("nomina-search");
+      const filters = document.getElementById("nomina-filters");
+      const letters = document.getElementById("nomina-letters");
+      const systems = [...new Set(items.map((n) => n.system).filter(Boolean))].sort();
+      filters.innerHTML = ["All", ...systems].map((x, i) => `<button class="${i ? "" : "active"}" data-sys="${esc(x)}">${esc(x)}</button>`).join("");
+      let sys = "All";
+      const row = (n) => `<article class="nomen" id="${esc(n.term.toLowerCase().replace(/[^a-z0-9]+/g, "-"))}">
+          <h3>${md(n.term)}${n.latin ? ` <span class="latin">${md(n.latin)}</span>` : ""}</h3>
+          <p class="nomen-meta">${[n.system ? `<span class="badge">${esc(n.system)}</span>` : "", n.synonyms ? `<span>Synonyms: ${md(n.synonyms)}</span>` : ""].join("")}</p>
+          ${n.text ? `<p>${md(n.text)}</p>` : ""}
+          ${n.history ? `<p class="nomen-history"><span>History</span>${md(n.history)}</p>` : ""}
+          ${n.links ? `<p class="nomen-links">${md(n.links)}</p>` : ""}
+        </article>`;
+      function draw() {
+        const q = (search.value || "").trim().toLowerCase();
+        const shown = items.filter((n) => (sys === "All" || n.system === sys) &&
+          (!q || Object.values(n).join(" ").toLowerCase().includes(q)));
+        const groups = {};
+        shown.forEach((n) => { const L = n.term[0].toUpperCase(); (groups[L] = groups[L] || []).push(n); });
+        const L = Object.keys(groups).sort();
+        letters.innerHTML = L.map((x) => `<a href="#letter-${x}">${x}</a>`).join("");
+        nomList.innerHTML = L.length
+          ? L.map((x) => `<section class="nomina-group" id="letter-${x}"><h2 class="nomina-letter">${x}</h2>${groups[x].map(row).join("")}</section>`).join("")
+          : `<p class="muted">No term found.</p>`;
+      }
+      search.addEventListener("input", draw);
+      filters.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+        filters.querySelectorAll("button").forEach((x) => x.classList.toggle("active", x === b));
+        sys = b.dataset.sys; draw();
+      }));
+      draw();
+    });
+  }
+
+  // ---------- Tools (content/tools.txt) ----------
+  const toolList = document.getElementById("tool-list");
+  if (toolList) {
+    load("content/tools.txt").then((items) => {
+      items = items.filter((t) => t.name);
+      toolList.innerHTML = items.length ? items.map((t) => {
+        const inner = `${t.photo ? `<img class="tool-photo" src="${esc(photoUrl(t.photo))}" alt="" loading="lazy">` : ""}
+            ${t.type ? `<span class="badge">${esc(t.type)}</span>` : ""}
+            <h3>${md(t.name)}</h3>
+            ${t.text ? `<p>${md(t.text)}</p>` : ""}
+            ${safeUrl(t.link) ? `<span class="tool-more">Open &rarr;</span>` : ""}`;
+        const u = safeUrl(t.link);
+        return u ? `<a class="tool-card" href="${esc(u)}"${/^https?:/i.test(u) ? ' target="_blank" rel="noopener"' : ""}>${inner}</a>`
+                 : `<div class="tool-card">${inner}</div>`;
+      }).join("") : `<p class="muted">Tools will be listed here soon.</p>`;
     });
   }
 

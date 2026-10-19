@@ -70,8 +70,10 @@ def IMG(key, label, cls="figure", style="", parallax=True):
 
 # ---------------------------------------------------------------- layout
 NAV = [("index.html", "nav.home", "Home"), ("about.html", "nav.about", "About us"),
-       ("research.html", "nav.research", "Research"), ("atlas.html", "nav.atlas", "Atlas"), ("publications.html", "nav.publications", "Publications"),
-       ("news.html", "nav.news", "News & Events"), ("contacts.html", "nav.contacts", "Contacts")]
+       ("research.html", "nav.research", "Research"), ("publications.html", "nav.publications", "Publications"),
+       ("news.html", "nav.news", "News & Events"), ("atlas.html", "nav.atlas", "Atlas"),
+       ("nomina.html", "nav.nomina", "Nomina Anatomica"), ("tools.html", "nav.tools", "Tools"),
+       ("contacts.html", "nav.contacts", "Contacts")]
 
 # ---------------------------------------------------------------- cache busting
 # Every asset reference gets ?v=<hash of the file>, so a browser can never combine an
@@ -375,6 +377,8 @@ page("research.html", "research.page_title", "Research — TrachLab", "research.
      "Research areas of TrachLab: white matter anatomy, comparative neuroanatomy, connections in disease, history of neuroscience.", research)
 
 # ================================================================= ATLAS
+section("ATLAS OPENING ANIMATION — mri = the MRI sections drawn like Dejerine's plates, then the streamlines; a, b, c = a pen drawing that turns into streamlines; d = Dejerine's section lines I-XII; none = no animation")
+val("atlas.opening", "mri")
 section("ATLAS PAGE (the cards of the tracts are in content/tracts.txt)")
 atlas = f'''
     <header class="page-header">
@@ -446,6 +450,50 @@ news = f'''
 page("news.html", "news.page_title", "News & Events — TrachLab", "news.page_description", "News and events from TrachLab.", news)
 
 # ================================================================= CONTACTS
+
+section("NOMINA ANATOMICA PAGE (the terms are in content/nomina.txt)")
+nomina = f'''
+    <header class="page-header">
+      <div class="container">
+        {T("span", "nomina.eyebrow", "Nomina Anatomica", "eyebrow reveal")}
+        {T("h1", "nomina.title", "The names of the white matter", "reveal d1")}
+        {T("p", "nomina.intro", "A glossary of white matter tracts: their names, synonyms and the history of their description.", "reveal d2")}
+      </div>
+    </header>
+
+    <section style="padding-top:30px">
+      <div class="container narrow">
+        <div class="nomina-tools">
+          <input type="search" id="nomina-search" placeholder="Search a term, a synonym, an author…" aria-label="Search the glossary">
+          <div class="filters" id="nomina-filters"></div>
+        </div>
+        <div id="nomina-letters" class="nomina-letters"></div>
+        <div id="nomina-list"></div>
+      </div>
+    </section>
+'''
+page("nomina.html", "nomina.page_title", "Nomina Anatomica — BrainTraCh Lab", "nomina.page_description",
+     "A glossary of white matter tracts: names, synonyms and history.", nomina)
+
+section("TOOLS PAGE (the tools are in content/tools.txt)")
+tools = f'''
+    <header class="page-header">
+      <div class="container">
+        {T("span", "tools.eyebrow", "Tools", "eyebrow reveal")}
+        {T("h1", "tools.title", "Tools and resources", "reveal d1")}
+        {T("p", "tools.intro", "Atlases, software and data developed or used by the lab, freely available to the community.", "reveal d2")}
+      </div>
+    </header>
+
+    <section style="padding-top:30px">
+      <div class="container">
+        <div class="tool-grid" id="tool-list"></div>
+      </div>
+    </section>
+'''
+page("tools.html", "tools.page_title", "Tools — BrainTraCh Lab", "tools.page_description",
+     "Atlases, software and data of the BrainTraCh Lab.", tools)
+
 section("CONTACTS PAGE (in the address, ' | ' starts a new line)")
 contacts = f'''
     <header class="page-header">

@@ -31,7 +31,8 @@
     fetch(box.dataset.meta).then((r) => r.json()),
     fetch(box.dataset.bin).then((r) => r.arrayBuffer()),
     C.load("content/tracts.txt"),
-  ]).then(([THREE, meta, buf, cards]) => {
+    fetch("assets/atlas/mri/slices.json").then((r) => (r.ok ? r.json() : null)).catch(() => null),
+  ]).then(([THREE, meta, buf, cards, mri]) => {
     const nl = meta.tracts.reduce((a, t) => a + t.lines, 0);
     const counts = new Uint16Array(buf, 0, nl);
     const q = new Int16Array(buf, nl * 2 + (nl * 2) % 2);
@@ -49,25 +50,34 @@
     let off = 0, li = 0;
     const WIDTH = 0.42;            // tube radius in mm
     const vert = `
-      attribute vec3 tangent; attribute float side; attribute float t; attribute float shade;
-      uniform float uWidth;
-      varying vec3 vT; varying vec3 vB; varying float vSide; varying float vt; varying float vShade;
+      attribute vec3 tangent; attribute float side; attribute float t; attribute float shade; attribute float u;
+      uniform float uWidth; uniform float uInk; uniform float uWave; uniform float uInkW;
+      varying vec3 vT; varying vec3 vB; varying float vSide; varying float vt; varying float vShade; varying float vInk; varying float vY;
       void main() {
+        vY = position.y;
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         vec3 T = normalize(mat3(modelViewMatrix) * tangent);
         vec3 V = normalize(-mv.xyz);
         vec3 B = cross(T, V);
         float bl = length(B);
         B = bl > 1e-4 ? B / bl : vec3(1.0, 0.0, 0.0);
-        mv.xyz += B * side * uWidth;
-        vT = T; vB = B; vSide = side; vt = t; vShade = shade;
+        // "Dejerine" pen stroke: thin and tapered at both ends; tractography: full tube
+        float ink = uInk * smoothstep(uWave - 0.08, uWave, t);
+        float taper = 0.3 + 0.7 * pow(max(sin(3.14159 * u), 0.0), 0.6);
+        mv.xyz += B * side * mix(uWidth, uInkW * taper, ink);
+        vT = T; vB = B; vSide = side; vt = t; vShade = shade; vInk = ink;
         gl_Position = projectionMatrix * mv;
       }`;
     const frag = `
       uniform vec3 cDark; uniform vec3 cLight; uniform float uProg; uniform float uAlpha; uniform float uFade;
-      varying vec3 vT; varying vec3 vB; varying float vSide; varying float vt; varying float vShade;
+      uniform float uSweep; uniform float uSweepOn;
+      varying vec3 vT; varying vec3 vB; varying float vSide; varying float vt; varying float vShade; varying float vInk; varying float vY;
       void main() {
         if (vt > uProg) discard;
+        // section sweep (front to back): fibres exist only in front of the moving section plane
+        if (uSweepOn > 0.5 && vY < uSweep) discard;
+        float born = uSweepOn > 0.5 ? smoothstep(0.0, 3.5, vY - uSweep) : 1.0;     // soft edge where the fibres emerge
+        float nearPlane = uSweepOn * (1.0 - smoothstep(0.0, 9.0, vY - uSweep));
         float a = clamp(vSide, -1.0, 1.0);
         float nz = sqrt(max(0.0, 1.0 - a * a));
         vec3 F = normalize(cross(vB, vT));            // across the tube, facing the viewer
@@ -79,9 +89,12 @@
         float k = clamp(0.12 + 0.88 * diff, 0.0, 1.0) * (0.85 + 0.15 * vShade);
         vec3 col = mix(cDark, cLight, k) + vec3(0.32) * spec;
         col *= 0.62 + 0.38 * nz;                        // darker rims: the tube outline
+        vec3 inkCol = mix(vec3(0.17, 0.13, 0.10), vec3(0.42, 0.34, 0.26), vShade);   // sepia ink of the old plates
+        inkCol *= 1.0 - 0.45 * nearPlane;                                          // fresh ink where the fibres emerge
+        col = mix(col, inkCol, vInk);
         col = mix(col, vec3(0.86, 0.87, 0.88), uFade * 0.92);      // non-selected tracts: pale grey ghost
         float front = smoothstep(uProg - 0.03, uProg, vt);
-        gl_FragColor = vec4(col, uAlpha * (1.0 - 0.6 * front));
+        gl_FragColor = vec4(col, born * uAlpha * (1.0 - 0.6 * front) * mix(1.0, min(1.0, 0.62 + 0.38 * nearPlane), vInk));
       }`;
     // growth direction of each tract (x = left→right, y = back→front, z = bottom→top)
     const GROW = {
@@ -96,7 +109,7 @@
       let nseg = 0;
       for (let n = 0; n < t.lines; n++) nseg += counts[li + n] - 1;
       const pos = new Float32Array(nseg * 4 * 3), tan = new Float32Array(nseg * 4 * 3);
-      const side = new Float32Array(nseg * 4), tt = new Float32Array(nseg * 4), sh = new Float32Array(nseg * 4);
+      const side = new Float32Array(nseg * 4), tt = new Float32Array(nseg * 4), sh = new Float32Array(nseg * 4), uu = new Float32Array(nseg * 4);
       const idx = new Uint32Array(nseg * 6);
       const pick = [];
       let v = 0, e = 0;
@@ -115,9 +128,9 @@
           const ta = [b[0] - pa[0], b[1] - pa[1], b[2] - pa[2]], tb = [pb[0] - a[0], pb[1] - a[1], pb[2] - a[2]];
           const u0 = U(k), u1 = U(k + 1);
           const g0 = u0 * 0.85 + s * 0.15, g1 = u1 * 0.85 + s * 0.15;
-          const quad = [[a, ta, -1, g0], [a, ta, 1, g0], [b, tb, -1, g1], [b, tb, 1, g1]];
-          for (const [p, d, sd, g] of quad) {
-            pos.set(p, v * 3); tan.set(d, v * 3); side[v] = sd; tt[v] = g; sh[v] = s; v++;
+          const quad = [[a, ta, -1, g0, u0], [a, ta, 1, g0, u0], [b, tb, -1, g1, u1], [b, tb, 1, g1, u1]];
+          for (const [p, d, sd, g, uv] of quad) {
+            pos.set(p, v * 3); tan.set(d, v * 3); side[v] = sd; tt[v] = g; sh[v] = s; uu[v] = uv; v++;
           }
           const o = v - 4;
           idx.set([o, o + 1, o + 2, o + 1, o + 3, o + 2], e); e += 6;
@@ -131,17 +144,135 @@
       g.setAttribute("side", new THREE.BufferAttribute(side, 1));
       g.setAttribute("t", new THREE.BufferAttribute(tt, 1));
       g.setAttribute("shade", new THREE.BufferAttribute(sh, 1));
+      g.setAttribute("u", new THREE.BufferAttribute(uu, 1));
       g.setIndex(new THREE.BufferAttribute(idx, 1));
       const pal = PAL[t.id] || [[90, 96, 110], [180, 186, 196]];
       const m = new THREE.ShaderMaterial({
         vertexShader: vert, fragmentShader: frag, transparent: true, depthWrite: true, side: THREE.DoubleSide,
         uniforms: { cDark: { value: new THREE.Color(...rgb(pal[0])) }, cLight: { value: new THREE.Color(...rgb(pal[1])) },
-                    uProg: { value: 0 }, uAlpha: { value: 1.0 }, uFade: { value: 0 }, uWidth: { value: WIDTH } },
+                    uProg: { value: 0 }, uAlpha: { value: 1.0 }, uFade: { value: 0 }, uWidth: { value: WIDTH },
+                    uInk: { value: 1 }, uWave: { value: -0.2 }, uInkW: { value: 0.13 }, uSweep: { value: 999 }, uSweepOn: { value: 0 } },
       });
       mats[t.id] = m;
       pickPts[t.id] = pick;
       const mesh = new THREE.Mesh(g, m); mesh.renderOrder = 1; mesh.frustumCulled = false; meshes[t.id] = mesh;
       group.add(mesh);
+    }
+
+
+    // ---------- Dejerine's section planes (fig. 278): lines I-XII, from front to back ----------
+    // positions measured on the plate, as fractions of the hemisphere length from the frontal pole
+    const SECT = [0.195, 0.23, 0.36, 0.385, 0.40, 0.447, 0.478, 0.50, 0.54, 0.625, 0.76, 0.845];
+    const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+    const ext = { y0: Infinity, y1: -Infinity, z0: Infinity, z1: -Infinity };
+    for (let i = 0; i < q.length; i += 3) {
+      const y = q[i + 1] * sc, z = q[i + 2] * sc;
+      if (y < ext.y0) ext.y0 = y; if (y > ext.y1) ext.y1 = y; if (z < ext.z0) ext.z0 = z; if (z > ext.z1) ext.z1 = z;
+    }
+    const front = ext.y1 + 8, back = ext.y0 - 8;                  // the cortex lies a little beyond the fibres
+    const secY = SECT.map((f) => front - f * (front - back));
+    const lineTop = ext.z1 + 6, lineBot = ext.z0 - 3;
+    const lp = [], lu = [], lid = [];
+    secY.forEach((y, i) => {
+      const n = 60;
+      for (let k = 0; k < n; k++) {
+        for (const kk of [k, k + 1]) { lp.push(0, y, lineTop - (lineTop - lineBot) * kk / n); lu.push(kk / n); lid.push(i); }
+      }
+    });
+    const lg = new THREE.BufferGeometry();
+    lg.setAttribute("position", new THREE.Float32BufferAttribute(lp, 3));
+    lg.setAttribute("u", new THREE.Float32BufferAttribute(lu, 1));
+    lg.setAttribute("lid", new THREE.Float32BufferAttribute(lid, 1));
+    const lineMat = new THREE.ShaderMaterial({
+      transparent: true, depthTest: false, depthWrite: false,
+      uniforms: { uDraw: { value: 0 }, uLineA: { value: 0 }, uActive: { value: -1 } },
+      vertexShader: `attribute float u; attribute float lid; varying float vu; varying float vid;
+        void main() { vu = u; vid = lid; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: `uniform float uDraw; uniform float uLineA; uniform float uActive; varying float vu; varying float vid;
+        void main() {
+          float shown = clamp((uDraw - vid * 0.11) / 0.45, 0.0, 1.0);
+          if (vu > shown) discard;
+          if (vid > 8.5 && fract(vu * 34.0) > 0.62) discard;                 // the posterior lines are dashed, as on the plate
+          float act = 1.0 - smoothstep(0.0, 0.6, abs(vid - uActive));
+          gl_FragColor = vec4(mix(vec3(0.36, 0.30, 0.24), vec3(0.12, 0.09, 0.07), act), uLineA * (0.55 + 0.45 * act));
+        }`,
+    });
+    const secLines = new THREE.LineSegments(lg, lineMat); secLines.renderOrder = 5; secLines.frustumCulled = false;
+    group.add(secLines);
+    const numerals = document.createElement("div"); numerals.className = "atlas-numerals";
+    numerals.innerHTML = ROMAN.map((r) => `<span>${r}</span>`).join("");
+    box.appendChild(numerals);
+    const numEls = [...numerals.children];
+    const inset = document.createElement("figure"); inset.className = "atlas-coupe";
+    inset.innerHTML = '<div class="sec-imgs"></div><figcaption></figcaption>';
+    box.appendChild(inset);
+    const secImgs = SECT.map((_, i) => {
+      const im = new Image(); im.alt = ""; im.src = `assets/atlas/sections/coupe-${String(i + 1).padStart(2, "0")}.webp`;
+      inset.firstChild.appendChild(im); return im;
+    });
+    let shownSec = -1;
+    function showSection(i) {
+      if (i === shownSec) return; shownSec = i;
+      secImgs.forEach((im, k) => im.classList.toggle("on", k === i));
+      inset.querySelector("figcaption").innerHTML = i >= 0 ? `Dejerine, coupe <em>${ROMAN[i]}</em>` : "";
+      lineMat.uniforms.uActive.value = i;
+    }
+
+
+    // ---------- MRI sections drawn like Dejerine's plates (intro "mri") ----------
+    // The coronal slices of the brain (front to back) are packed in assets/atlas/mri/slices.png;
+    // the shader turns each one into an engraving: myelin (white matter) dark and hatched as in a
+    // Weigert stain, cortex light and stippled, ink contours at the pial surface and grey/white border.
+    let mriPlane = null, mriMat = null, mriY0 = 0;
+    if (mri) {
+      const tex = new THREE.TextureLoader().load("assets/atlas/mri/slices.png");
+      tex.minFilter = THREE.LinearFilter; tex.magFilter = THREE.LinearFilter; tex.generateMipmaps = false; tex.flipY = false;
+      const px = mri.px_mm, cx = mri.brain.center_px[0], rTop = 2.5, zTop = ext.z1 + 5;
+      mriY0 = (mri.n - 1) / 2 * mri.slice_mm;                    // slice 0 (frontal pole) lies here
+      const xa = (cx - mri.w) * px, xb = cx * px, za = zTop - (mri.h - rTop) * px, zb = zTop + rTop * px;
+      const pg = new THREE.BufferGeometry();
+      pg.setAttribute("position", new THREE.Float32BufferAttribute([xa, 0, za, xb, 0, za, xb, 0, zb, xa, 0, zb], 3));
+      pg.setIndex([0, 1, 2, 0, 2, 3]);
+      mriMat = new THREE.ShaderMaterial({
+        transparent: true, depthWrite: false, side: THREE.DoubleSide, extensions: { derivatives: true },
+        uniforms: { uTex: { value: tex }, uSlice: { value: 0 }, uN: { value: mri.n }, uGrid: { value: new THREE.Vector2(mri.cols, mri.rows) },
+                    uTile: { value: new THREE.Vector2(mri.w, mri.h) }, uCx: { value: cx }, uRTop: { value: rTop }, uZTop: { value: zTop },
+                    uPx: { value: px }, uOpacity: { value: 0 } },
+        vertexShader: `varying vec3 vP; void main() { vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+        fragmentShader: `
+          uniform sampler2D uTex; uniform float uSlice; uniform float uN; uniform vec2 uGrid; uniform vec2 uTile;
+          uniform float uCx; uniform float uRTop; uniform float uZTop; uniform float uPx; uniform float uOpacity;
+          varying vec3 vP;
+          float tile(float k, vec2 cr) {
+            float c = mod(k, uGrid.x), r = floor(k / uGrid.x);
+            vec2 p = vec2(c * uTile.x, r * uTile.y) + clamp(cr, vec2(0.5), uTile - 0.5);
+            return texture2D(uTex, p / (uGrid * uTile)).r;
+          }
+          float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+          void main() {
+            vec2 cr = vec2(uCx - vP.x / uPx, uRTop + (uZTop - vP.z) / uPx);
+            float k0 = floor(uSlice), f = uSlice - k0;
+            float v = mix(tile(k0, cr), tile(min(k0 + 1.0, uN - 1.0), cr), f);
+            if (v < 0.004) discard;
+            float n = max(v - 0.02, 0.0) / 0.98;
+            float wm = smoothstep(0.60, 0.80, n), gm = smoothstep(0.22, 0.45, n);
+            float dens = 0.07 * gm + 0.62 * wm;
+            vec2 mm = vec2(vP.x, vP.z);
+            float ph = dot(mm, vec2(0.42, 0.91)) / 1.05 + 0.6 * sin(mm.x * 0.09 + mm.y * 0.05);
+            float line = abs(fract(ph) - 0.5) * 2.0;
+            float aa = fwidth(ph) * 1.6 + 0.02;
+            float ink = (1.0 - smoothstep(dens * 1.3 - aa, dens * 1.3 + aa, line)) * step(0.02, dens);
+            ink = max(ink, smoothstep(0.60, 0.69, dens) * 0.55);                       // deep white matter
+            ink = max(ink, step(0.9, hash(floor(mm * 2.6))) * gm * (1.0 - wm) * 0.55);   // stipple of the cortex
+            float dn = fwidth(n) + 1e-4, dv = fwidth(v) + 1e-4;
+            ink = max(ink, (1.0 - smoothstep(0.0, dn * 1.3, abs(n - 0.70))) * 0.5);    // grey/white border
+            ink = max(ink, (1.0 - smoothstep(0.0, dv * 1.3, abs(v - 0.12))) * 0.95);   // pial surface
+            vec3 sepia = mix(vec3(0.16, 0.12, 0.09), vec3(0.30, 0.24, 0.18), 1.0 - wm);
+            gl_FragColor = vec4(sepia, ink * uOpacity);
+          }`,
+      });
+      mriPlane = new THREE.Mesh(pg, mriMat); mriPlane.renderOrder = 4; mriPlane.frustumCulled = false; mriPlane.visible = false;
+      group.add(mriPlane);
     }
 
     // ---------- scene ----------
@@ -259,26 +390,124 @@
     box.querySelector(".atlas-reset").addEventListener("click", () => { select(null); pivot.rotation.set(0, 0, 0); dist = R * 3.6; auto = true; });
 
     // ---------- animation ----------
+    // Intro: the fibres are first drawn as pen strokes on paper, like the plates of Dejerine,
+    // then they turn into tractography streamlines. Style: "atlas.opening" in content/texts.txt
+    //   a = the drawing dissolves into the streamlines     b = a wave re-traces every fibre
+    //   c = the brain starts to turn while the 3D emerges
+    //   d = Dejerine's section planes (fig. 278): the fibres emerge from the sections, front to back
+    //   none = no drawing
     const speed = 0.75;
-    let t0 = null, started = false, prev = null;
+    let intro = "mri";
+    fetch("content/texts.txt", { cache: "no-cache" }).then((r) => r.text()).then((t) => {
+      const m = t.match(/^\s*atlas\.opening\s*:\s*([a-z]+)/m); if (m) intro = m[1];
+    }).catch(() => {}).finally(() => {
+      const q = new URLSearchParams(location.search).get("intro"); if (q) intro = q;
+      if (intro === "mri" && !mriPlane) intro = "a";
+      if (intro === "mri") { pivot.rotation.set(0.32, 0.95, 0); dist = R * 4.0; mriPlane.visible = true; for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 1; }
+      if (intro === "d") { pivot.rotation.y = Math.PI; for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 1; }
+      if (!["a", "b", "c", "d", "mri"].includes(intro)) { intro = "none"; setInk(0, 2); box.style.setProperty("--paper", 0); }
+      introReady = true;
+    });
+    let introReady = false;
+    function setInk(ink, wave) { for (const t of tracts) { mats[t.id].uniforms.uInk.value = ink; mats[t.id].uniforms.uWave.value = wave; } }
+    const ease = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
+    let t0 = null, started = false, prev = null, skip = false;
     const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { started = true; io.disconnect(); } }, { threshold: 0.2 });
     io.observe(box);
+    el.addEventListener("pointerdown", () => { skip = true; });      // any interaction ends the intro
     const ORDER = { cc: 0, atr: 0.5, fat: 0.9, ifof: 1.1, uf: 1.3 };
+    const DRAWN = (1.3 + 2.6 * 1.05) * speed + 0.5;                 // seconds until the drawing is complete
+    let introDone = false, inkNow = 1;
+    box.style.setProperty("--paper", 1);
+
+
+    // ----- intro "mri": the coronal sections scroll from front to back, the fibres emerge behind them
+    const M_IN = 0.8, M_SWEEP = 8.0, M_OUT = M_IN + M_SWEEP, MRI_END = M_OUT + 4.2;
+    const o0 = { x: 0.32, y: 0.95 };
+    function mriIntro(sec) {
+      const p = Math.min(1, Math.max(0, (sec - M_IN) / M_SWEEP));
+      const slice = p * (mri.n - 1);
+      const y = mriY0 - slice * mri.slice_mm;
+      mriPlane.position.y = y;
+      mriMat.uniforms.uSlice.value = slice;
+      mriMat.uniforms.uOpacity.value = Math.min(1, sec / M_IN) * (1 - ease((sec - M_OUT) / 0.9));
+      for (const t of tracts) mats[t.id].uniforms.uSweep.value = y;
+      const x = sec - M_OUT;
+      if (x > 0) for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 0;
+      const ink = 1 - ease((x - 0.4) / 2.4); setInk(ink, -0.2);
+      const r = ease((x - 0.8) / 3.2);                                   // turn to the lateral view
+      pivot.rotation.x = o0.x * (1 - r); pivot.rotation.y = o0.y * (1 - r);
+      dist = R * (4.0 - 0.4 * r);
+      return ink;
+    }
+    // ----- intro "d": Dejerine's section planes
+    const SWEEP0 = 1.6, SWEEP = 5.8, DISS = SWEEP0 + SWEEP + 0.5;
+    function sectionsIntro(sec, dt) {
+      lineMat.uniforms.uDraw.value = sec;
+      const p = Math.min(1, Math.max(0, (sec - SWEEP0) / SWEEP));
+      const sw = front + 2 - p * (front - back + 4);
+      for (const t of tracts) mats[t.id].uniforms.uSweep.value = sw;
+      let act = -1; secY.forEach((y, i) => { if (sw <= y) act = i; });
+      showSection(p > 0 && p < 1 ? act : (p >= 1 ? SECT.length - 1 : -1));
+      const x = sec - DISS;
+      const fade = 1 - ease(x / 1.1);
+      lineMat.uniforms.uLineA.value = Math.min(1, sec * 3) * fade;
+      numerals.style.opacity = fade; inset.style.opacity = sec > SWEEP0 - 0.3 ? fade : 0;
+      placeNumerals();
+      const r = ease((sec - DISS - 0.5) / 3.0);
+      pivot.rotation.y = Math.PI * (1 + r);
+      if (!skip) dist = R * (4.3 - 0.7 * r);
+      if (x > 0) for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 0;
+      const ink = 1 - ease(x / 2.4); setInk(ink, -0.2);
+      return ink;
+    }
+    function endSections() {
+      if (mriPlane) { mriPlane.visible = false; }
+      if (intro !== "d" && intro !== "mri") return;
+      for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 0;
+      lineMat.uniforms.uLineA.value = 0; numerals.style.opacity = 0; inset.style.opacity = 0;
+    }
+    const pv = new THREE.Vector3();
+    function placeNumerals() {
+      group.updateMatrixWorld();
+      const r = box.getBoundingClientRect();
+      numEls.forEach((elN, i) => {
+        pv.set(0, secY[i], lineTop).applyMatrix4(group.matrixWorld).project(cam);
+        elN.style.transform = `translate(${((pv.x + 1) / 2 * r.width).toFixed(1)}px, ${((1 - pv.y) / 2 * r.height).toFixed(1)}px) translate(-50%, ${i % 2 && i < 9 ? -10 : -125}%)`;      // staggered like on the plate
+        const shown = Math.min(1, Math.max(0, (lineMat.uniforms.uDraw.value - i * 0.11) / 0.3));
+        elN.style.opacity = shown;
+      });
+    }
     function frame(now) {
       requestAnimationFrame(frame);
-      if (!started) return;
+      if (!started || !introReady) { renderer.render(scene, cam); return; }
       if (t0 === null) t0 = now;
       const dt = Math.min(0.25, prev === null ? 0.016 : (now - prev) / 1000); prev = now;
       const k = 1 - Math.exp(-dt * 7);                 // time-based easing (same on slow and fast devices)
-      const s = (now - t0) / 1000 / speed;
+      const sec = (now - t0) / 1000, s = sec / speed;
       for (const t of tracts) {
         const m = mats[t.id].uniforms;
-        m.uProg.value = Math.min(1.05, Math.max(0, (s - (ORDER[t.id] || 0)) / 2.6));
+        m.uProg.value = skip || intro === "d" || intro === "mri" ? 1.05 : Math.min(1.05, Math.max(0, (s - (ORDER[t.id] || 0)) / 2.6));
         m.uAlpha.value += (target[t.id] - m.uAlpha.value) * k;
         const fadeTo = selected && t.id !== selected ? 1 : 0;
         m.uFade.value += (fadeTo - m.uFade.value) * 0.12;
       }
-      if (auto && now - lastInteract > 4000) pivot.rotation.y += 0.15 * dt;
+      // ----- intro: drawing -> streamlines
+      if (!introDone) {
+        const x = sec - DRAWN;                         // time since the drawing was completed
+        if (skip) { inkNow = Math.max(0, inkNow - dt * 2.5); setInk(inkNow, -0.2); endSections(); }
+        else if (intro === "a") { inkNow = 1 - ease(x / 2.2); setInk(inkNow, -0.2); }
+        else if (intro === "b") { const w = -0.2 + 1.45 * ease(x / 2.6); inkNow = w > 1.2 ? 0 : 1 - Math.max(0, w) / 1.2; setInk(1, w); }
+        else if (intro === "d") inkNow = sectionsIntro(sec, dt);
+        else if (intro === "mri") inkNow = mriIntro(sec);
+        else if (intro === "c") { inkNow = 1 - ease((x - 0.3) / 3.4); setInk(inkNow, -0.2); if (x > 0) pivot.rotation.y += 0.32 * dt * ease(x / 1.5); }
+        else inkNow = 0;
+        box.style.setProperty("--paper", Math.min(1, inkNow * 1.4).toFixed(3));
+        if (inkNow <= 0 && intro === "d" && !skip && sec < 11.6) inkNow = 0.0001;
+        if (inkNow <= 0 && intro === "mri" && !skip && sec < MRI_END) inkNow = 0.0001;   // wait for the turn to the lateral view
+        if (inkNow <= 0) { introDone = true; endSections(); setInk(0, 2); lastInteract = skip ? lastInteract : now - 4000; }
+      }
+      if (introDone && auto && now - lastInteract > 4000) pivot.rotation.y += 0.15 * dt;
       // when the card is open, slide the brain into the free part of the view
       const shiftTo = selected && box.clientWidth > 700 ? -R * 0.55 * (dist / (R * 3.6)) : 0;
       pivot.position.x += (shiftTo - pivot.position.x) * k;
