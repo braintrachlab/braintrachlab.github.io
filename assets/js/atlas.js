@@ -31,7 +31,7 @@
     fetch(box.dataset.meta).then((r) => r.json()),
     fetch(box.dataset.bin).then((r) => r.arrayBuffer()),
     C.load("content/tracts.txt"),
-    fetch("assets/atlas/drawings/drawings.json").then((r) => (r.ok ? r.json() : null)).catch(() => null),
+    fetch("assets/atlas/planes/sections.json").then((r) => (r.ok ? r.json() : null)).catch(() => null),
   ]).then(([THREE, meta, buf, cards, mri]) => {
     const nl = meta.tracts.reduce((a, t) => a + t.lines, 0);
     const counts = new Uint16Array(buf, 0, nl);
@@ -52,9 +52,9 @@
     const vert = `
       attribute vec3 tangent; attribute float side; attribute float t; attribute float shade; attribute float u;
       uniform float uWidth; uniform float uInk; uniform float uWave; uniform float uInkW;
-      varying vec3 vT; varying vec3 vB; varying float vSide; varying float vt; varying float vShade; varying float vInk; varying float vY;
+      varying vec3 vT; varying vec3 vB; varying float vSide; varying float vt; varying float vShade; varying float vInk; varying vec3 vP;
       void main() {
-        vY = position.y;
+        vP = position;
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         vec3 T = normalize(mat3(modelViewMatrix) * tangent);
         vec3 V = normalize(-mv.xyz);
@@ -70,15 +70,17 @@
       }`;
     const frag = `
       uniform vec3 cDark; uniform vec3 cLight; uniform float uProg; uniform float uAlpha; uniform float uFade;
-      uniform float uSweep; uniform float uSweepOn;
-      varying vec3 vT; varying vec3 vB; varying float vSide; varying float vt; varying float vShade; varying float vInk; varying float vY;
+      uniform float uSweep; uniform float uSweepOn; uniform vec3 uN; uniform float uSide;
+      varying vec3 vT; varying vec3 vB; varying float vSide; varying float vt; varying float vShade; varying float vInk; varying vec3 vP;
       void main() {
         if (vt > uProg) discard;
         // section sweep (front to back): fibres exist only in front of the moving section plane
-        if (uSweepOn > 0.5 && vY < uSweep) discard;
-        if (uSweepOn < -0.5 && vY > uSweep) discard;                              // slider: only behind the section
-        float born = uSweepOn > 0.5 ? smoothstep(0.0, 3.5, vY - uSweep) : 1.0;     // soft edge where the fibres emerge
-        float nearPlane = max(uSweepOn, 0.0) * (1.0 - smoothstep(0.0, 9.0, vY - uSweep));
+        float dP = dot(vP, uN) - uSweep;
+        float intro = step(0.5, uSweepOn) * (1.0 - step(1.5, uSweepOn));
+        if (intro > 0.5 && dP < 0.0) discard;
+        if (uSweepOn > 1.5 && dP * uSide > 0.0) discard;                             // slider: only behind the section
+        float born = intro > 0.5 ? smoothstep(0.0, 3.5, dP) : 1.0;                  // soft edge where the fibres emerge
+        float nearPlane = intro * (1.0 - smoothstep(0.0, 9.0, dP));
         float a = clamp(vSide, -1.0, 1.0);
         float nz = sqrt(max(0.0, 1.0 - a * a));
         vec3 F = normalize(cross(vB, vT));            // across the tube, facing the viewer
@@ -105,7 +107,7 @@
       ifof: [0, 1, 0.2],        // from the occipital to the frontal lobe
       uf: [-0.5, 0.7, 0.5],     // from the temporal pole to the orbitofrontal cortex
     };
-    const meshes = {};
+    const meshes = {}, segs = {};
     for (const t of tracts) {
       let nseg = 0;
       for (let n = 0; n < t.lines; n++) nseg += counts[li + n] - 1;
@@ -113,6 +115,7 @@
       const side = new Float32Array(nseg * 4), tt = new Float32Array(nseg * 4), sh = new Float32Array(nseg * 4), uu = new Float32Array(nseg * 4);
       const idx = new Uint32Array(nseg * 6);
       const pick = [];
+      const sa = new Float32Array(nseg * 3), sb = new Float32Array(nseg * 3); let si = 0;
       let v = 0, e = 0;
       for (let n = 0; n < t.lines; n++, li++) {
         const c = counts[li];
@@ -127,6 +130,7 @@
           const ka = Math.max(0, k - 1), kb = Math.min(c - 1, k + 2);
           const pa = P(ka), pb = P(kb);                       // smooth tangents at the joints
           const ta = [b[0] - pa[0], b[1] - pa[1], b[2] - pa[2]], tb = [pb[0] - a[0], pb[1] - a[1], pb[2] - a[2]];
+          sa.set(a, si * 3); sb.set(b, si * 3); si++;
           const u0 = U(k), u1 = U(k + 1);
           const g0 = u0 * 0.85 + s * 0.15, g1 = u1 * 0.85 + s * 0.15;
           const quad = [[a, ta, -1, g0, u0], [a, ta, 1, g0, u0], [b, tb, -1, g1, u1], [b, tb, 1, g1, u1]];
@@ -152,10 +156,10 @@
         vertexShader: vert, fragmentShader: frag, transparent: true, depthWrite: true, side: THREE.DoubleSide,
         uniforms: { cDark: { value: new THREE.Color(...rgb(pal[0])) }, cLight: { value: new THREE.Color(...rgb(pal[1])) },
                     uProg: { value: 0 }, uAlpha: { value: 1.0 }, uFade: { value: 0 }, uWidth: { value: WIDTH },
-                    uInk: { value: 1 }, uWave: { value: -0.2 }, uInkW: { value: 0.13 }, uSweep: { value: 999 }, uSweepOn: { value: 0 } },
+                    uInk: { value: 1 }, uWave: { value: -0.2 }, uInkW: { value: 0.13 }, uSweep: { value: 999 }, uSweepOn: { value: 0 }, uN: { value: new THREE.Vector3(0, 1, 0) }, uSide: { value: 1 } },
       });
       mats[t.id] = m;
-      pickPts[t.id] = pick;
+      pickPts[t.id] = pick; segs[t.id] = { a: sa, b: sb, n: si };
       const mesh = new THREE.Mesh(g, m); mesh.renderOrder = 1; mesh.frustumCulled = false; meshes[t.id] = mesh;
       group.add(mesh);
     }
@@ -220,38 +224,61 @@
     }
 
 
-    // ---------- MRI sections drawn like Dejerine's plates (intro "mri") ----------
-    // Coronal slices of the T1 (front to back), drawn offline in the style of the Weigert-stained
-    // plates of Dejerine (tools/sections/dejerine_render.py -> assets/atlas/drawings). The plane moves
-    // through the brain and cross-fades between consecutive drawings.
-    let mriPlane = null, mriMat = null, mriY0 = 0, mriImgs = [], mriLoaded = Promise.resolve(), mriShown = -1;
-    let mode = "dejerine"; const modeImgs = {};             // appearance of the section: dejerine, t1, fa
-    function loadMode(md) {
-      if (modeImgs[md]) return modeImgs[md].ready;
-      const dir = "assets/atlas/drawings/" + ((mri.modes && mri.modes[md]) || "");
+    // ---------- sections of the same brain (coronal, axial, sagittal) ----------
+    // Each plane is a series of images (one per 1.25 mm slice) drawn from the T1 and the whole-brain
+    // tractogram in the style of Dejerine's Weigert plates (tools/sections/dejerine_render.py), plus the
+    // T1 and FA of the same slices. Positions are in the world space of the brain (RAS mm).
+    const PL = {};                                     // plane name -> plane.json + image sets
+    let plane = "coronal", mode = "dejerine", kNow = 0, secOn = false, mriPlane = null, mriMat = null;
+    const secTex = new THREE.Texture(); secTex.minFilter = THREE.LinearFilter; secTex.generateMipmaps = false;
+    let mriShown = null;
+    // world (RAS mm) -> atlas frame. Tracts dissected in the same space line up exactly; otherwise the
+    // brain is placed on the tracts by its bounding box (approximate).
+    const T = new THREE.Vector3();
+    if (mri) {
+      const bb = mri.brain_box;
+      if (meta.space && meta.space === mri.space && meta.center_rasmm) T.set(...meta.center_rasmm).multiplyScalar(-1);
+      else T.set(0 - (bb[0][0] + bb[1][0]) / 2, (ext.y0 + ext.y1) / 2 - (bb[0][1] + bb[1][1]) / 2, ext.z1 + 5 - bb[1][2]);
+    }
+    const planeJson = (p) => PL[p] ? Promise.resolve(PL[p]) :
+      fetch(`assets/atlas/planes/${p}/plane.json`).then((r) => r.json()).then((j) => (PL[p] = Object.assign(j, { sets: {} })));
+    function loadSet(p, md) {
+      const P = PL[p];
+      if (P.sets[md]) return P.sets[md].ready;
+      const dir = `assets/atlas/planes/${p}/` + (P.modes[md] || "");
       const imgs = [];
-      const ready = Promise.all(mri.files.map((f, i) => new Promise((res) => {
-        const im = new Image(); im.onload = im.onerror = res; im.src = dir + f; imgs[i] = im;
+      const ready = Promise.all(P.pos.map((_, i) => new Promise((res) => {
+        const im = new Image(); im.onload = im.onerror = res; im.src = dir + "s" + String(i).padStart(3, "0") + ".webp"; imgs[i] = im;
       })));
-      modeImgs[md] = { imgs, ready };
+      P.sets[md] = { imgs, ready };
       return ready;
     }
-    const secTex = new THREE.Texture(); secTex.minFilter = THREE.LinearFilter; secTex.generateMipmaps = false;
+    const setName = () => (mode === "dejerine" && selected ? "base" : mode);   // a selected tract: only its fibres
     function showSlice(k) {                       // one section on screen: swap the image of the single texture
-      k = Math.max(0, Math.min(mri.n - 1, Math.round(k)));
-      const im = (modeImgs[mode] || { imgs: mriImgs }).imgs[k];
-      if (k === mriShown || !im || !im.complete || !im.naturalWidth) return;
-      mriShown = k; secTex.image = im; secTex.needsUpdate = true;
+      const P = PL[plane]; if (!P) return;
+      k = Math.max(0, Math.min(P.n - 1, Math.round(k))); kNow = k;
+      const set = P.sets[setName()] || P.sets.dejerine; if (!set) return;
+      const im = set.imgs[k], key = plane + setName() + k;
+      if (key === mriShown || !im || !im.complete || !im.naturalWidth) return;
+      mriShown = key; secTex.image = im; secTex.needsUpdate = true;
     }
+    const nrm = (p) => new THREE.Vector3(...[0, 1, 2].map((d) => (d === PL[p].axis ? 1 : 0)));
+    function buildPlane(p) {                       // the quad of the images of plane p (normal coordinate = 0)
+      const P = PL[p], ax = P.axis;
+      const O = new THREE.Vector3(...P.O), U = new THREE.Vector3(...P.U), V = new THREE.Vector3(...P.V);
+      O.add(T); O.setComponent(ax, 0);
+      const c = [O.clone(), O.clone().add(U), O.clone().add(U).add(V), O.clone().add(V)];
+      const g = new THREE.BufferGeometry();
+      g.setAttribute("position", new THREE.Float32BufferAttribute(c.flatMap((v) => [v.x, v.y, v.z]), 3));
+      g.setAttribute("uv", new THREE.Float32BufferAttribute([0, 1, 1, 1, 1, 0, 0, 0], 2));
+      g.setIndex([0, 1, 2, 0, 2, 3]);
+      if (mriPlane.geometry) mriPlane.geometry.dispose();
+      mriPlane.geometry = g; mriPlane.position.set(0, 0, 0);
+      for (const t of tracts) mats[t.id].uniforms.uN.value.copy(nrm(p));
+    }
+    const atlasPos = (p, k) => PL[p].pos[k] + T.getComponent(PL[p].axis);
+    const mriLoaded = mri ? planeJson("coronal").then(() => loadSet("coronal", "dejerine")) : Promise.resolve();
     if (mri) {
-      mriLoaded = loadMode("dejerine"); mriImgs = modeImgs.dejerine.imgs;
-      const px = mri.px_mm, cx = mri.brain.center_px[0], rTop = mri.brain.top_row, zTop = ext.z1 + 5;
-      mriY0 = (mri.n - 1) / 2 * mri.slice_mm;                    // first drawing (frontal pole) lies here
-      const xa = (cx - mri.w) * px, xb = cx * px, za = zTop - (mri.h - rTop) * px, zb = zTop + rTop * px;
-      const pg = new THREE.BufferGeometry();
-      pg.setAttribute("position", new THREE.Float32BufferAttribute([xa, 0, za, xb, 0, za, xb, 0, zb, xa, 0, zb], 3));
-      pg.setAttribute("uv", new THREE.Float32BufferAttribute([1, 0, 0, 0, 0, 1, 1, 1], 2));
-      pg.setIndex([0, 1, 2, 0, 2, 3]);
       mriMat = new THREE.ShaderMaterial({
         transparent: true, depthWrite: false, side: THREE.DoubleSide,
         uniforms: { uA: { value: secTex }, uOpacity: { value: 0 }, uMode: { value: 0 } },
@@ -265,46 +292,113 @@
             gl_FragColor = vec4(col, uOpacity * smoothstep(0.05, 0.6, tx.a));
           }`,
       });
-      mriPlane = new THREE.Mesh(pg, mriMat); mriPlane.renderOrder = 4; mriPlane.frustumCulled = false; mriPlane.visible = false;
+      mriPlane = new THREE.Mesh(new THREE.BufferGeometry(), mriMat); mriPlane.renderOrder = 4; mriPlane.frustumCulled = false; mriPlane.visible = false;
       group.add(mriPlane);
     }
+    function placeSection(k) {                    // move the plane to slice k and cut the tracts there
+      const P = PL[plane]; if (!P) return;
+      const w = atlasPos(plane, Math.max(0, Math.min(P.n - 1, Math.round(k))));
+      mriPlane.position.setComponent(P.axis, w);
+      showSlice(k);
+      for (const t of tracts) mats[t.id].uniforms.uSweep.value = w;
+      drawOverlay();
+    }
 
+    // ---------- the selected tract on the section: its streamlines within the slice (lines or dots) ----------
+    const ovLines = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x1e1f18, transparent: true, depthTest: false }));
+    const ovDots = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0x1e1f18, size: 2.6, sizeAttenuation: false, transparent: true, depthTest: false }));
+    ovLines.renderOrder = ovDots.renderOrder = 6; ovLines.frustumCulled = ovDots.frustumCulled = false;
+    group.add(ovLines); group.add(ovDots);
+    let ovSide = 1;
+    function drawOverlay() {
+      const on = secOn && selected && PL[plane];
+      ovLines.visible = ovDots.visible = !!on;
+      if (!on) return;
+      const P = PL[plane], ax = P.axis, w = atlasPos(plane, kNow), half = 0.65;
+      const S = segs[selected], L = [], D = [];
+      for (let i = 0; i < S.n; i++) {
+        const a0 = S.a[i * 3 + ax], b0 = S.b[i * 3 + ax];
+        if (Math.max(a0, b0) < w - half || Math.min(a0, b0) > w + half) continue;
+        const d = b0 - a0;
+        let t0 = 0, t1 = 1;
+        if (Math.abs(d) > 1e-6) { const u = (w - half - a0) / d, v2 = (w + half - a0) / d; t0 = Math.max(0, Math.min(u, v2)); t1 = Math.min(1, Math.max(u, v2)); }
+        const pa = [], pb = [];
+        for (let c = 0; c < 3; c++) { const A = S.a[i * 3 + c], B = S.b[i * 3 + c]; pa.push(A + (B - A) * t0); pb.push(A + (B - A) * t1); }
+        pa[ax] = pb[ax] = 0;
+        const len = Math.hypot(pb[0] - pa[0], pb[1] - pa[1], pb[2] - pa[2]);
+        if (len < 0.45) D.push((pa[0] + pb[0]) / 2, (pa[1] + pb[1]) / 2, (pa[2] + pb[2]) / 2);   // crossing the section: a dot
+        else L.push(...pa, ...pb);                                                              // running in it: a line
+      }
+      ovLines.geometry.setAttribute("position", new THREE.Float32BufferAttribute(L, 3));
+      ovDots.geometry.setAttribute("position", new THREE.Float32BufferAttribute(D, 3));
+      const col = mode === "dejerine" ? 0x1e1f18 : new THREE.Color(...rgb((PAL[selected] || [[200, 60, 60], [230, 120, 110]])[1])).getHex();
+      ovLines.material.color.set(col); ovDots.material.color.set(col);
+      ovLines.position.set(0, 0, 0); ovLines.position.setComponent(ax, w + ovSide * 0.4);
+      ovDots.position.copy(ovLines.position);
+    }
 
-    // ---------- slider under the view: move the section from front to back ----------
+    // ---------- controls under the view: plane, appearance, position ----------
     const sliderBox = document.getElementById("atlas-slider");
     let slider = null, sliderOn = false, viewTo = null;
+    const VIEW = { coronal: { x: 0.15, y: Math.PI / 2 - 0.42 }, axial: { x: 1.15, y: 0.35 }, sagittal: { x: 0.15, y: 0.42 } };
+    const FROM = { coronal: "from the frontal pole", axial: "from the lowest point", sagittal: "from the right surface" };
     function setSlider(k) { if (slider && !sliderOn) slider.value = Math.round(k); }
-    function sectionAt(k) {                               // place the drawn section and cut the tracts there
-      const y = mriY0 - k * mri.slice_mm;
-      mriPlane.position.y = y; showSlice(k);
-      for (const t of tracts) { mats[t.id].uniforms.uSweep.value = y; }
-    }
+    let openSection = () => {};
     if (mri && sliderBox) {
       sliderBox.hidden = false;
       slider = sliderBox.querySelector("input");
-      slider.max = mri.n - 1; slider.value = 0;
       const out = sliderBox.querySelector("output");
-      const update = () => {
-        if (!sliderOn) { viewTo = { x: 0.15, y: Math.PI / 2 - 0.42 }; auto = false; lastInteract = performance.now(); }
-        skip = true; sliderOn = true; group.position.set(0, 0, 0);
+      const [selPlane, selMode] = sliderBox.querySelectorAll("select");
+      const ends = sliderBox.querySelectorAll(".end");
+      const labels = () => { const P = PL[plane]; ends[0].textContent = P.labels[0]; ends[1].textContent = P.labels[1]; slider.max = P.n - 1; };
+      openSection = (turn) => {
+        if (!PL[plane]) return;
+        if (turn || !sliderOn) { viewTo = Object.assign({}, VIEW[plane]); auto = false; lastInteract = performance.now(); }
+        skip = true; sliderOn = true; secOn = true; group.position.set(0, 0, 0);
         mriPlane.visible = true; mriMat.uniforms.uOpacity.value = 1;
-        for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 1;
-        sectionAt(+slider.value);
-        out.textContent = `${Math.round(+slider.value * mri.slice_mm)} mm from the frontal pole`;
+        for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 2;
+        placeSection(+slider.value);
+        out.textContent = `${Math.round(+slider.value * 1.25)} mm ${FROM[plane]}`;
         sliderBox.classList.add("active");
       };
-      slider.addEventListener("input", update);
-      const sel = sliderBox.querySelector("select");
-      if (!(mri.modes && mri.modes.fa)) sel.querySelector('option[value="fa"]').remove();
-      sel.addEventListener("change", () => {
-        mode = sel.value; mriMat.uniforms.uMode.value = mode === "dejerine" ? 0 : 1;
-        loadMode(mode).then(() => { mriShown = -1; showSlice(+slider.value); });
-        update();
+      slider.addEventListener("input", () => openSection(false));
+      if (!(mri.planes || []).includes("axial")) selPlane.querySelector('option[value="axial"]').remove();
+      if (!(mri.planes || []).includes("sagittal")) selPlane.querySelector('option[value="sagittal"]').remove();
+      selPlane.addEventListener("change", () => {
+        const keepFrac = +slider.value / Math.max(1, +slider.max);
+        plane = selPlane.value;
+        planeJson(plane).then(() => {
+          buildPlane(plane); labels(); mriShown = null;
+          slider.value = Math.round(keepFrac * (PL[plane].n - 1));
+          loadSet(plane, setName()).then(() => { mriShown = null; showSlice(+slider.value); });
+          openSection(true);
+        });
+      });
+      selMode.addEventListener("change", () => {
+        mode = selMode.value; mriMat.uniforms.uMode.value = mode === "dejerine" ? 0 : 1;
+        loadSet(plane, setName()).then(() => { mriShown = null; showSlice(+slider.value); });
+        openSection(false); drawOverlay();
       });
       sliderBox.querySelector("button").addEventListener("click", () => {
-        sliderOn = false; mriPlane.visible = false; viewTo = { x: 0, y: 0 }; sliderBox.classList.remove("active"); out.textContent = "";
+        sliderOn = false; secOn = false; mriPlane.visible = false; viewTo = { x: 0, y: 0 }; sliderBox.classList.remove("active"); out.textContent = "";
         for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 0;
+        drawOverlay();
       });
+      planeJson("coronal").then(() => { buildPlane("coronal"); labels(); });
+    }
+    // after a selection: switch the Dejerine images to the version without fibres, and draw the tract
+    function sectionSelectionChanged() {
+      if (!secOn) return;
+      loadSet(plane, setName()).then(() => { mriShown = null; showSlice(kNow); });
+      mriShown = null; showSlice(kNow); drawOverlay();
+    }
+    const camL = new THREE.Vector3();
+    function updateSide() {                        // keep the tracts on the far side of the section
+      if (!secOn || !PL[plane]) return;
+      group.updateMatrixWorld(); camL.copy(cam.position); group.worldToLocal(camL);
+      const s = Math.sign(camL.getComponent(PL[plane].axis) - atlasPos(plane, kNow)) || 1;
+      for (const t of tracts) mats[t.id].uniforms.uSide.value = s;
+      if (s !== ovSide) { ovSide = s; drawOverlay(); }
     }
 
     // ---------- scene ----------
@@ -400,6 +494,7 @@
         if (r.top < hdr) window.scrollBy({ top: r.top - hdr, behavior: "smooth" });
       }
       list.querySelectorAll("button").forEach((b) => b.classList.toggle("active", b.dataset.id === selected));
+      sectionSelectionChanged();
       if (!selected) { panel.classList.remove("open"); return; }
       const c = cardOf[selected] || { name: selected };
       const sec = (k, title) => c[k] ? `<h4>${title}</h4><p>${C.md(c[k])}</p>` : "";
@@ -434,8 +529,8 @@
       const m = t.match(/^\s*atlas\.opening\s*:\s*([a-z]+)/m); if (m) intro = m[1];
     }).catch(() => {}).then(() => Promise.race([mriLoaded, new Promise((r) => setTimeout(r, 9000))])).finally(() => {
       const q = new URLSearchParams(location.search).get("intro"); if (q) intro = q;
-      if (intro === "mri" && !mriPlane) intro = "a";
-      if (intro === "mri") { pivot.rotation.set(0, Math.PI / 2, 0); dist = R * 3.3; mriPlane.visible = true; }
+      if (intro === "mri" && (!mriPlane || !PL.coronal)) intro = "a";
+      if (intro === "mri") { buildPlane("coronal"); pivot.rotation.set(0, Math.PI / 2, 0); dist = R * 3.3; mriPlane.visible = true; }
       if (intro === "d") { pivot.rotation.y = Math.PI; for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 1; }
       if (!["a", "b", "c", "d", "mri"].includes(intro)) { intro = "none"; setInk(0, 2); box.style.setProperty("--paper", 0); }
       introReady = true;
@@ -460,10 +555,9 @@
     const tmpV = new THREE.Vector3();
     function mriIntro(sec) {
       const p = Math.min(1, Math.max(0, (sec - M_IN) / M_SWEEP));
-      const slice = p * (mri.n - 1);
-      const y = mriY0 - slice * mri.slice_mm;
+      const slice = p * (PL.coronal.n - 1);
+      const y = atlasPos("coronal", Math.round(slice));
       mriPlane.position.y = y;
-      const k0 = Math.min(mri.n - 1, Math.floor(slice));
       showSlice(slice); setSlider(slice);
       mriMat.uniforms.uOpacity.value = Math.min(1, sec / M_IN) * (1 - ease((sec - M_OUT) / 0.8));
       // turn from the coronal view to the lateral view while the fibres grow
@@ -548,7 +642,7 @@
         if (inkNow <= 0) { introDone = true; endSections(); setInk(0, 2); lastInteract = skip ? lastInteract : now - 4000; }
       }
       if (introDone && auto && now - lastInteract > 4000) pivot.rotation.y += 0.15 * dt;
-      if (viewTo) {                                         // turn so that the section faces the viewer
+      if (viewTo) {          // turn so that the section faces the viewer
         pivot.rotation.x += (viewTo.x - pivot.rotation.x) * k; pivot.rotation.y += (viewTo.y - pivot.rotation.y) * k;
         if (Math.abs(viewTo.y - pivot.rotation.y) < 0.002) viewTo = null;
       }
@@ -557,6 +651,7 @@
       pivot.position.x += (shiftTo - pivot.position.x) * k;
       if (!auto && now - lastInteract > 12000 && !selected && !sliderOn) auto = true;
       cam.position.set(0, 0, dist); cam.lookAt(0, 0, 0);
+      updateSide();
       renderer.render(scene, cam);
     }
     requestAnimationFrame(frame);

@@ -1,0 +1,22 @@
+{
+ "planes": [
+  "coronal",
+  "axial",
+  "sagittal"
+ ],
+ "space": "HCP 102109 DTI (1.25 mm)",
+ "brain_box": [
+  [
+   25.0,
+   15.046508312225342,
+   3.75
+  ],
+  [
+   157.5,
+   206.29650831222534,
+   150.0
+  ]
+ ],
+ "style": "Dejerine (Weigert stain) drawings from the T1 and the whole-brain tractogram: tools/sections/dejerine_render.py",
+ "note": "world = RAS mm of the DTI space; atlas tracts in the same space align exactly"
+}

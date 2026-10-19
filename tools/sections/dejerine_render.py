@@ -4,7 +4,7 @@ white matter, dark white matter made of fine streaks that follow the fibres alon
 thin ink contours along every gyrus, sulcus and ventricle.
 
 usage: python3 dejerine_render.py <T1.nii.gz> <out folder> --at 0.195,0.385   (fractions front->back)
-       python3 dejerine_render.py <T1.nii.gz> assets/atlas/drawings --web 3      (series for the atlas)
+       python3 dejerine_render.py <T1.nii.gz> assets/atlas/sections --web coronal,axial,sagittal --index coronal,axial,sagittal --trk wb.trk --fa FA.nii.gz
        add  --trk whole_brain.trk  to draw the white matter from the real streamlines of the same brain
        python3 dejerine_render.py <T1.nii.gz> <out folder> --every 3            (every 3rd slice)
 """
@@ -34,16 +34,16 @@ class Tracts:
         own = np.repeat(sel, ln)
         ok = ~last[:-1] & own[:-1]
         self.a = pts[:-1][ok]; self.b = pts[1:][ok]
-        self.ymin = np.minimum(self.a[:, 1], self.b[:, 1]); self.ymax = np.maximum(self.a[:, 1], self.b[:, 1])
+        self.lo = np.minimum(self.a, self.b); self.hi = np.maximum(self.a, self.b)
 
-    def slab(self, y0, half=0.65):
-        """segments clipped to the slab |y - y0| < half (world mm)"""
-        i = np.where((self.ymin < y0 + half) & (self.ymax > y0 - half))[0]
+    def slab(self, w0, half=0.65, axis=1):
+        """segments clipped to the slab |coord[axis] - w0| < half (world mm)"""
+        i = np.where((self.lo[:, axis] < w0 + half) & (self.hi[:, axis] > w0 - half))[0]
         a, b = self.a[i], self.b[i]
-        dy = b[:, 1] - a[:, 1]
+        dy = b[:, axis] - a[:, axis]
         with np.errstate(divide="ignore", invalid="ignore"):
-            t0 = np.where(np.abs(dy) > 1e-6, (y0 - half - a[:, 1]) / dy, -np.inf)
-            t1 = np.where(np.abs(dy) > 1e-6, (y0 + half - a[:, 1]) / dy, np.inf)
+            t0 = np.where(np.abs(dy) > 1e-6, (w0 - half - a[:, axis]) / dy, -np.inf)
+            t1 = np.where(np.abs(dy) > 1e-6, (w0 + half - a[:, axis]) / dy, np.inf)
         lo = np.clip(np.minimum(t0, t1), 0, 1); hi = np.clip(np.maximum(t0, t1), 0, 1)
         d = b - a
         return a + d * lo[:, None], a + d * hi[:, None]
@@ -108,7 +108,7 @@ def lic(noise, vx, vy, L=14):
             acc += wk * ndi.map_coordinates(noise, [py, px], order=1, mode="nearest"); wsum += wk
     return acc / wsum
 
-def draw(t1s, ms, seed=0, fib=None, return_alpha=False):
+def draw(t1s, ms, seed=0, fib=None, return_alpha=False, with_base=False):
     """fib: density of the real streamline segments crossing this section (upsampled pixel grid)"""
     rng = np.random.default_rng(seed)
     # upsample smoothly (no voxel blocks)
@@ -138,8 +138,8 @@ def draw(t1s, ms, seed=0, fib=None, return_alpha=False):
     dots = np.clip(cv2.GaussianBlur(dots, (0, 0), 0.4) * 3.0, 0, 1)
     ctx = np.clip(np.maximum(tone, dots * 0.7), 0, 1) * gm2
     wash = 0.08 * core
-    ink = np.clip(np.maximum(np.maximum(wash, ctx), fibink), 0, 1)
-    tone_gm = (0.70 * np.exp(-dwm / 1.0) + 0.05) * gm
+    base_ink = np.clip(np.maximum(wash, ctx), 0, 1)
+    ink = np.clip(np.maximum(base_ink, fibink), 0, 1)
     # stipple in the cortex where the tone fades
     ink = np.clip(ink, 0, 1)
     # ---- contours: brain outline and the CSF of sulci and ventricles, as clean thin lines
@@ -154,36 +154,23 @@ def draw(t1s, ms, seed=0, fib=None, return_alpha=False):
     csf = ((cv2.GaussianBlur(n, (0, 0), UP * 0.35) < 0.16) & (cv2.erode(sm, np.ones((5, 5), np.uint8)) > 0)).astype(np.uint8)
     cs2, _ = cv2.findContours(csf, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
     dsurf = ndi.distance_transform_edt(tis > 0) * (1.25 / UP)
-    cs2 = [c for c in cs2 if cv2.arcLength(c, True) > UP * 9 and
+    hull = cv2.convexHull(np.concatenate(cg)) if cg else None
+    cs2 = [c for c in cs2 if cv2.arcLength(c, True) > UP * 9 and hull is not None and
            np.min(dsurf[np.clip(c[:, 0, 1], 0, tis.shape[0] - 1), np.clip(c[:, 0, 0], 0, tis.shape[1] - 1)]) > 0 and
-           cv2.pointPolygonTest(cv2.convexHull(np.concatenate(cg)) if cg else c, tuple(map(float, c[0, 0])), True) > UP * 4]
+           cv2.pointPolygonTest(hull, tuple(map(float, c[0, 0])), True) > UP * 4]
     cv2.drawContours(canvas, cs2, -1, 170, 1, cv2.LINE_AA)            # ventricles only
-    # sulci: midline of the cortex between two white matter blades (skeleton of brain minus white matter)
-    from skimage.morphology import skeletonize, remove_small_objects
-    ctx = (cv2.erode(sm, np.ones((3, 3), np.uint8)) > 0) & (wm < 0.5)
-    sk = skeletonize(ctx)
-    dsk = ndi.distance_transform_edt(wm < 0.5) * mmpx                     # distance from the white matter
-    dout = ndi.distance_transform_edt(sm > 0) * mmpx                      # distance from the brain surface
-    sk &= (dsk > 1.3) & (dsk < 5.0) & (dout > 0.6)
-    nb = cv2.GaussianBlur(n, (0, 0), UP * 0.25)
-    lab, nl = ndi.label(sk, structure=np.ones((3, 3)))
-    keep = np.zeros(nl + 1, bool)
-    if nl:
-        mean_n = ndi.mean(nb, lab, index=np.arange(1, nl + 1))
-        size = ndi.sum(sk, lab, index=np.arange(1, nl + 1))
-        touch = ndi.minimum(dout, lab, index=np.arange(1, nl + 1))
-        keep[1:] = (size > UP * 4) & (mean_n < 0.50) & (touch < 3.0)     # darker (CSF) and open to the surface
-    sk = keep[lab]
-    skl = cv2.GaussianBlur(sk.astype(np.float32), (0, 0), 0.6) * 1.8
-    ink = np.maximum(ink, canvas.astype(np.float32) / 255 * 0.92)
-    # the CSF itself stays paper-white
-    ink *= 1 - cv2.GaussianBlur(csf.astype(np.float32), (0, 0), 1.0) * 0.9
-    ink = np.maximum(ink, canvas.astype(np.float32) / 255 * 0.92)
     tisd = cv2.dilate(tis, np.ones((3, 3), np.uint8)).astype(np.float32)
     alpha = cv2.GaussianBlur(tisd, (0, 0), 0.6)                  # tissue: grey and white matter only
-    ink *= alpha
-    if return_alpha: return np.clip(ink, 0, 1), np.clip(alpha, 0, 1)
-    return np.clip(ink, 0, 1)
+    csfb = cv2.GaussianBlur(csf.astype(np.float32), (0, 0), 1.0)
+    def finish(x):
+        x = np.maximum(x, canvas.astype(np.float32) / 255 * 0.92)
+        x = x * (1 - csfb * 0.9)                                  # the CSF itself stays paper-white
+        x = np.maximum(x, canvas.astype(np.float32) / 255 * 0.92)
+        return np.clip(x * alpha, 0, 1)
+    out = [finish(ink)]
+    if with_base: out.append(finish(base_ink))
+    if return_alpha: out.append(np.clip(alpha, 0, 1))
+    return out[0] if len(out) == 1 else tuple(out)
 
 def plate(ink, paper=(247, 247, 245), inkc=(30, 31, 24), alpha=None):
     a = ink[..., None]
@@ -194,49 +181,80 @@ TR = None
 FA = None
 MAPS_ONLY = "--maps-only" in sys.argv          # only re-make the T1 and FA images
 
-def web_series(t1, m, out, every=1, width=640):
-    """all coronal slices (front -> back, every N), same crop, ink as grayscale WebP + slices.json for atlas.js"""
-    os.makedirs(out, exist_ok=True)
-    ys = np.where(m.any((0, 2)))[0]
-    js = list(range(ys.max(), ys.min() - 1, -every))
-    xs = np.where(m.any((1, 2)))[0]; zs = np.where(m.any((0, 1)))[0]
-    # crop in the coronal image (columns = x reversed, rows = z reversed), with a margin of 3 voxels
-    c0, c1 = m.shape[0] - 1 - xs.max() - 3, m.shape[0] - 1 - xs.min() + 4
-    r0, r1 = m.shape[2] - 1 - zs.max() - 3, m.shape[2] - 1 - zs.min() + 4
-    c0, r0 = max(c0, 0), max(r0, 0)
-    names = []
-    for sub in ("t1", "fa"): os.makedirs(os.path.join(out, sub), exist_ok=True)
-    sw = width // 2                                          # T1 and FA: their own resolution is ~1.25 mm
+# plane: normal axis, in-plane axes (columns, rows; both drawn reversed), order of the slider, labels
+PLANES = {
+    "coronal":  {"axis": 1, "cols": 0, "rows": 2, "reverse": True,  "labels": ["Front", "Back"]},
+    "axial":    {"axis": 2, "cols": 0, "rows": 1, "reverse": False, "labels": ["Bottom", "Top"]},
+    "sagittal": {"axis": 0, "cols": 1, "rows": 2, "reverse": True,  "labels": ["Right", "Left"]},
+}
+
+def cut(vol, P, j):
+    """2D section: rows = reversed 'rows' axis (top/anterior first), columns = reversed 'cols' axis"""
+    sl = [slice(None)] * 3; sl[P["axis"]] = j
+    a = vol[tuple(sl)]                                         # remaining axes in increasing order
+    ax = [d for d in range(3) if d != P["axis"]]
+    if ax.index(P["cols"]) == 0: a = a.T                       # -> (rows axis, cols axis)
+    return np.ascontiguousarray(a[::-1, ::-1])
+
+def fibres_plane(tr, P, j, shape_vox, c0, r0, shape, aff, half=0.65):
+    w0 = aff[P["axis"], P["axis"]] * j + aff[P["axis"], 3]
+    pa, pb = tr.slab(w0, half, P["axis"])
+    def px(p):
+        ic = (p[:, P["cols"]] - aff[P["cols"], 3]) / aff[P["cols"], P["cols"]]
+        ir = (p[:, P["rows"]] - aff[P["rows"], 3]) / aff[P["rows"], P["rows"]]
+        c = (shape_vox[P["cols"]] - 1 - ic) - c0; r = (shape_vox[P["rows"]] - 1 - ir) - r0
+        return np.stack([(c + 0.5) * UP - 0.5, (r + 0.5) * UP - 0.5], 1)
+    return splat(shape, px(pa), px(pb))
+
+def web_plane(name, t1, m, aff, out, width=640):
+    P = PLANES[name]; od = os.path.join(out, name)
+    for sub in ("", "t1", "fa", "base"): os.makedirs(os.path.join(od, sub), exist_ok=True)
+    sh = m.shape
+    other = tuple(d for d in range(3) if d != P["axis"])
+    idx = np.where(m.any(other))[0]
+    js = list(range(idx.max(), idx.min() - 1, -1)) if P["reverse"] else list(range(idx.min(), idx.max() + 1))
+    cc = np.where(m.any(tuple(d for d in range(3) if d != P["cols"])))[0]
+    rr = np.where(m.any(tuple(d for d in range(3) if d != P["rows"])))[0]
+    c0, c1 = max(sh[P["cols"]] - 1 - cc.max() - 3, 0), min(sh[P["cols"]] - 1 - cc.min() + 4, sh[P["cols"]])
+    r0, r1 = max(sh[P["rows"]] - 1 - rr.max() - 3, 0), min(sh[P["rows"]] - 1 - rr.min() + 4, sh[P["rows"]])
+    sw = width // 2
     for k, j in enumerate(js):
-        sec = coronal(t1, j)[r0:r1, c0:c1]; msk = coronal(m, j)[r0:r1, c0:c1]
-        fib = fibres(TR, j, m.shape[0], m.shape[2], c0, r0, (sec.shape[0] * UP, sec.shape[1] * UP)) if TR else None
-        if MAPS_ONLY: ink = alpha = np.zeros((sec.shape[0] * UP, sec.shape[1] * UP), np.float32)
-        else: ink, alpha = draw(sec, msk, seed=j, fib=fib, return_alpha=True)
-        h = int(round(ink.shape[0] * width / ink.shape[1]))
-        la = np.stack([(ink * 255).astype(np.uint8), (alpha * 255).astype(np.uint8)], -1)
-        im = Image.fromarray(la, "LA").resize((width, h), Image.LANCZOS)
-        name = f"s{k:03d}.webp"
-        if not MAPS_ONLY: im.save(os.path.join(out, name), quality=76, method=6)
-        # T1 and FA of the same slice, brain only (transparent outside the brain)
+        sec = cut(t1, P, j)[r0:r1, c0:c1]; msk = cut(m, P, j)[r0:r1, c0:c1]
+        fname = f"s{k:03d}.webp"
+        if not MAPS_ONLY:
+            fib = fibres_plane(TR, P, j, sh, c0, r0, (sec.shape[0] * UP, sec.shape[1] * UP), aff) if TR else None
+            ink, base, alpha = draw(sec, msk, seed=j, fib=fib, return_alpha=True, with_base=True)
+            h = int(round(ink.shape[0] * width / ink.shape[1]))
+            for sub, x, q in (("", ink, 74), ("base", base, 74)):
+                la = np.stack([(x * 255).astype(np.uint8), (alpha * 255).astype(np.uint8)], -1)
+                Image.fromarray(la, "LA").resize((width, h), Image.LANCZOS).save(os.path.join(od, sub, fname), quality=q, method=6)
         hs = int(round(sec.shape[0] * sw / sec.shape[1]))
         mk = cv2.resize(cv2.GaussianBlur(msk.astype(np.float32), (0, 0), 0.8), (sw, hs), interpolation=cv2.INTER_CUBIC)
-        mk = smoothstep(0.35, 0.65, mk)                     # smooth outline instead of voxel steps
-        for sub, img, lo, hi in (("t1", sec, 0.15, 1.15), ("fa", coronal(FA, j)[r0:r1, c0:c1] if FA is not None else None, 0.0, 0.85)):
+        mk = smoothstep(0.35, 0.65, mk)
+        for sub, img, lo, hi in (("t1", sec, 0.15, 1.15), ("fa", cut(FA, P, j)[r0:r1, c0:c1] if FA is not None else None, 0.0, 0.85)):
             if img is None: continue
             v = cv2.resize(np.clip((img - lo) / (hi - lo), 0, 1), (sw, hs), interpolation=cv2.INTER_CUBIC)
             la = np.stack([(np.clip(v, 0, 1) * 255).astype(np.uint8), (np.clip(mk, 0, 1) * 255).astype(np.uint8)], -1)
-            Image.fromarray(la, "LA").save(os.path.join(out, sub, name), quality=82, method=6)
-        names.append(name); print(k, j, flush=True)
-    vox = 1.25
-    px = (c1 - c0) * vox / width
-    cx = ((m.shape[0] - 1 - (xs.min() + xs.max()) / 2) - c0) * vox / px    # column of the brain centre
-    meta = {"n": len(names), "files": names, "w": width, "h": h, "px_mm": px, "slice_mm": every * vox,
-            "brain": {"center_px": [cx, 0.0], "top_row": (m.shape[2] - 1 - zs.max() - r0) * vox / px,
-                      "length_mm": (ys.max() - ys.min() + 1) * vox},
-            "style": "Dejerine (Weigert stain) drawing of the T1, tools/sections/dejerine_render.py",
-            "modes": {"dejerine": "", "t1": "t1/", "fa": "fa/" if FA is not None else None},
-            "note": "s000 = most anterior; image left = subject's right"}
-    json.dump(meta, open(os.path.join(out, "drawings.json"), "w"), indent=1)
+            Image.fromarray(la, "LA").save(os.path.join(od, sub, fname), quality=82, method=6)
+        print(name, k, j, flush=True)
+    vx = [aff[d, d] for d in range(3)]
+    def world(d, i): return float(aff[d, d] * i + aff[d, 3])
+    O = [0.0, 0.0, 0.0]; U = [0.0, 0.0, 0.0]; V = [0.0, 0.0, 0.0]
+    O[P["cols"]] = world(P["cols"], sh[P["cols"]] - 1 - c0 + 0.5); U[P["cols"]] = -(c1 - c0) * vx[P["cols"]]
+    O[P["rows"]] = world(P["rows"], sh[P["rows"]] - 1 - r0 + 0.5); V[P["rows"]] = -(r1 - r0) * vx[P["rows"]]
+    meta = {"n": len(js), "axis": P["axis"], "labels": P["labels"], "w": width, "aspect": (r1 - r0) / (c1 - c0),
+            "pos": [world(P["axis"], j) for j in js], "O": O, "U": U, "V": V,
+            "modes": {"dejerine": "", "base": "base/", "t1": "t1/", "fa": "fa/" if FA is not None else None}}
+    json.dump(meta, open(os.path.join(od, "plane.json"), "w"), indent=1)
+
+def web_index(m, aff, out, planes):
+    xs, ys, zs = [np.where(m.any(tuple(d for d in range(3) if d != a)))[0] for a in range(3)]
+    def w(d, i): return float(aff[d, d] * i + aff[d, 3])
+    meta = {"planes": planes, "space": "HCP 102109 DTI (1.25 mm)",
+            "brain_box": [[w(0, xs.min()), w(1, ys.min()), w(2, zs.min())], [w(0, xs.max()), w(1, ys.max()), w(2, zs.max())]],
+            "style": "Dejerine (Weigert stain) drawings from the T1 and the whole-brain tractogram: tools/sections/dejerine_render.py",
+            "note": "world = RAS mm of the DTI space; atlas tracts in the same space align exactly"}
+    json.dump(meta, open(os.path.join(out, "sections.json"), "w"), indent=1)
 
 if __name__ == "__main__":
     src, out = sys.argv[1], sys.argv[2]
@@ -247,7 +265,11 @@ if __name__ == "__main__":
     if "--fa" in sys.argv:
         FA = np.clip(np.asarray(nib.as_closest_canonical(nib.load(sys.argv[sys.argv.index("--fa") + 1])).dataobj, dtype=np.float32), 0, 1)
     if "--web" in sys.argv:
-        web_series(t1, m, out, every=int(sys.argv[sys.argv.index("--web") + 1])); sys.exit()
+        aff = nib.as_closest_canonical(nib.load(src)).affine
+        planes = sys.argv[sys.argv.index("--web") + 1].split(",")
+        for pl in planes: web_plane(pl, t1, m, aff, out)
+        if "--index" in sys.argv: web_index(m, aff, out, sys.argv[sys.argv.index("--index") + 1].split(","))
+        sys.exit()
     ys = np.where(m.any((0, 2)))[0]
     front, back = ys.max(), ys.min()
     if "--at" in sys.argv:
@@ -257,7 +279,8 @@ if __name__ == "__main__":
         e = int(sys.argv[sys.argv.index("--every") + 1]); js = list(range(front, back - 1, -e))
     for k, j in enumerate(js):
         sec = coronal(t1, j)
-        fib = fibres(TR, j, m.shape[0], m.shape[2], 0, 0, (sec.shape[0] * UP, sec.shape[1] * UP)) if TR else None
+        aff = nib.as_closest_canonical(nib.load(src)).affine
+        fib = fibres_plane(TR, PLANES["coronal"], j, m.shape, 0, 0, (sec.shape[0] * UP, sec.shape[1] * UP), aff) if TR else None
         ink, al = draw(sec, coronal(m, j), seed=j, fib=fib, return_alpha=True)
         plate(ink, alpha=al).save(os.path.join(out, f"plate-{k:03d}.png"))
         print(k, j, ink.shape, flush=True)

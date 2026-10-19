@@ -404,6 +404,13 @@ atlas = f'''
           <span class="end">Back</span>
           <output></output>
           <div class="slider-tools">
+            <label>Plane
+              <select aria-label="Plane of the section">
+                <option value="coronal">Coronal</option>
+                <option value="axial">Axial</option>
+                <option value="sagittal">Sagittal</option>
+              </select>
+            </label>
             <label>Appearance
               <select aria-label="Appearance of the section">
                 <option value="dejerine">Dejerine (Weigert stain)</option>
