@@ -51,19 +51,52 @@ def cut(vol, P, j):
     if ax.index(P["cols"]) == 0: a = a.T
     return np.ascontiguousarray(a[::-1, ::-1])
 
-def up_mask(m, sigma=0.6):
+def up_mask(m, sigma=0.25):
     """binary mask -> smooth upsampled mask (no voxel steps)"""
     f = cv2.resize(m.astype(np.float32), None, fx=UP, fy=UP, interpolation=cv2.INTER_LINEAR)
     return cv2.GaussianBlur(f, (0, 0), UP * sigma)
 
-def draw(t1s, labs, fib, seed=0):
+T2_CSF, T2_VESSEL = 600.0, 300.0      # T2: above = CSF (sulci, fissures), below (outside the parcellation) = vessels
+
+LEFT = lambda p: ((p >= 1000) & (p < 2000)) | ((p >= 3000) & (p < 4000)) | (p == 5001) | ((p > 0) & (p < 40) & (p != 16) & (p != 24))
+RIGHT = lambda p: ((p >= 2000) & (p < 3000)) | ((p >= 4000) & (p < 5000)) | (p == 5002) | ((p >= 40) & (p < 80))
+
+def fine_tissue(tissue, t2s, ps):
+    """brain border at the upsampled resolution: the parcellation says what is brain, the T2 where the CSF is.
+    Sulci and fissures stay open; the two hemispheres never fuse."""
+    t2u = cv2.resize(t2s, None, fx=UP, fy=UP, interpolation=cv2.INTER_CUBIC)
+    core = cv2.resize(tissue.astype(np.float32), None, fx=UP, fy=UP, interpolation=cv2.INTER_LINEAR) > 0.5
+    ring = cv2.resize(ndi.binary_dilation(tissue, iterations=1).astype(np.float32), None, fx=UP, fy=UP, interpolation=cv2.INTER_LINEAR) > 0.5
+    tis = (core & (t2u < T2_CSF)) | (ring & (t2u >= T2_VESSEL) & (t2u < T2_CSF * 0.92))
+    # hemispheres: a thin gap where left and right tissue meet (not through the corpus callosum or the midline)
+    L = cv2.resize(LEFT(ps).astype(np.float32), None, fx=UP, fy=UP, interpolation=cv2.INTER_LINEAR)
+    R = cv2.resize(RIGHT(ps).astype(np.float32), None, fx=UP, fy=UP, interpolation=cv2.INTER_LINEAR)
+    seam = (L > 0.2) & (R > 0.2)
+    tis &= ~cv2.dilate(seam.astype(np.uint8), np.ones((2, 2), np.uint8)).astype(bool)
+    tis = cv2.morphologyEx(tis.astype(np.uint8), cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))).astype(bool)
+    tis = cv2.medianBlur(tis.astype(np.uint8) * 255, 3) > 127           # clean edges without rounding the gyri
+    return tis
+
+def draw(t1s, labs, fib, seed=0, t2s=None, ps=None):
     """Dejerine (Weigert) drawing of one section. Returns ink (with fibres), ink (without), tissue alpha."""
     rng = np.random.default_rng(seed)
     tissue, ctx, deep, wm = labs
-    T = up_mask(tissue); C = up_mask(ctx); Dp = up_mask(deep); W = up_mask(wm)
-    alpha = smoothstep(0.42, 0.58, T)
-    tis = alpha > 0.5
+    C = up_mask(ctx, 0.25); Dp = up_mask(deep, 0.25); W = up_mask(wm, 0.25)
+    tis = fine_tissue(tissue, t2s, ps) if t2s is not None else (smoothstep(0.42, 0.58, up_mask(tissue)) > 0.5)
+    alpha = cv2.GaussianBlur(tis.astype(np.float32), (0, 0), 0.5)
     wmb = (W > 0.5) & tis
+    # sulci: where the cortex of two gyri touch, the line equidistant from their white matter blades
+    # (skeleton of the space outside the white matter, inside the tissue): a fine line, and a cut between the gyri
+    from skimage.morphology import skeletonize
+    dw = ndi.distance_transform_edt(~wmb) * (0.7 / UP)
+    sk = skeletonize(~wmb) & tis & (dw > 0.9) & (dw < 4.0) & (cv2.dilate((C > 0.4).astype(np.uint8), np.ones((3, 3), np.uint8)) > 0)
+    lab, nl = ndi.label(sk, structure=np.ones((3, 3)))
+    if nl:
+        size = ndi.sum(sk, lab, index=np.arange(1, nl + 1))
+        sk = np.concatenate([[False], size > UP * 4])[lab]
+    sulc = cv2.GaussianBlur(sk.astype(np.float32), (0, 0), 0.55)
+    tis = tis & ~(sk & (dw > 1.2))                                     # the two banks do not fuse
+    alpha = cv2.GaussianBlur(tis.astype(np.float32), (0, 0), 0.5)
     mmpx = 0.7 / UP
     dwm = ndi.distance_transform_edt(~wmb).astype(np.float32) * mmpx       # mm from the white matter
     # myelin from the T1 (smooth), for a light wash under the fibres
@@ -96,7 +129,7 @@ def draw(t1s, labs, fib, seed=0):
     cs, _ = cv2.findContours(tis.astype(np.uint8), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
     cs = [c for c in cs if cv2.arcLength(c, True) > UP * 10]
     cv2.drawContours(canvas, cs, -1, 150, 1, cv2.LINE_AA)
-    line = canvas.astype(np.float32) / 255
+    line = np.maximum(canvas.astype(np.float32) / 255, np.clip(sulc * 2.2, 0, 1) * 0.75)
     out = []
     for x in (full, base):
         x = np.maximum(x, line * 0.85) * alpha
@@ -132,6 +165,7 @@ def main():
     def section(P, j, c0, c1, r0, r1, want_fib=True):
         sec = cut(t1, P, j)[r0:r1, c0:c1]
         labs = [cut(m, P, j)[r0:r1, c0:c1] for m in (tissue, ctx, deep, wm)]
+        extra = (cut(t2, P, j)[r0:r1, c0:c1], cut(parc, P, j)[r0:r1, c0:c1])
         fib = None
         if TR is not None and want_fib:
             w0 = world(P["axis"], j)
@@ -142,7 +176,7 @@ def main():
                 c = (sh[P["cols"]] - 1 - ic) - c0; r = (sh[P["rows"]] - 1 - ir) - r0
                 return np.stack([(c + 0.5) * UP - 0.5, (r + 0.5) * UP - 0.5], 1)
             fib = splat((sec.shape[0] * UP, sec.shape[1] * UP), px(pa), px(pb))
-        return sec, labs, fib
+        return sec, labs, fib, extra
 
     def crop(P):
         cc = np.where(tissue.any(tuple(d for d in range(3) if d != P["cols"])))[0]
@@ -158,8 +192,8 @@ def main():
             idx = np.where(tissue.any(tuple(d for d in range(3) if d != P["axis"])))[0]
             j = int(round(idx.max() - f * (idx.max() - idx.min()))) if P["reverse"] else int(round(idx.min() + f * (idx.max() - idx.min())))
             c0, c1, r0, r1 = crop(P)
-            sec, labs, fib = section(P, j, c0, c1, r0, r1)
-            full, base, alpha = draw(sec, labs, fib, seed=j)
+            sec, labs, fib, (t2s, ps) = section(P, j, c0, c1, r0, r1)
+            full, base, alpha = draw(sec, labs, fib, seed=j, t2s=t2s, ps=ps)
             for nm, x in (("full", full), ("base", base)):
                 rgb = (247 * (1 - x[..., None]) + 60 * x[..., None]).astype(np.uint8).repeat(3, -1)
                 Image.fromarray(rgb).save(os.path.join(od, f"{pl}_{f}_{nm}.png"))
@@ -175,8 +209,8 @@ def main():
         js = list(range(idx.max(), idx.min() - 1, -STEP)) if P["reverse"] else list(range(idx.min(), idx.max() + 1, STEP))
         c0, c1, r0, r1 = crop(P)
         for k, j in enumerate(js):
-            sec, labs, fib = section(P, j, c0, c1, r0, r1)
-            full, base, alpha = draw(sec, labs, fib, seed=j)
+            sec, labs, fib, (t2s, ps) = section(P, j, c0, c1, r0, r1)
+            full, base, alpha = draw(sec, labs, fib, seed=j, t2s=t2s, ps=ps)
             h = int(round(full.shape[0] * WIDTH / full.shape[1]))
             fname = f"s{k:03d}.webp"
             for sub, x in (("", full), ("base", base)):
@@ -184,8 +218,7 @@ def main():
                 Image.fromarray(la, "LA").resize((WIDTH, h), Image.LANCZOS).save(os.path.join(od, sub, fname), quality=74, method=4)
             # T1, T2, FA: brain only (the parcellation), at their own resolution
             sw = WIDTH // 2; hs = int(round(sec.shape[0] * sw / sec.shape[1]))
-            mk = cv2.resize(cv2.GaussianBlur(labs[0].astype(np.float32), (0, 0), 0.7), (sw, hs), interpolation=cv2.INTER_CUBIC)
-            mk = smoothstep(0.4, 0.6, mk)
+            mk = cv2.resize(alpha, (sw, hs), interpolation=cv2.INTER_AREA)       # same border as the drawing
             for sub, vol, lo, hi in (("t1", t1, t1lo, t1hi), ("t2", t2, t2lo, t2hi), ("fa", FA, 0.0, 0.85)):
                 if vol is None: continue
                 v = cv2.resize(norm(cut(vol, P, j)[r0:r1, c0:c1], lo, hi), (sw, hs), interpolation=cv2.INTER_AREA)

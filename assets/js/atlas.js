@@ -393,7 +393,7 @@
     let slider = null, sliderOn = false, viewTo = null;
     const VIEW = { coronal: { x: 0.15, y: Math.PI / 2 - 0.42 }, axial: { x: 1.15, y: 0.35 }, sagittal: { x: 0.15, y: 0.42 } };
     const FROM = { coronal: "from the frontal pole", axial: "from the lowest point", sagittal: "from the right surface" };
-    function setSlider(k) { if (slider && !sliderOn) slider.value = Math.round(k); }
+    function setSlider(k) { if (slider && !sliderOn) slider.value = Math.round(k) + 1; }
     let openSection = () => {};
     if (mri && sliderBox) {
       sliderBox.hidden = false;
@@ -401,16 +401,18 @@
       const out = sliderBox.querySelector("output");
       const selPlane = document.getElementById("atlas-plane"), selMode = document.getElementById("atlas-mode");
       const ends = sliderBox.querySelectorAll(".end");
-      const labels = () => { const P = PL[plane]; ends[0].textContent = P.labels[0]; ends[1].textContent = P.labels[1]; slider.max = P.n - 1; };
+      const labels = () => { const P = PL[plane]; ends[0].textContent = P.labels[0]; ends[1].textContent = P.labels[1]; slider.max = P.n + 1; };      // 0 and n+1: beyond the brain, no section
       openSection = (turn) => {
         if (!PL[plane]) return;
         if (turn || !sliderOn) { viewTo = Object.assign({}, VIEW[plane]); auto = false; lastInteract = performance.now(); }
         skip = true; sliderOn = true; secOn = true; group.position.set(0, 0, 0);
         if (!introReady) { intro = "none"; introReady = true; }        // using the controls ends the opening at once
-        mriPlane.visible = true; mriMat.uniforms.uOpacity.value = 1;
-        for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 2;
-        placeSection(+slider.value);
-        out.textContent = `${Math.round(+slider.value * (PL[plane].step_mm || 1.25))} mm ${PL[plane].from || FROM[plane]}`;
+        const kk = +slider.value - 1, outside = kk < 0 || kk > PL[plane].n - 1;
+        secOn = !outside;                                // at both ends the plane disappears completely
+        mriPlane.visible = !outside; mriMat.uniforms.uOpacity.value = 1;
+        for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = outside ? 0 : 2;
+        if (!outside) placeSection(kk); else drawOverlay();
+        out.textContent = outside ? "" : `${Math.round(kk * (PL[plane].step_mm || 1.25))} mm ${PL[plane].from || FROM[plane]}`;
         sliderBox.classList.add("active");
       };
       slider.addEventListener("input", () => openSection(false));
@@ -421,14 +423,14 @@
         plane = selPlane.value;
         planeJson(plane).then(() => {
           buildPlane(plane); labels(); mriShown = null;
-          slider.value = Math.round(keepFrac * (PL[plane].n - 1));
-          loadSet(plane, setName()).then(() => { mriShown = null; showSlice(+slider.value); });
+          slider.value = Math.round(keepFrac * (PL[plane].n + 1));
+          loadSet(plane, setName()).then(() => { mriShown = null; showSlice(+slider.value - 1); });
           openSection(true);
         });
       });
       selMode.addEventListener("change", () => {
         mode = selMode.value; mriMat.uniforms.uMode.value = mode === "dejerine" ? 0 : STAIN[mode] || 1;
-        loadSet(plane, setName()).then(() => { mriShown = null; showSlice(+slider.value); });
+        loadSet(plane, setName()).then(() => { mriShown = null; showSlice(+slider.value - 1); });
         openSection(false); drawOverlay();
       });
       sliderBox.querySelector("button").addEventListener("click", () => {
