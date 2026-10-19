@@ -69,7 +69,7 @@ about.eyebrow: People
 about.title: Our team
 about.intro: 
 about.network.eyebrow: Network
-about.network.title: Collaborations
+about.network.title: International Collaborations
 about.page_title: About us — BrainTraCh Lab
 about.page_description: Team and collaborations of BrainTraCh Lab.
 
