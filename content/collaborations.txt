@@ -23,8 +23,6 @@
 #  link:         website, makes the name clickable     (optional)
 # ======================================================================
 
-institution: IRCCS Neuromed
-
 institution: King's College London
 unit: Neuroimaging & Biophysics Lab (NBL)
 people: Flavio Dell'Acqua
@@ -33,6 +31,10 @@ institution: Northwestern University, Chicago
 unit: Mesulam Institute for Cognitive Neurology & Alzheimer's Disease
 people: Marsel Mesulam
 
+institution: University of Edinburgh UK
+unit: Human Cognitive Neuroscience, Psychology Department
+people: Sergio Della Sala
+
 institution: University of Chicago
 unit: Healthy Aging & Alzheimer's Research Care (HAARC) Center
 people: Emily Rogalski
@@ -40,6 +42,18 @@ people: Emily Rogalski
 institution: University of Texas
 unit: Michale E. Keeling Center for Comparative Medicine and Research
 people: William Hopkins
+
+institution: Copenhagen University Hospital - Amager and Hvidovre; Hvidovre, 2650, Denmark.
+unit: Danish Research Centre for Magnetic Resonance (DRCMR), Department of Radiology and Nuclear Medicine
+people: Tim Dyrby
+
+institution: IRCSS Synlab SDN Naples
+unit: Neuroradiology Unit
+people: Carlo Cavaliere
+
+institution: IRCSS Neuromed
+unit: Interventional Neuroradiology Unit
+people: Salvatore Mangiafico - Andrea Bartolo - Giovanni Grillea
 
 # Example (remove the # signs to use it):
 # institution: University of Somewhere
