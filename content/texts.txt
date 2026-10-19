@@ -33,15 +33,14 @@ footer.tagline: White matter neuroanatomy & history of neuroscience
 
 # ---------------- HOME PAGE
 home.eyebrow: Neuroanatomy lab
-home.title: Mapping the brain *connections*
-home.lead: In 1999, the development of tractography revolutionized the study of brain connections. Since, we have discovered with tractography how connections develop in the human brain, the functional correlates and what is unique to humans compared to other species.
-The application of tractography to neurological and psychiatric disorders has revealed symptoms associated with damage to specific tracts and has opened the possibility of describing novel disconnection syndromes.
+home.title: Mapping brain *connections*
+home.lead: In 1999, the development of tractography revolutionized the study of brain connections. Since, we have discovered with tractography how connections develop in the human brain, the functional correlates and what is unique to humans compared to other species. The application of tractography to neurological and psychiatric disorders has revealed symptoms associated with damage to specific tracts and has opened the possibility of describing novel disconnection syndromes. Our results have contributed to international neuroanatomical nomenclature - *Nomina Anatomica* - and the last two editions of the *Gray's Anatomy*.
 home.button1: Our research
 home.button2: About us
-home.who.eyebrow: Who we are
-home.who.title: Anatomy as the foundation of brain function
-home.who.p1: BrainTraCh Lab is a research group devoted to the description of the white matter connections of the human brain. By combining detailed anatomical study with the analysis of their functional role, we aim to understand how the networks support brain functions, in healthy individuals and in people with neurological conditions.
-home.who.p2: Alongside this work, the lab cultivates a strong interest in the history of neuroscience, tracing how our knowledge of the brain's connections has taken shape over the centuries.
+home.who.eyebrow: Our mission
+home.who.title: From history to discoveries
+home.who.p1: Whenever a new tecnique is developed, scientist are forced to look back to move forward. Understanding what has been done by our predecessors is pivotal to make true discoveries.
+home.who.p2:
 home.who.link: Learn more about the lab
 home.who.photo: 
 home.areas.eyebrow: Research areas
