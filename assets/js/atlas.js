@@ -410,7 +410,7 @@
       mriPlane.position.y = y;
       const k0 = Math.min(mri.n - 1, Math.floor(slice));
       mriMat.uniforms.uA.value = mriTex[k0]; mriMat.uniforms.uB.value = mriTex[Math.min(mri.n - 1, k0 + 1)];
-      mriMat.uniforms.uMix.value = slice - k0;
+      const fr = slice - k0; mriMat.uniforms.uMix.value = fr < 0.8 ? 0 : (fr - 0.8) / 0.2;   // one crisp plate at a time
       mriMat.uniforms.uOpacity.value = Math.min(1, sec / M_IN) * (1 - ease((sec - M_OUT) / 0.8));
       // turn from the coronal view to the lateral view while the fibres grow
       const r = ease((sec - M_GROW - 0.4) / 4.2);

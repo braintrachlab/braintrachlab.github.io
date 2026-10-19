@@ -54,16 +54,16 @@
   "s050.webp",
   "s051.webp"
  ],
- "w": 640,
- "h": 697,
- "px_mm": 0.220703125,
+ "w": 800,
+ "h": 871,
+ "px_mm": 0.1765625,
  "slice_mm": 3.75,
  "brain": {
   "center_px": [
-   317.16814159292034,
+   396.46017699115043,
    0.0
   ],
-  "top_row": 16.991150442477878,
+  "top_row": 21.238938053097343,
   "length_mm": 192.5
  },
  "style": "Dejerine (Weigert stain) drawing of the T1, tools/sections/dejerine_render.py",

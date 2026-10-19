@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from pack_nifti import brain_mask
 
 UP = 6                       # 1.25 mm voxels -> ~0.21 mm pixels
-FIB_GAIN = 0.20              # ink left by each streamline (higher = darker white matter)
+FIB_GAIN = 0.75              # ink left by each streamline (higher = darker white matter)
 
 class Tracts:
     """streamline segments of a whole-brain tractogram (same grid as the T1), for drawing the sections"""
@@ -57,7 +57,7 @@ def splat(shape, pa, pb, step=0.35):
     f = (k + 0.5) / np.repeat(n, n)
     x = pa[idx, 0] + (pb[idx, 0] - pa[idx, 0]) * f
     y = pa[idx, 1] + (pb[idx, 1] - pa[idx, 1]) * f
-    wgt = np.repeat(np.maximum(L, 1.2) / n, n)          # ink per unit length (a crossing fibre still leaves a dot)
+    wgt = np.repeat(np.where(L < 1.0, 1.6, L / n) if False else np.maximum(L, 1.6) / n, n)  # a crossing fibre leaves a dot
     acc = np.zeros(shape, np.float32)
     x0 = np.floor(x).astype(int); y0 = np.floor(y).astype(int); fx = x - x0; fy = y - y0
     for dx, dy, ww in ((0, 0, (1 - fx) * (1 - fy)), (1, 0, fx * (1 - fy)), (0, 1, (1 - fx) * fy), (1, 1, fx * fy)):
@@ -122,13 +122,13 @@ def draw(t1s, ms, seed=0, fib=None):
     gm = smoothstep(0.30, 0.42, n) * (wm < 0.5)
     # ---- the fibres: real streamlines of this brain crossing the section (lines in plane, dots across it)
     if fib is not None:
-        fl = cv2.GaussianBlur(fib, (0, 0), 0.40)
-        fibink = 1.0 - np.exp(-fl * FIB_GAIN)
+        fl = cv2.GaussianBlur(fib, (0, 0), 0.30)
+        fibink = 0.88 * (1.0 - np.exp(-fl * FIB_GAIN))            # each line stays a line: little build-up
     else:
         fibink = np.zeros_like(n)
     # light wash of the stain under the fibres (white matter and deep nuclei), and the cortex band
-    wash = 0.50 * core + (0.34 * np.exp(-dwm / 0.8) + 0.05) * gm
-    ink = np.clip(np.maximum(wash, fibink * 0.95) + 0.25 * wash * fibink, 0, 1)
+    wash = 0.10 * core + (0.22 * np.exp(-dwm / 0.7) + 0.04) * gm
+    ink = np.clip(np.maximum(wash, fibink), 0, 1)
     tone_gm = (0.70 * np.exp(-dwm / 1.0) + 0.05) * gm
     # stipple in the cortex where the tone fades
     ink = np.clip(ink, 0, 1)
@@ -178,7 +178,7 @@ def plate(ink, paper=(233, 229, 204), inkc=(30, 31, 24)):
 
 TR = None
 
-def web_series(t1, m, out, every=3, width=640):
+def web_series(t1, m, out, every=3, width=800):
     """all coronal slices (front -> back, every N), same crop, ink as grayscale WebP + slices.json for atlas.js"""
     os.makedirs(out, exist_ok=True)
     ys = np.where(m.any((0, 2)))[0]
@@ -196,7 +196,7 @@ def web_series(t1, m, out, every=3, width=640):
         im = Image.fromarray((ink * 255).astype(np.uint8), "L")
         h = int(round(im.height * width / im.width))
         im = im.resize((width, h), Image.LANCZOS)
-        name = f"s{k:03d}.webp"; im.save(os.path.join(out, name), quality=72, method=6)
+        name = f"s{k:03d}.webp"; im.save(os.path.join(out, name), quality=80, method=6)
         names.append(name); print(k, j, flush=True)
     vox = 1.25
     px = (c1 - c0) * vox / width
@@ -212,7 +212,8 @@ if __name__ == "__main__":
     src, out = sys.argv[1], sys.argv[2]
     os.makedirs(out, exist_ok=True)
     t1, m, vox = load(src)
-    TR = Tracts(sys.argv[sys.argv.index("--trk") + 1]) if "--trk" in sys.argv else None
+    KEEP = float(sys.argv[sys.argv.index("--keep") + 1]) if "--keep" in sys.argv else 0.15
+    TR = Tracts(sys.argv[sys.argv.index("--trk") + 1], keep=KEEP) if "--trk" in sys.argv else None
     if "--web" in sys.argv:
         web_series(t1, m, out, every=int(sys.argv[sys.argv.index("--web") + 1])); sys.exit()
     ys = np.where(m.any((0, 2)))[0]
