@@ -70,7 +70,7 @@
       }`;
     const frag = `
       uniform vec3 cDark; uniform vec3 cLight; uniform float uProg; uniform float uAlpha; uniform float uFade;
-      uniform float uSweep; uniform float uSweepOn; uniform vec3 uN; uniform float uSide;
+      uniform float uSweep; uniform float uSweepOn; uniform vec3 uN; uniform float uSide; uniform float uKl; uniform vec3 uKlTint;
       varying vec3 vT; varying vec3 vB; varying float vSide; varying float vt; varying float vShade; varying float vInk; varying vec3 vP;
       void main() {
         if (vt > uProg) discard;
@@ -92,12 +92,20 @@
         float k = clamp(0.12 + 0.88 * diff, 0.0, 1.0) * (0.85 + 0.15 * vShade);
         vec3 col = mix(cDark, cLight, k) + vec3(0.32) * spec;
         col *= 0.62 + 0.38 * nz;                        // darker rims: the tube outline
+        // Klingler dissection: ivory, wet-looking fibres, deep grooves between the bundles
+        float specK = pow(max(dot(reflect(-L, N), vec3(0.0, 0.0, 1.0)), 0.0), 46.0);
+        vec3 colK = mix(vec3(0.46, 0.38, 0.30) * uKlTint, vec3(0.95, 0.92, 0.84) * uKlTint, pow(k, 0.75));
+        colK = colK * (0.52 + 0.48 * pow(nz, 0.5)) + vec3(0.62, 0.60, 0.55) * specK;
+        colK *= 0.94 + 0.06 * vShade;                                  // each fibre slightly different
+        col = mix(col, colK, uKl);
         vec3 inkCol = mix(vec3(0.22), vec3(0.42), vShade);  // ink of the old plates
         inkCol *= 1.0 - 0.45 * nearPlane;                                          // fresh ink where the fibres emerge
         col = mix(col, inkCol, vInk);
         col = mix(col, vec3(0.86, 0.87, 0.88), uFade * 0.92);      // non-selected tracts: pale grey ghost
+        float behind = step(1.5, uSweepOn);                          // with a section: the tracts behind it as a pale ghost
+        col = mix(col, vec3(0.90, 0.90, 0.89), behind * 0.72);
         float front = smoothstep(uProg - 0.03, uProg, vt);
-        gl_FragColor = vec4(col, born * uAlpha * (1.0 - 0.6 * front) * mix(1.0, min(1.0, 0.62 + 0.38 * nearPlane), vInk));
+        gl_FragColor = vec4(col, born * uAlpha * (1.0 - 0.6 * front) * mix(1.0, min(1.0, 0.62 + 0.38 * nearPlane), vInk) * (1.0 - 0.55 * behind));
       }`;
     // growth direction of each tract (x = left→right, y = back→front, z = bottom→top)
     const GROW = {
@@ -155,7 +163,7 @@
       const m = new THREE.ShaderMaterial({
         vertexShader: vert, fragmentShader: frag, transparent: true, depthWrite: true, side: THREE.DoubleSide,
         uniforms: { cDark: { value: new THREE.Color(...rgb(pal[0])) }, cLight: { value: new THREE.Color(...rgb(pal[1])) },
-                    uProg: { value: 0 }, uAlpha: { value: 1.0 }, uFade: { value: 0 }, uWidth: { value: WIDTH },
+                    uProg: { value: 0 }, uAlpha: { value: 1.0 }, uFade: { value: 0 }, uWidth: { value: WIDTH }, uKl: { value: 0 }, uKlTint: { value: new THREE.Color(1, 1, 1) },
                     uInk: { value: 1 }, uWave: { value: -0.2 }, uInkW: { value: 0.13 }, uSweep: { value: 999 }, uSweepOn: { value: 0 }, uN: { value: new THREE.Vector3(0, 1, 0) }, uSide: { value: 1 } },
       });
       mats[t.id] = m;
@@ -316,7 +324,13 @@
 
     // ---------- the selected tract on the section: its streamlines within the slice (lines or dots) ----------
     const ovLines = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x3c3c3c, transparent: true, depthTest: false }));
-    const ovDots = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0x3c3c3c, size: 2.6, sizeAttenuation: false, transparent: true, depthTest: false }));
+    const dotMat = new THREE.ShaderMaterial({                   // small round dots, like the stipple of the plates
+      transparent: true, depthTest: false, uniforms: { color: { value: new THREE.Color(0x3c3c3c) }, uSize: { value: 2.4 * Math.min(window.devicePixelRatio || 1, 2) } },
+      vertexShader: `uniform float uSize; void main() { gl_PointSize = uSize; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: `uniform vec3 color; void main() { vec2 d = gl_PointCoord - 0.5; float r = length(d); if (r > 0.5) discard; gl_FragColor = vec4(color, smoothstep(0.5, 0.3, r)); }`,
+    });
+    dotMat.color = dotMat.uniforms.color.value;
+    const ovDots = new THREE.Points(new THREE.BufferGeometry(), dotMat);
     ovLines.renderOrder = ovDots.renderOrder = 6; ovLines.frustumCulled = ovDots.frustumCulled = false;
     group.add(ovLines); group.add(ovDots);
     let ovSide = 1;
@@ -358,7 +372,7 @@
       sliderBox.hidden = false;
       slider = sliderBox.querySelector("input");
       const out = sliderBox.querySelector("output");
-      const [selPlane, selMode] = sliderBox.querySelectorAll("select");
+      const selPlane = document.getElementById("atlas-plane"), selMode = document.getElementById("atlas-mode");
       const ends = sliderBox.querySelectorAll(".end");
       const labels = () => { const P = PL[plane]; ends[0].textContent = P.labels[0]; ends[1].textContent = P.labels[1]; slider.max = P.n - 1; };
       openSection = (turn) => {
@@ -396,6 +410,22 @@
         drawOverlay();
       });
       planeJson("coronal").then(() => { buildPlane("coronal"); labels(); });
+    }
+    // ---------- view of the tracts: tractography colours, or a Klingler fibre dissection ----------
+    const KL_TINT = { cc: [1.0, 0.975, 0.94], atr: [0.97, 0.975, 1.0], fat: [0.985, 1.0, 0.965], ifof: [0.97, 0.99, 0.97], uf: [1.0, 0.99, 0.95] };
+    const styleSel = document.getElementById("atlas-style");
+    let klTarget = 0;
+    if (styleSel) styleSel.addEventListener("change", () => {
+      klTarget = styleSel.value === "klingler" ? 1 : 0;
+      box.classList.toggle("klingler", klTarget === 1);
+      for (const t of tracts) mats[t.id].uniforms.uKlTint.value.setRGB(...(KL_TINT[t.id] || [1, 1, 1]));
+    });
+    function stepStyle(k) {
+      for (const t of tracts) {
+        const u = mats[t.id].uniforms;
+        u.uKl.value += (klTarget - u.uKl.value) * k;
+        u.uWidth.value = WIDTH * (1 + 0.95 * u.uKl.value);                 // dissected bundles: thicker, packed fibres
+      }
     }
     // after a selection: switch the Dejerine images to the version without fibres, and draw the tract
     function sectionSelectionChanged() {
@@ -663,6 +693,7 @@
       pivot.position.x += (shiftTo - pivot.position.x) * k;
       if (!auto && now - lastInteract > 12000 && !selected && !sliderOn) auto = true;
       cam.position.set(0, 0, dist); cam.lookAt(0, 0, 0);
+      stepStyle(k);
       updateSide();
       renderer.render(scene, cam);
     }

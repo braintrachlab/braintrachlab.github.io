@@ -665,3 +665,7 @@ a.tool-card:hover { border-color: var(--ink); transform: translateY(-2px); box-s
 .atlas-slider button { margin-left: auto; visibility: hidden; background: none; border: 1px solid var(--line); font: inherit; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); padding: 6px 10px; cursor: pointer; }
 .atlas-slider.active button { visibility: visible; }
 .atlas-slider button:hover { border-color: var(--ink); color: var(--ink); }
+
+/* atlas: Klingler dissection view (dark background of the dissection photographs) */
+.atlas-view { transition: background 0.8s ease; }
+.atlas-view.klingler { background: radial-gradient(circle at 50% 45%, #3a3632 0%, #24211f 65%, #191716 100%); }

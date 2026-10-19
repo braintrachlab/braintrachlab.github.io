@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css?v=42bace53">
+  <link rel="stylesheet" href="assets/css/style.css?v=31df15c0">
   <script>document.documentElement.classList.add("texts-loading");setTimeout(function(){document.documentElement.classList.remove("texts-loading")},1500);</script>
 </head>
 <body data-page="atlas">
@@ -60,15 +60,21 @@
           <span class="end">Back</span>
           <output></output>
           <div class="slider-tools">
+            <label>View
+              <select id="atlas-style" aria-label="Rendering of the tracts">
+                <option value="tracto">Tractography</option>
+                <option value="klingler">Klingler dissection</option>
+              </select>
+            </label>
             <label>Plane
-              <select aria-label="Plane of the section">
+              <select id="atlas-plane" aria-label="Plane of the section">
                 <option value="coronal">Coronal</option>
                 <option value="axial">Axial</option>
                 <option value="sagittal">Sagittal</option>
               </select>
             </label>
             <label>Appearance
-              <select aria-label="Appearance of the section">
+              <select id="atlas-mode" aria-label="Appearance of the section">
                 <option value="dejerine">Dejerine (Weigert stain)</option>
                 <option value="fa">FA map</option>
                 <option value="t1">T1</option>
@@ -110,6 +116,6 @@
 
   <script src="assets/js/main.js?v=49ba73e7"></script>
   <script src="assets/js/content.js?v=f3b39e35"></script>
-  <script src="assets/js/atlas.js?v=21aeae81"></script>
+  <script src="assets/js/atlas.js?v=172dd7e0"></script>
 </body>
 </html>

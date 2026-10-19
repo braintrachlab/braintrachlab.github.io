@@ -404,15 +404,21 @@ atlas = f'''
           <span class="end">Back</span>
           <output></output>
           <div class="slider-tools">
+            <label>View
+              <select id="atlas-style" aria-label="Rendering of the tracts">
+                <option value="tracto">Tractography</option>
+                <option value="klingler">Klingler dissection</option>
+              </select>
+            </label>
             <label>Plane
-              <select aria-label="Plane of the section">
+              <select id="atlas-plane" aria-label="Plane of the section">
                 <option value="coronal">Coronal</option>
                 <option value="axial">Axial</option>
                 <option value="sagittal">Sagittal</option>
               </select>
             </label>
             <label>Appearance
-              <select aria-label="Appearance of the section">
+              <select id="atlas-mode" aria-label="Appearance of the section">
                 <option value="dejerine">Dejerine (Weigert stain)</option>
                 <option value="fa">FA map</option>
                 <option value="t1">T1</option>
