@@ -31,7 +31,7 @@
     fetch(box.dataset.meta).then((r) => r.json()),
     fetch(box.dataset.bin).then((r) => r.arrayBuffer()),
     C.load("content/tracts.txt"),
-    fetch("assets/atlas/mri/slices.json").then((r) => (r.ok ? r.json() : null)).catch(() => null),
+    fetch("assets/atlas/drawings/drawings.json").then((r) => (r.ok ? r.json() : null)).catch(() => null),
   ]).then(([THREE, meta, buf, cards, mri]) => {
     const nl = meta.tracts.reduce((a, t) => a + t.lines, 0);
     const counts = new Uint16Array(buf, 0, nl);
@@ -89,7 +89,7 @@
         float k = clamp(0.12 + 0.88 * diff, 0.0, 1.0) * (0.85 + 0.15 * vShade);
         vec3 col = mix(cDark, cLight, k) + vec3(0.32) * spec;
         col *= 0.62 + 0.38 * nz;                        // darker rims: the tube outline
-        vec3 inkCol = mix(vec3(0.17, 0.13, 0.10), vec3(0.42, 0.34, 0.26), vShade);   // sepia ink of the old plates
+        vec3 inkCol = mix(vec3(0.12, 0.125, 0.095), vec3(0.34, 0.34, 0.27), vShade);  // ink of the old plates
         inkCol *= 1.0 - 0.45 * nearPlane;                                          // fresh ink where the fibres emerge
         col = mix(col, inkCol, vInk);
         col = mix(col, vec3(0.86, 0.87, 0.88), uFade * 0.92);      // non-selected tracts: pale grey ghost
@@ -220,55 +220,32 @@
 
 
     // ---------- MRI sections drawn like Dejerine's plates (intro "mri") ----------
-    // The coronal slices of the brain (front to back) are packed in assets/atlas/mri/slices.png;
-    // the shader turns each one into an engraving: myelin (white matter) dark and hatched as in a
-    // Weigert stain, cortex light and stippled, ink contours at the pial surface and grey/white border.
-    let mriPlane = null, mriMat = null, mriY0 = 0;
+    // Coronal slices of the T1 (front to back), drawn offline in the style of the Weigert-stained
+    // plates of Dejerine (tools/sections/dejerine_render.py -> assets/atlas/drawings). The plane moves
+    // through the brain and cross-fades between consecutive drawings.
+    let mriPlane = null, mriMat = null, mriY0 = 0, mriTex = [], mriLoaded = Promise.resolve();
     if (mri) {
-      const tex = new THREE.TextureLoader().load("assets/atlas/mri/slices.png");
-      tex.minFilter = THREE.LinearFilter; tex.magFilter = THREE.LinearFilter; tex.generateMipmaps = false; tex.flipY = false;
-      const px = mri.px_mm, cx = mri.brain.center_px[0], rTop = 2.5, zTop = ext.z1 + 5;
-      mriY0 = (mri.n - 1) / 2 * mri.slice_mm;                    // slice 0 (frontal pole) lies here
+      const loader = new THREE.TextureLoader();
+      mriLoaded = Promise.all(mri.files.map((f, i) => new Promise((res) => {
+        mriTex[i] = loader.load("assets/atlas/drawings/" + f, res, undefined, res);
+        mriTex[i].minFilter = THREE.LinearFilter; mriTex[i].generateMipmaps = false;
+      })));
+      const px = mri.px_mm, cx = mri.brain.center_px[0], rTop = mri.brain.top_row, zTop = ext.z1 + 5;
+      mriY0 = (mri.n - 1) / 2 * mri.slice_mm;                    // first drawing (frontal pole) lies here
       const xa = (cx - mri.w) * px, xb = cx * px, za = zTop - (mri.h - rTop) * px, zb = zTop + rTop * px;
       const pg = new THREE.BufferGeometry();
       pg.setAttribute("position", new THREE.Float32BufferAttribute([xa, 0, za, xb, 0, za, xb, 0, zb, xa, 0, zb], 3));
+      pg.setAttribute("uv", new THREE.Float32BufferAttribute([1, 0, 0, 0, 0, 1, 1, 1], 2));
       pg.setIndex([0, 1, 2, 0, 2, 3]);
       mriMat = new THREE.ShaderMaterial({
-        transparent: true, depthWrite: false, side: THREE.DoubleSide, extensions: { derivatives: true },
-        uniforms: { uTex: { value: tex }, uSlice: { value: 0 }, uN: { value: mri.n }, uGrid: { value: new THREE.Vector2(mri.cols, mri.rows) },
-                    uTile: { value: new THREE.Vector2(mri.w, mri.h) }, uCx: { value: cx }, uRTop: { value: rTop }, uZTop: { value: zTop },
-                    uPx: { value: px }, uOpacity: { value: 0 } },
-        vertexShader: `varying vec3 vP; void main() { vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-        fragmentShader: `
-          uniform sampler2D uTex; uniform float uSlice; uniform float uN; uniform vec2 uGrid; uniform vec2 uTile;
-          uniform float uCx; uniform float uRTop; uniform float uZTop; uniform float uPx; uniform float uOpacity;
-          varying vec3 vP;
-          float tile(float k, vec2 cr) {
-            float c = mod(k, uGrid.x), r = floor(k / uGrid.x);
-            vec2 p = vec2(c * uTile.x, r * uTile.y) + clamp(cr, vec2(0.5), uTile - 0.5);
-            return texture2D(uTex, p / (uGrid * uTile)).r;
-          }
-          float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        transparent: true, depthWrite: false, side: THREE.DoubleSide,
+        uniforms: { uA: { value: null }, uB: { value: null }, uMix: { value: 0 }, uOpacity: { value: 0 } },
+        vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+        fragmentShader: `uniform sampler2D uA; uniform sampler2D uB; uniform float uMix; uniform float uOpacity; varying vec2 vUv;
           void main() {
-            vec2 cr = vec2(uCx - vP.x / uPx, uRTop + (uZTop - vP.z) / uPx);
-            float k0 = floor(uSlice), f = uSlice - k0;
-            float v = mix(tile(k0, cr), tile(min(k0 + 1.0, uN - 1.0), cr), f);
-            if (v < 0.004) discard;
-            float n = max(v - 0.02, 0.0) / 0.98;
-            float wm = smoothstep(0.60, 0.80, n), gm = smoothstep(0.22, 0.45, n);
-            float dens = 0.07 * gm + 0.62 * wm;
-            vec2 mm = vec2(vP.x, vP.z);
-            float ph = dot(mm, vec2(0.42, 0.91)) / 1.05 + 0.6 * sin(mm.x * 0.09 + mm.y * 0.05);
-            float line = abs(fract(ph) - 0.5) * 2.0;
-            float aa = fwidth(ph) * 1.6 + 0.02;
-            float ink = (1.0 - smoothstep(dens * 1.3 - aa, dens * 1.3 + aa, line)) * step(0.02, dens);
-            ink = max(ink, smoothstep(0.60, 0.69, dens) * 0.55);                       // deep white matter
-            ink = max(ink, step(0.9, hash(floor(mm * 2.6))) * gm * (1.0 - wm) * 0.55);   // stipple of the cortex
-            float dn = fwidth(n) + 1e-4, dv = fwidth(v) + 1e-4;
-            ink = max(ink, (1.0 - smoothstep(0.0, dn * 1.3, abs(n - 0.70))) * 0.5);    // grey/white border
-            ink = max(ink, (1.0 - smoothstep(0.0, dv * 1.3, abs(v - 0.12))) * 0.95);   // pial surface
-            vec3 sepia = mix(vec3(0.16, 0.12, 0.09), vec3(0.30, 0.24, 0.18), 1.0 - wm);
-            gl_FragColor = vec4(sepia, ink * uOpacity);
+            float ink = mix(texture2D(uA, vUv).r, texture2D(uB, vUv).r, uMix);
+            if (ink < 0.01) discard;
+            gl_FragColor = vec4(vec3(0.12, 0.125, 0.095), ink * uOpacity);       // ink of the plates
           }`,
       });
       mriPlane = new THREE.Mesh(pg, mriMat); mriPlane.renderOrder = 4; mriPlane.frustumCulled = false; mriPlane.visible = false;
@@ -400,10 +377,10 @@
     let intro = "mri";
     fetch("content/texts.txt", { cache: "no-cache" }).then((r) => r.text()).then((t) => {
       const m = t.match(/^\s*atlas\.opening\s*:\s*([a-z]+)/m); if (m) intro = m[1];
-    }).catch(() => {}).finally(() => {
+    }).catch(() => {}).then(() => Promise.race([mriLoaded, new Promise((r) => setTimeout(r, 9000))])).finally(() => {
       const q = new URLSearchParams(location.search).get("intro"); if (q) intro = q;
       if (intro === "mri" && !mriPlane) intro = "a";
-      if (intro === "mri") { pivot.rotation.set(0.32, 0.95, 0); dist = R * 4.0; mriPlane.visible = true; for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 1; }
+      if (intro === "mri") { pivot.rotation.set(0, Math.PI / 2, 0); dist = R * 3.3; mriPlane.visible = true; }
       if (intro === "d") { pivot.rotation.y = Math.PI; for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 1; }
       if (!["a", "b", "c", "d", "mri"].includes(intro)) { intro = "none"; setInk(0, 2); box.style.setProperty("--paper", 0); }
       introReady = true;
@@ -421,23 +398,30 @@
     box.style.setProperty("--paper", 1);
 
 
-    // ----- intro "mri": the coronal sections scroll from front to back, the fibres emerge behind them
-    const M_IN = 0.8, M_SWEEP = 8.0, M_OUT = M_IN + M_SWEEP, MRI_END = M_OUT + 4.2;
-    const o0 = { x: 0.32, y: 0.95 };
+    // ----- intro "mri": 1) the drawn coronal sections scroll from front to back, face on, like turning
+    // the plates; 2) the streamlines grow in ink while the brain turns to the lateral view; 3) colour.
+    const M_IN = 0.6, M_SWEEP = 7.5, M_OUT = M_IN + M_SWEEP * 0.86, M_GROW = M_OUT + 0.1, MRI_END = M_GROW + 6.2;
+    const v0 = { x: 0.0, y: Math.PI / 2 };                              // seen from behind, face on
+    const tmpV = new THREE.Vector3();
     function mriIntro(sec) {
       const p = Math.min(1, Math.max(0, (sec - M_IN) / M_SWEEP));
       const slice = p * (mri.n - 1);
       const y = mriY0 - slice * mri.slice_mm;
       mriPlane.position.y = y;
-      mriMat.uniforms.uSlice.value = slice;
-      mriMat.uniforms.uOpacity.value = Math.min(1, sec / M_IN) * (1 - ease((sec - M_OUT) / 0.9));
-      for (const t of tracts) mats[t.id].uniforms.uSweep.value = y;
-      const x = sec - M_OUT;
-      if (x > 0) for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 0;
-      const ink = 1 - ease((x - 0.4) / 2.4); setInk(ink, -0.2);
-      const r = ease((x - 0.8) / 3.2);                                   // turn to the lateral view
-      pivot.rotation.x = o0.x * (1 - r); pivot.rotation.y = o0.y * (1 - r);
-      dist = R * (4.0 - 0.4 * r);
+      const k0 = Math.min(mri.n - 1, Math.floor(slice));
+      mriMat.uniforms.uA.value = mriTex[k0]; mriMat.uniforms.uB.value = mriTex[Math.min(mri.n - 1, k0 + 1)];
+      mriMat.uniforms.uMix.value = slice - k0;
+      mriMat.uniforms.uOpacity.value = Math.min(1, sec / M_IN) * (1 - ease((sec - M_OUT) / 0.8));
+      // turn from the coronal view to the lateral view while the fibres grow
+      const r = ease((sec - M_GROW - 0.4) / 4.2);
+      pivot.rotation.x = v0.x * (1 - r); pivot.rotation.y = v0.y * (1 - r);
+      // keep the section in the middle of the view (the camera follows the cut), then return to the brain centre
+      const follow = 1 - ease((sec - M_OUT) / 2.5);
+      tmpV.set(0, y * follow, (ext.z1 + ext.z0) / 2 * 0).applyEuler(group.rotation);
+      group.position.set(-tmpV.x, -tmpV.y, -tmpV.z);
+      dist = R * (3.3 + 0.3 * r);
+      const x = sec - (M_GROW + 3.4);
+      const ink = 1 - ease(x / 2.4); setInk(ink, -0.2);
       return ink;
     }
     // ----- intro "d": Dejerine's section planes
@@ -462,7 +446,7 @@
       return ink;
     }
     function endSections() {
-      if (mriPlane) { mriPlane.visible = false; }
+      if (mriPlane) { mriPlane.visible = false; group.position.set(0, 0, 0); }
       if (intro !== "d" && intro !== "mri") return;
       for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 0;
       lineMat.uniforms.uLineA.value = 0; numerals.style.opacity = 0; inset.style.opacity = 0;
@@ -487,7 +471,8 @@
       const sec = (now - t0) / 1000, s = sec / speed;
       for (const t of tracts) {
         const m = mats[t.id].uniforms;
-        m.uProg.value = skip || intro === "d" || intro === "mri" ? 1.05 : Math.min(1.05, Math.max(0, (s - (ORDER[t.id] || 0)) / 2.6));
+        const sg = intro === "mri" ? (sec - M_GROW) / speed * 1.3 : s;
+        m.uProg.value = skip || intro === "d" ? 1.05 : Math.min(1.05, Math.max(0, (sg - (ORDER[t.id] || 0)) / 2.6));
         m.uAlpha.value += (target[t.id] - m.uAlpha.value) * k;
         const fadeTo = selected && t.id !== selected ? 1 : 0;
         m.uFade.value += (fadeTo - m.uFade.value) * 0.12;

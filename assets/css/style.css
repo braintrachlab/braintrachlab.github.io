@@ -581,7 +581,7 @@ form button { cursor: pointer; background: none; font: inherit; }
 .atlas-view canvas { display: block; width: 100%; height: 100%; position: relative; z-index: 1; }
 /* intro: warm paper of the old anatomical plates, fading to the normal background */
 .atlas-view::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: var(--paper, 0);
-  background: radial-gradient(circle at 50% 45%, #fbf7ee 0%, #f1e9d8 80%, #e9dfca 100%); }
+  background: radial-gradient(circle at 50% 45%, #f6f3e2 0%, #ece8d0 80%, #e4dfc4 100%); }
 .atlas-reset { position: absolute; left: 16px; bottom: 16px; z-index: 2; background: rgba(255,255,255,0.85); border: 1px solid var(--line); font: inherit; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); padding: 7px 12px; cursor: pointer; }
 .atlas-reset:hover { color: var(--ink); border-color: var(--ink); }
 .tract-panel { position: absolute; top: 0; right: 0; bottom: 0; width: min(400px, 92%); background: rgba(255,255,255,0.97); border-left: 1px solid var(--line); padding: 44px 30px 30px; overflow-y: auto; transform: translateX(105%); transition: transform 0.45s cubic-bezier(.2,.65,.3,1); z-index: 3; cursor: auto; box-shadow: -18px 0 40px rgba(27,29,34,0.06); }

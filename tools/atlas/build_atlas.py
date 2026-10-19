@@ -29,6 +29,6 @@ center = (coords_all.min(0) + coords_all.max(0)) / 2
 q = np.round((coords_all - center) * 10).astype(np.int16)
 os.makedirs(OUT, exist_ok=True)
 open(os.path.join(OUT, "atlas.bin"), "wb").write(np.array(counts, np.uint16).tobytes() + q.tobytes())
-json.dump({"tracts": meta, "scale": 0.1, "radius": float(np.linalg.norm(coords_all - center, axis=1).max())},
+json.dump({"tracts": meta, "scale": 0.1, "center_rasmm": [round(float(c), 3) for c in center], "radius": float(np.linalg.norm(coords_all - center, axis=1).max())},
           open(os.path.join(OUT, "atlas.json"), "w"), indent=1)
 print(meta, "total points", len(q), "bytes", os.path.getsize(os.path.join(OUT, "atlas.bin")))
