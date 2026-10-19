@@ -143,8 +143,11 @@ def draw(t1s, ms, seed=0, fib=None):
     cv2.drawContours(canvas, cg, -1, 140, 1, cv2.LINE_AA)            # outline of the gyri: border between tissue and CSF
     csf = ((cv2.GaussianBlur(n, (0, 0), UP * 0.35) < 0.16) & (cv2.erode(sm, np.ones((5, 5), np.uint8)) > 0)).astype(np.uint8)
     cs2, _ = cv2.findContours(csf, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-    cs2 = [c for c in cs2 if cv2.arcLength(c, True) > UP * 9]
-    cv2.drawContours(canvas, cs2, -1, 200, 1, cv2.LINE_AA)
+    dsurf = ndi.distance_transform_edt(tis > 0) * (1.25 / UP)
+    cs2 = [c for c in cs2 if cv2.arcLength(c, True) > UP * 9 and
+           np.min(dsurf[np.clip(c[:, 0, 1], 0, tis.shape[0] - 1), np.clip(c[:, 0, 0], 0, tis.shape[1] - 1)]) > 0 and
+           cv2.pointPolygonTest(cv2.convexHull(np.concatenate(cg)) if cg else c, tuple(map(float, c[0, 0])), True) > UP * 4]
+    cv2.drawContours(canvas, cs2, -1, 170, 1, cv2.LINE_AA)            # ventricles only
     # sulci: midline of the cortex between two white matter blades (skeleton of brain minus white matter)
     from skimage.morphology import skeletonize, remove_small_objects
     ctx = (cv2.erode(sm, np.ones((3, 3), np.uint8)) > 0) & (wm < 0.5)
@@ -162,7 +165,6 @@ def draw(t1s, ms, seed=0, fib=None):
         keep[1:] = (size > UP * 4) & (mean_n < 0.50) & (touch < 3.0)     # darker (CSF) and open to the surface
     sk = keep[lab]
     skl = cv2.GaussianBlur(sk.astype(np.float32), (0, 0), 0.6) * 1.8
-    ink = np.maximum(ink, np.clip(skl, 0, 1) * 0.50)
     ink = np.maximum(ink, canvas.astype(np.float32) / 255 * 0.92)
     # the CSF itself stays paper-white
     ink *= 1 - cv2.GaussianBlur(csf.astype(np.float32), (0, 0), 1.0) * 0.9
