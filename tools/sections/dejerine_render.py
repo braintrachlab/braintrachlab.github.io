@@ -5,6 +5,7 @@ thin ink contours along every gyrus, sulcus and ventricle.
 
 usage: python3 dejerine_render.py <T1.nii.gz> <out folder> --at 0.195,0.385   (fractions front->back)
        python3 dejerine_render.py <T1.nii.gz> assets/atlas/drawings --web 3      (series for the atlas)
+       add  --trk whole_brain.trk  to draw the white matter from the real streamlines of the same brain
        python3 dejerine_render.py <T1.nii.gz> <out folder> --every 3            (every 3rd slice)
 """
 import sys, os, json
@@ -15,6 +16,65 @@ sys.path.insert(0, os.path.dirname(__file__))
 from pack_nifti import brain_mask
 
 UP = 6                       # 1.25 mm voxels -> ~0.21 mm pixels
+FIB_GAIN = 0.20              # ink left by each streamline (higher = darker white matter)
+
+class Tracts:
+    """streamline segments of a whole-brain tractogram (same grid as the T1), for drawing the sections"""
+    def __init__(self, trk, keep=1.0, seed=0):
+        t = nib.streamlines.load(trk)
+        sl = t.streamlines
+        pts = sl.get_data().astype(np.float32)
+        off, ln = sl._offsets, sl._lengths
+        if keep < 1:
+            sel = np.random.default_rng(seed).random(len(ln)) < keep
+        else:
+            sel = np.ones(len(ln), bool)
+        last = np.zeros(len(pts), bool); last[(off + ln - 1)] = True     # no segment between two streamlines
+        own = np.repeat(sel, ln)
+        ok = ~last[:-1] & own[:-1]
+        self.a = pts[:-1][ok]; self.b = pts[1:][ok]
+        self.ymin = np.minimum(self.a[:, 1], self.b[:, 1]); self.ymax = np.maximum(self.a[:, 1], self.b[:, 1])
+
+    def slab(self, y0, half=0.65):
+        """segments clipped to the slab |y - y0| < half (world mm)"""
+        i = np.where((self.ymin < y0 + half) & (self.ymax > y0 - half))[0]
+        a, b = self.a[i], self.b[i]
+        dy = b[:, 1] - a[:, 1]
+        with np.errstate(divide="ignore", invalid="ignore"):
+            t0 = np.where(np.abs(dy) > 1e-6, (y0 - half - a[:, 1]) / dy, -np.inf)
+            t1 = np.where(np.abs(dy) > 1e-6, (y0 + half - a[:, 1]) / dy, np.inf)
+        lo = np.clip(np.minimum(t0, t1), 0, 1); hi = np.clip(np.maximum(t0, t1), 0, 1)
+        d = b - a
+        return a + d * lo[:, None], a + d * hi[:, None]
+
+def splat(shape, pa, pb, step=0.35):
+    """accumulate line segments (pixel coords, columns/rows) into a density image"""
+    h, w = shape
+    L = np.hypot(pb[:, 0] - pa[:, 0], pb[:, 1] - pa[:, 1])
+    n = np.maximum(1, np.ceil(L / step)).astype(int)
+    idx = np.repeat(np.arange(len(L)), n)
+    k = np.arange(n.sum()) - np.repeat(np.cumsum(n) - n, n)
+    f = (k + 0.5) / np.repeat(n, n)
+    x = pa[idx, 0] + (pb[idx, 0] - pa[idx, 0]) * f
+    y = pa[idx, 1] + (pb[idx, 1] - pa[idx, 1]) * f
+    wgt = np.repeat(np.maximum(L, 1.2) / n, n)          # ink per unit length (a crossing fibre still leaves a dot)
+    acc = np.zeros(shape, np.float32)
+    x0 = np.floor(x).astype(int); y0 = np.floor(y).astype(int); fx = x - x0; fy = y - y0
+    for dx, dy, ww in ((0, 0, (1 - fx) * (1 - fy)), (1, 0, fx * (1 - fy)), (0, 1, (1 - fx) * fy), (1, 1, fx * fy)):
+        xx, yy = x0 + dx, y0 + dy
+        ok = (xx >= 0) & (yy >= 0) & (xx < w) & (yy < h)
+        np.add.at(acc, (yy[ok], xx[ok]), (wgt * ww)[ok])
+    return acc
+
+def fibres(tr, j, X, Z, c0=0, r0=0, shape=None, half=0.65):
+    """density image (upsampled section pixels) of the streamline segments within the slab of coronal slice j"""
+    y0 = 1.25 * j + 1.297                                      # world y of the T1 slice (affine of the T1)
+    pa, pb = tr.slab(y0, half)
+    def px(p):
+        i = p[:, 0] / 1.25 - 1; k = p[:, 2] / 1.25 - 1          # voxel indices (affine of the tractogram)
+        c = (X - 1 - i) - c0; r = (Z - 1 - k) - r0
+        return np.stack([(c + 0.5) * UP - 0.5, (r + 0.5) * UP - 0.5], 1)
+    return splat(shape, px(pa), px(pb))
 
 def load(src):
     img = nib.as_closest_canonical(nib.load(src))
@@ -47,7 +107,8 @@ def lic(noise, vx, vy, L=14):
             acc += wk * ndi.map_coordinates(noise, [py, px], order=1, mode="nearest"); wsum += wk
     return acc / wsum
 
-def draw(t1s, ms, seed=0):
+def draw(t1s, ms, seed=0, fib=None):
+    """fib: density of the real streamline segments crossing this section (upsampled pixel grid)"""
     rng = np.random.default_rng(seed)
     # upsample smoothly (no voxel blocks)
     t = cv2.resize(t1s, None, fx=UP, fy=UP, interpolation=cv2.INTER_CUBIC)
@@ -55,44 +116,27 @@ def draw(t1s, ms, seed=0):
     m = cv2.GaussianBlur(cv2.resize(ms.astype(np.float32), None, fx=UP, fy=UP, interpolation=cv2.INTER_LINEAR), (0, 0), UP * 0.5) > 0.5
     n = np.clip((t - 0.30) / 0.80, 0, 1) * m                   # grey ~0.47, white ~0.88
     wm = smoothstep(0.60, 0.80, n)
-    # ---- fibre direction: radiating from the centrum semiovale along each gyral blade
-    depth = ndi.distance_transform_edt(wm > 0.5).astype(np.float32)
-    big = cv2.GaussianBlur(wm.astype(np.float32), (0, 0), UP * 2.2)
-    gx = cv2.Sobel(big, cv2.CV_32F, 1, 0, ksize=5); gy = cv2.Sobel(big, cv2.CV_32F, 0, 1, ksize=5)
-    s_ = UP * 0.8
-    jxx = cv2.GaussianBlur(gx * gx, (0, 0), s_); jyy = cv2.GaussianBlur(gy * gy, (0, 0), s_); jxy = cv2.GaussianBlur(gx * gy, (0, 0), s_)
-    ang = 0.5 * np.arctan2(2 * jxy, jxx - jyy)                     # major eigenvector = along the gradient
-    vx, vy = np.cos(ang).astype(np.float32), np.sin(ang).astype(np.float32)
-    # ---- fibrous texture
-    noise = rng.random(t.shape).astype(np.float32)
-    noise = cv2.GaussianBlur(noise, (0, 0), 0.45)
-    tex = lic(noise, vx, vy, L=int(UP * 1.6))
-    u = np.empty_like(tex); idx = np.argsort(tex, axis=None)       # rank transform -> uniform 0..1
-    u.ravel()[idx] = np.linspace(0, 1, tex.size, dtype=np.float32)
     mmpx = 1.25 / UP                                                # mm per pixel
-    # ---- tone of the Weigert stain (continuous, like the engraver's shading)
     core = smoothstep(0.50, 0.90, n)                                # myelin content from T1
-    width = ndi.maximum_filter(depth, size=int(UP * 5)) * mmpx      # local half-width of the white matter (mm)
-    thin = np.exp(-width / 3.0)                                     # gyral blades are darker than the centrum
-    tone_wm = core * (0.70 + 0.26 * thin)
     dwm = ndi.distance_transform_edt(wm < 0.5).astype(np.float32) * mmpx     # mm outside the white matter
-    gm = smoothstep(0.10, 0.30, n) * (wm < 0.5)
-    tone_gm = (0.70 * np.exp(-dwm / 1.0) + 0.05) * gm                # radial fibres fading into the cortex
-    tone = np.maximum(tone_wm, tone_gm)
-    tone = cv2.GaussianBlur(tone, (0, 0), 1.0)
-    # fine fibres: the streak texture modulates the tone (no hard black)
-    streak = (u - 0.5) * 2                                          # -1..1
-    ink = np.clip(tone * (1.0 + 0.30 * streak) - 0.03, 0, 1)
+    gm = smoothstep(0.30, 0.42, n) * (wm < 0.5)
+    # ---- the fibres: real streamlines of this brain crossing the section (lines in plane, dots across it)
+    if fib is not None:
+        fl = cv2.GaussianBlur(fib, (0, 0), 0.40)
+        fibink = 1.0 - np.exp(-fl * FIB_GAIN)
+    else:
+        fibink = np.zeros_like(n)
+    # light wash of the stain under the fibres (white matter and deep nuclei), and the cortex band
+    wash = 0.50 * core + (0.34 * np.exp(-dwm / 0.8) + 0.05) * gm
+    ink = np.clip(np.maximum(wash, fibink * 0.95) + 0.25 * wash * fibink, 0, 1)
+    tone_gm = (0.70 * np.exp(-dwm / 1.0) + 0.05) * gm
     # stipple in the cortex where the tone fades
-    near = 0.70 * np.exp(-dwm / 1.0) * gm
-    dots = (rng.random(t.shape) < near * 0.20).astype(np.float32)
-    ink = np.maximum(ink, cv2.GaussianBlur(dots, (0, 0), 0.5) * 1.5)
     ink = np.clip(ink, 0, 1)
     # ---- contours: brain outline and the CSF of sulci and ventricles, as clean thin lines
     canvas = np.zeros(t.shape, np.uint8)
     sm = (cv2.GaussianBlur(m.astype(np.float32), (0, 0), UP * 0.3) > 0.5).astype(np.uint8)
     cs, _ = cv2.findContours(sm, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    tis = ((cv2.GaussianBlur(n, (0, 0), UP * 0.18) > 0.30) & (sm > 0)).astype(np.uint8)
+    tis = ((cv2.GaussianBlur(n, (0, 0), UP * 0.18) > 0.33) & (sm > 0)).astype(np.uint8)
     tis = cv2.morphologyEx(tis, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
     cg, _ = cv2.findContours(tis, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
     cg = [c for c in cg if cv2.arcLength(c, True) > UP * 12]
@@ -132,6 +176,8 @@ def plate(ink, paper=(233, 229, 204), inkc=(30, 31, 24)):
     rgb = (np.array(paper)[None, None] * (1 - a) + np.array(inkc)[None, None] * a).astype(np.uint8)
     return Image.fromarray(rgb)
 
+TR = None
+
 def web_series(t1, m, out, every=3, width=640):
     """all coronal slices (front -> back, every N), same crop, ink as grayscale WebP + slices.json for atlas.js"""
     os.makedirs(out, exist_ok=True)
@@ -144,7 +190,9 @@ def web_series(t1, m, out, every=3, width=640):
     c0, r0 = max(c0, 0), max(r0, 0)
     names = []
     for k, j in enumerate(js):
-        ink = draw(coronal(t1, j)[r0:r1, c0:c1], coronal(m, j)[r0:r1, c0:c1], seed=j)
+        sec = coronal(t1, j)[r0:r1, c0:c1]
+        fib = fibres(TR, j, m.shape[0], m.shape[2], c0, r0, (sec.shape[0] * UP, sec.shape[1] * UP)) if TR else None
+        ink = draw(sec, coronal(m, j)[r0:r1, c0:c1], seed=j, fib=fib)
         im = Image.fromarray((ink * 255).astype(np.uint8), "L")
         h = int(round(im.height * width / im.width))
         im = im.resize((width, h), Image.LANCZOS)
@@ -164,6 +212,7 @@ if __name__ == "__main__":
     src, out = sys.argv[1], sys.argv[2]
     os.makedirs(out, exist_ok=True)
     t1, m, vox = load(src)
+    TR = Tracts(sys.argv[sys.argv.index("--trk") + 1]) if "--trk" in sys.argv else None
     if "--web" in sys.argv:
         web_series(t1, m, out, every=int(sys.argv[sys.argv.index("--web") + 1])); sys.exit()
     ys = np.where(m.any((0, 2)))[0]
@@ -174,6 +223,8 @@ if __name__ == "__main__":
     else:
         e = int(sys.argv[sys.argv.index("--every") + 1]); js = list(range(front, back - 1, -e))
     for k, j in enumerate(js):
-        ink = draw(coronal(t1, j), coronal(m, j), seed=j)
+        sec = coronal(t1, j)
+        fib = fibres(TR, j, m.shape[0], m.shape[2], 0, 0, (sec.shape[0] * UP, sec.shape[1] * UP)) if TR else None
+        ink = draw(sec, coronal(m, j), seed=j, fib=fib)
         plate(ink).save(os.path.join(out, f"plate-{k:03d}.png"))
         print(k, j, ink.shape, flush=True)
