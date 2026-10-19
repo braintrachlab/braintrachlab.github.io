@@ -647,3 +647,17 @@ a.tool-card:hover { border-color: var(--ink); transform: translateY(-2px); box-s
 .tool-card p { color: var(--ink-soft); margin: 0 0 14px; }
 .tool-photo { width: 100%; aspect-ratio: 16/9; object-fit: cover; margin-bottom: 14px; }
 .tool-more { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+
+/* atlas: slider to move the coronal section from front to back */
+.atlas-slider { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 6px 14px; margin: 18px 0 4px; }
+.atlas-slider[hidden] { display: none; }
+.atlas-slider .end { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.atlas-slider input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; cursor: pointer; }
+.atlas-slider input[type=range]::-webkit-slider-runnable-track { height: 1px; background: var(--ink-soft); }
+.atlas-slider input[type=range]::-moz-range-track { height: 1px; background: var(--ink-soft); }
+.atlas-slider input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 3px; height: 22px; margin-top: -11px; background: var(--ink); border: 0; }
+.atlas-slider input[type=range]::-moz-range-thumb { width: 3px; height: 22px; background: var(--ink); border: 0; border-radius: 0; }
+.atlas-slider output { grid-column: 1 / 3; font-family: var(--serif); font-style: italic; color: var(--ink-soft); min-height: 1.3em; }
+.atlas-slider button { grid-column: 3; justify-self: end; visibility: hidden; background: none; border: 1px solid var(--line); font: inherit; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); padding: 5px 10px; cursor: pointer; }
+.atlas-slider.active button { visibility: visible; }
+.atlas-slider button:hover { border-color: var(--ink); color: var(--ink); }

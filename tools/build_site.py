@@ -398,6 +398,13 @@ atlas = f'''
             <div class="tract-body"></div>
           </aside>
         </div>
+        <div id="atlas-slider" class="atlas-slider" hidden>
+          <span class="end">Front</span>
+          <input type="range" min="0" max="100" step="1" value="0" aria-label="Position of the coronal section, from front to back">
+          <span class="end">Back</span>
+          <output></output>
+          <button type="button">Hide section</button>
+        </div>
         <div id="tract-list" class="tract-list" aria-label="Tracts"></div>
         {T("p", "atlas.caption", "Tractography reconstructions of the right hemisphere and of the corpus callosum. Colours follow the fibre system: red commissural, blue projection, green association.", "plate-caption atlas-caption")}
       </div>

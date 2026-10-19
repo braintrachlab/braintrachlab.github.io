@@ -180,7 +180,7 @@ def plate(ink, paper=(233, 229, 204), inkc=(30, 31, 24)):
 
 TR = None
 
-def web_series(t1, m, out, every=3, width=800):
+def web_series(t1, m, out, every=1, width=640):
     """all coronal slices (front -> back, every N), same crop, ink as grayscale WebP + slices.json for atlas.js"""
     os.makedirs(out, exist_ok=True)
     ys = np.where(m.any((0, 2)))[0]
@@ -198,7 +198,7 @@ def web_series(t1, m, out, every=3, width=800):
         im = Image.fromarray((ink * 255).astype(np.uint8), "L")
         h = int(round(im.height * width / im.width))
         im = im.resize((width, h), Image.LANCZOS)
-        name = f"s{k:03d}.webp"; im.save(os.path.join(out, name), quality=80, method=6)
+        name = f"s{k:03d}.webp"; im.save(os.path.join(out, name), quality=76, method=6)
         names.append(name); print(k, j, flush=True)
     vox = 1.25
     px = (c1 - c0) * vox / width

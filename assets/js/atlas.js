@@ -76,8 +76,9 @@
         if (vt > uProg) discard;
         // section sweep (front to back): fibres exist only in front of the moving section plane
         if (uSweepOn > 0.5 && vY < uSweep) discard;
+        if (uSweepOn < -0.5 && vY > uSweep) discard;                              // slider: only behind the section
         float born = uSweepOn > 0.5 ? smoothstep(0.0, 3.5, vY - uSweep) : 1.0;     // soft edge where the fibres emerge
-        float nearPlane = uSweepOn * (1.0 - smoothstep(0.0, 9.0, vY - uSweep));
+        float nearPlane = max(uSweepOn, 0.0) * (1.0 - smoothstep(0.0, 9.0, vY - uSweep));
         float a = clamp(vSide, -1.0, 1.0);
         float nz = sqrt(max(0.0, 1.0 - a * a));
         vec3 F = normalize(cross(vB, vT));            // across the tube, facing the viewer
@@ -223,12 +224,17 @@
     // Coronal slices of the T1 (front to back), drawn offline in the style of the Weigert-stained
     // plates of Dejerine (tools/sections/dejerine_render.py -> assets/atlas/drawings). The plane moves
     // through the brain and cross-fades between consecutive drawings.
-    let mriPlane = null, mriMat = null, mriY0 = 0, mriTex = [], mriLoaded = Promise.resolve();
+    let mriPlane = null, mriMat = null, mriY0 = 0, mriImgs = [], mriLoaded = Promise.resolve(), mriShown = -1;
+    const secTex = new THREE.Texture(); secTex.minFilter = THREE.LinearFilter; secTex.generateMipmaps = false;
+    function showSlice(k) {                       // one section on screen: swap the image of the single texture
+      k = Math.max(0, Math.min(mri.n - 1, Math.round(k)));
+      const im = mriImgs[k];
+      if (k === mriShown || !im || !im.complete || !im.naturalWidth) return;
+      mriShown = k; secTex.image = im; secTex.needsUpdate = true;
+    }
     if (mri) {
-      const loader = new THREE.TextureLoader();
       mriLoaded = Promise.all(mri.files.map((f, i) => new Promise((res) => {
-        mriTex[i] = loader.load("assets/atlas/drawings/" + f, res, undefined, res);
-        mriTex[i].minFilter = THREE.LinearFilter; mriTex[i].generateMipmaps = false;
+        const im = new Image(); im.onload = im.onerror = res; im.src = "assets/atlas/drawings/" + f; mriImgs[i] = im;
       })));
       const px = mri.px_mm, cx = mri.brain.center_px[0], rTop = mri.brain.top_row, zTop = ext.z1 + 5;
       mriY0 = (mri.n - 1) / 2 * mri.slice_mm;                    // first drawing (frontal pole) lies here
@@ -239,17 +245,49 @@
       pg.setIndex([0, 1, 2, 0, 2, 3]);
       mriMat = new THREE.ShaderMaterial({
         transparent: true, depthWrite: false, side: THREE.DoubleSide,
-        uniforms: { uA: { value: null }, uB: { value: null }, uMix: { value: 0 }, uOpacity: { value: 0 } },
+        uniforms: { uA: { value: secTex }, uOpacity: { value: 0 } },
         vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-        fragmentShader: `uniform sampler2D uA; uniform sampler2D uB; uniform float uMix; uniform float uOpacity; varying vec2 vUv;
+        fragmentShader: `uniform sampler2D uA; uniform float uOpacity; varying vec2 vUv;
           void main() {
-            float ink = mix(texture2D(uA, vUv).r, texture2D(uB, vUv).r, uMix);
-            if (ink < 0.01) discard;
-            gl_FragColor = vec4(vec3(0.12, 0.125, 0.095), ink * uOpacity);       // ink of the plates
+            float ink = texture2D(uA, vUv).r;
+            if (ink < 0.003) discard;                                          // outside the brain and ventricles
+            vec3 paper = vec3(0.975, 0.97, 0.95), inkc = vec3(0.12, 0.125, 0.095);
+            gl_FragColor = vec4(mix(paper, inkc, smoothstep(0.03, 1.0, ink)), uOpacity);   // the cut surface, opaque
           }`,
       });
       mriPlane = new THREE.Mesh(pg, mriMat); mriPlane.renderOrder = 4; mriPlane.frustumCulled = false; mriPlane.visible = false;
       group.add(mriPlane);
+    }
+
+
+    // ---------- slider under the view: move the section from front to back ----------
+    const sliderBox = document.getElementById("atlas-slider");
+    let slider = null, sliderOn = false, viewTo = null;
+    function setSlider(k) { if (slider && !sliderOn) slider.value = Math.round(k); }
+    function sectionAt(k) {                               // place the drawn section and cut the tracts there
+      const y = mriY0 - k * mri.slice_mm;
+      mriPlane.position.y = y; showSlice(k);
+      for (const t of tracts) { mats[t.id].uniforms.uSweep.value = y; }
+    }
+    if (mri && sliderBox) {
+      sliderBox.hidden = false;
+      slider = sliderBox.querySelector("input");
+      slider.max = mri.n - 1; slider.value = 0;
+      const out = sliderBox.querySelector("output");
+      const update = () => {
+        if (!sliderOn) { viewTo = { x: 0.15, y: Math.PI / 2 - 0.42 }; auto = false; lastInteract = performance.now(); }
+        skip = true; sliderOn = true; group.position.set(0, 0, 0);
+        mriPlane.visible = true; mriMat.uniforms.uOpacity.value = 1;
+        for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 1;
+        sectionAt(+slider.value);
+        out.textContent = `${Math.round(+slider.value * mri.slice_mm)} mm from the frontal pole`;
+        sliderBox.classList.add("active");
+      };
+      slider.addEventListener("input", update);
+      sliderBox.querySelector("button").addEventListener("click", () => {
+        sliderOn = false; mriPlane.visible = false; viewTo = { x: 0, y: 0 }; sliderBox.classList.remove("active"); out.textContent = "";
+        for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 0;
+      });
     }
 
     // ---------- scene ----------
@@ -276,7 +314,7 @@
     const pointers = new Map(); let pinch0 = 0;
     el.addEventListener("pointerdown", (e) => {
       el.setPointerCapture(e.pointerId); pointers.set(e.pointerId, [e.clientX, e.clientY]);
-      drag = [e.clientX, e.clientY]; moved = 0; auto = false; lastInteract = performance.now();
+      drag = [e.clientX, e.clientY]; moved = 0; auto = false; viewTo = null; lastInteract = performance.now();
       if (pointers.size === 2) { const [a, b] = [...pointers.values()]; pinch0 = Math.hypot(a[0] - b[0], a[1] - b[1]); }
     });
     el.addEventListener("pointermove", (e) => {
@@ -409,8 +447,7 @@
       const y = mriY0 - slice * mri.slice_mm;
       mriPlane.position.y = y;
       const k0 = Math.min(mri.n - 1, Math.floor(slice));
-      mriMat.uniforms.uA.value = mriTex[k0]; mriMat.uniforms.uB.value = mriTex[Math.min(mri.n - 1, k0 + 1)];
-      mriMat.uniforms.uMix.value = 0;                                  // one section at a time, never blended
+      showSlice(slice); setSlider(slice);
       mriMat.uniforms.uOpacity.value = Math.min(1, sec / M_IN) * (1 - ease((sec - M_OUT) / 0.8));
       // turn from the coronal view to the lateral view while the fibres grow
       const r = ease((sec - M_GROW - 0.4) / 4.2);
@@ -446,7 +483,8 @@
       return ink;
     }
     function endSections() {
-      if (mriPlane) { mriPlane.visible = false; group.position.set(0, 0, 0); }
+      if (sliderOn) { lineMat.uniforms.uLineA.value = 0; numerals.style.opacity = 0; inset.style.opacity = 0; setInk(0, 2); return; }
+      if (mriPlane && !sliderOn) { mriPlane.visible = false; } group.position.set(0, 0, 0);
       if (intro !== "d" && intro !== "mri") return;
       for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 0;
       lineMat.uniforms.uLineA.value = 0; numerals.style.opacity = 0; inset.style.opacity = 0;
@@ -493,10 +531,14 @@
         if (inkNow <= 0) { introDone = true; endSections(); setInk(0, 2); lastInteract = skip ? lastInteract : now - 4000; }
       }
       if (introDone && auto && now - lastInteract > 4000) pivot.rotation.y += 0.15 * dt;
+      if (viewTo) {                                         // turn so that the section faces the viewer
+        pivot.rotation.x += (viewTo.x - pivot.rotation.x) * k; pivot.rotation.y += (viewTo.y - pivot.rotation.y) * k;
+        if (Math.abs(viewTo.y - pivot.rotation.y) < 0.002) viewTo = null;
+      }
       // when the card is open, slide the brain into the free part of the view
       const shiftTo = selected && box.clientWidth > 700 ? -R * 0.55 * (dist / (R * 3.6)) : 0;
       pivot.position.x += (shiftTo - pivot.position.x) * k;
-      if (!auto && now - lastInteract > 12000 && !selected) auto = true;
+      if (!auto && now - lastInteract > 12000 && !selected && !sliderOn) auto = true;
       cam.position.set(0, 0, dist); cam.lookAt(0, 0, 0);
       renderer.render(scene, cam);
     }
