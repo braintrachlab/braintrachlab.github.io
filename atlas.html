@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css?v=21b94c78">
+  <link rel="stylesheet" href="assets/css/style.css?v=5f56830d">
   <script>document.documentElement.classList.add("texts-loading");setTimeout(function(){document.documentElement.classList.remove("texts-loading")},1500);</script>
 </head>
 <body data-page="atlas">
@@ -59,7 +59,16 @@
           <input type="range" min="0" max="100" step="1" value="0" aria-label="Position of the coronal section, from front to back">
           <span class="end">Back</span>
           <output></output>
-          <button type="button">Hide section</button>
+          <div class="slider-tools">
+            <label>Appearance
+              <select aria-label="Appearance of the section">
+                <option value="dejerine">Dejerine (Weigert stain)</option>
+                <option value="fa">FA map</option>
+                <option value="t1">T1</option>
+              </select>
+            </label>
+            <button type="button">Hide section</button>
+          </div>
         </div>
         <div id="tract-list" class="tract-list" aria-label="Tracts"></div>
         <p class="plate-caption atlas-caption" data-text="atlas.caption">Tractography reconstructions of the right hemisphere and of the corpus callosum. Colours follow the fibre system: red commissural, blue projection, green association.</p>
@@ -93,6 +102,6 @@
 
   <script src="assets/js/main.js?v=49ba73e7"></script>
   <script src="assets/js/content.js?v=f3b39e35"></script>
-  <script src="assets/js/atlas.js?v=73ee9f9e"></script>
+  <script src="assets/js/atlas.js?v=6b44280b"></script>
 </body>
 </html>

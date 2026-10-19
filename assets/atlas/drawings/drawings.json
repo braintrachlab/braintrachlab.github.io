@@ -169,5 +169,10 @@
   "length_mm": 192.5
  },
  "style": "Dejerine (Weigert stain) drawing of the T1, tools/sections/dejerine_render.py",
+ "modes": {
+  "dejerine": "",
+  "t1": "t1/",
+  "fa": "fa/"
+ },
  "note": "s000 = most anterior; image left = subject's right"
 }

@@ -403,7 +403,16 @@ atlas = f'''
           <input type="range" min="0" max="100" step="1" value="0" aria-label="Position of the coronal section, from front to back">
           <span class="end">Back</span>
           <output></output>
-          <button type="button">Hide section</button>
+          <div class="slider-tools">
+            <label>Appearance
+              <select aria-label="Appearance of the section">
+                <option value="dejerine">Dejerine (Weigert stain)</option>
+                <option value="fa">FA map</option>
+                <option value="t1">T1</option>
+              </select>
+            </label>
+            <button type="button">Hide section</button>
+          </div>
         </div>
         <div id="tract-list" class="tract-list" aria-label="Tracts"></div>
         {T("p", "atlas.caption", "Tractography reconstructions of the right hemisphere and of the corpus callosum. Colours follow the fibre system: red commissural, blue projection, green association.", "plate-caption atlas-caption")}

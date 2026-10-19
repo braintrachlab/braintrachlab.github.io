@@ -225,17 +225,26 @@
     // plates of Dejerine (tools/sections/dejerine_render.py -> assets/atlas/drawings). The plane moves
     // through the brain and cross-fades between consecutive drawings.
     let mriPlane = null, mriMat = null, mriY0 = 0, mriImgs = [], mriLoaded = Promise.resolve(), mriShown = -1;
+    let mode = "dejerine"; const modeImgs = {};             // appearance of the section: dejerine, t1, fa
+    function loadMode(md) {
+      if (modeImgs[md]) return modeImgs[md].ready;
+      const dir = "assets/atlas/drawings/" + ((mri.modes && mri.modes[md]) || "");
+      const imgs = [];
+      const ready = Promise.all(mri.files.map((f, i) => new Promise((res) => {
+        const im = new Image(); im.onload = im.onerror = res; im.src = dir + f; imgs[i] = im;
+      })));
+      modeImgs[md] = { imgs, ready };
+      return ready;
+    }
     const secTex = new THREE.Texture(); secTex.minFilter = THREE.LinearFilter; secTex.generateMipmaps = false;
     function showSlice(k) {                       // one section on screen: swap the image of the single texture
       k = Math.max(0, Math.min(mri.n - 1, Math.round(k)));
-      const im = mriImgs[k];
+      const im = (modeImgs[mode] || { imgs: mriImgs }).imgs[k];
       if (k === mriShown || !im || !im.complete || !im.naturalWidth) return;
       mriShown = k; secTex.image = im; secTex.needsUpdate = true;
     }
     if (mri) {
-      mriLoaded = Promise.all(mri.files.map((f, i) => new Promise((res) => {
-        const im = new Image(); im.onload = im.onerror = res; im.src = "assets/atlas/drawings/" + f; mriImgs[i] = im;
-      })));
+      mriLoaded = loadMode("dejerine"); mriImgs = modeImgs.dejerine.imgs;
       const px = mri.px_mm, cx = mri.brain.center_px[0], rTop = mri.brain.top_row, zTop = ext.z1 + 5;
       mriY0 = (mri.n - 1) / 2 * mri.slice_mm;                    // first drawing (frontal pole) lies here
       const xa = (cx - mri.w) * px, xb = cx * px, za = zTop - (mri.h - rTop) * px, zb = zTop + rTop * px;
@@ -245,14 +254,15 @@
       pg.setIndex([0, 1, 2, 0, 2, 3]);
       mriMat = new THREE.ShaderMaterial({
         transparent: true, depthWrite: false, side: THREE.DoubleSide,
-        uniforms: { uA: { value: secTex }, uOpacity: { value: 0 } },
+        uniforms: { uA: { value: secTex }, uOpacity: { value: 0 }, uMode: { value: 0 } },
         vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-        fragmentShader: `uniform sampler2D uA; uniform float uOpacity; varying vec2 vUv;
+        fragmentShader: `uniform sampler2D uA; uniform float uOpacity; uniform float uMode; varying vec2 vUv;
           void main() {
-            float ink = texture2D(uA, vUv).r;
-            if (ink < 0.003) discard;                                          // outside the brain and ventricles
-            vec3 paper = vec3(0.975, 0.97, 0.95), inkc = vec3(0.12, 0.125, 0.095);
-            gl_FragColor = vec4(mix(paper, inkc, smoothstep(0.03, 1.0, ink)), uOpacity);   // the cut surface, opaque
+            vec4 tx = texture2D(uA, vUv);
+            if (tx.a < 0.05) discard;                                          // no tissue: the background shows
+            vec3 paper = vec3(0.969, 0.969, 0.961), inkc = vec3(0.12, 0.125, 0.095);
+            vec3 col = uMode < 0.5 ? mix(paper, inkc, tx.r) : vec3(tx.r);        // Dejerine drawing, or T1 / FA
+            gl_FragColor = vec4(col, uOpacity * smoothstep(0.05, 0.6, tx.a));
           }`,
       });
       mriPlane = new THREE.Mesh(pg, mriMat); mriPlane.renderOrder = 4; mriPlane.frustumCulled = false; mriPlane.visible = false;
@@ -284,6 +294,13 @@
         sliderBox.classList.add("active");
       };
       slider.addEventListener("input", update);
+      const sel = sliderBox.querySelector("select");
+      if (!(mri.modes && mri.modes.fa)) sel.querySelector('option[value="fa"]').remove();
+      sel.addEventListener("change", () => {
+        mode = sel.value; mriMat.uniforms.uMode.value = mode === "dejerine" ? 0 : 1;
+        loadMode(mode).then(() => { mriShown = -1; showSlice(+slider.value); });
+        update();
+      });
       sliderBox.querySelector("button").addEventListener("click", () => {
         sliderOn = false; mriPlane.visible = false; viewTo = { x: 0, y: 0 }; sliderBox.classList.remove("active"); out.textContent = "";
         for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = 0;
