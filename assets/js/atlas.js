@@ -250,8 +250,9 @@
       if (meta.space && meta.space === mri.space && meta.center_rasmm) T.set(...meta.center_rasmm).multiplyScalar(-1);
       else T.set(0 - (bb[0][0] + bb[1][0]) / 2, (ext.y0 + ext.y1) / 2 - (bb[0][1] + bb[1][1]) / 2, ext.z1 + 5 - bb[1][2]);
     }
-    const planeJson = (p) => PL[p] ? Promise.resolve(PL[p]) :
-      fetch(`assets/atlas/planes/${p}/plane.json`).then((r) => r.json()).then((j) => (PL[p] = Object.assign(j, { sets: {} })));
+    const PLP = {};                                    // one request per plane, shared by every caller
+    const planeJson = (p) => PLP[p] || (PLP[p] =
+      fetch(`assets/atlas/planes/${p}/plane.json`).then((r) => r.json()).then((j) => (PL[p] = Object.assign(j, { sets: {} }))));
     function loadSet(p, md) {
       const P = PL[p];
       if (P.sets[md]) return P.sets[md].ready;
@@ -412,7 +413,7 @@
         secOn = !outside;                                // at both ends the plane disappears completely
         mriPlane.visible = !outside; mriMat.uniforms.uOpacity.value = 1;
         for (const t of tracts) mats[t.id].uniforms.uSweepOn.value = outside ? 0 : 2;
-        if (!outside) placeSection(kk); else drawOverlay();
+        if (!outside) { placeSection(kk); loadSet(plane, setName()).then(() => { mriShown = null; showSlice(kNow); }); } else drawOverlay();
         out.textContent = outside ? "" : `${Math.round(kk * (PL[plane].step_mm || 1.25))} mm ${PL[plane].from || FROM[plane]}`;
         sliderBox.classList.add("active");
       };

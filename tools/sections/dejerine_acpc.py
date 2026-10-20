@@ -215,6 +215,8 @@ def draw(t1s, labs, fib, seed=0, t2s=None, ps=None, surf=None):
     # white matter: a light wash, the fibres are the real streamlines
     wash = 0.09 * np.clip(W, 0, 1) * (0.6 + 0.4 * n)
     base = np.maximum(np.maximum(ctxink, deepink), wash)
+    # version shown with a selected tract: plain grey tones, no stipple (it would look like the tract's fibres)
+    plain = np.maximum(np.maximum(cv2.GaussianBlur(tone_c, (0, 0), 1.5) * 0.85, 0.10 * dm), wash)
     if fib is not None:
         fl = cv2.GaussianBlur(fib, (0, 0), 0.30)
         fibink = 0.88 * (1.0 - np.exp(-fl * FIB_GAIN)) * tis
@@ -240,7 +242,7 @@ def draw(t1s, labs, fib, seed=0, t2s=None, ps=None, surf=None):
     global LAST_SILVER
     LAST_SILVER = (silver(t1s, ps, tis, rng, cortex, white & ~upl(np.isin(ps, NONCEREBRAL))) if surf is not None else silver(t1s, ps, tis, rng)) if ps is not None else None
     out = []
-    for x in (full, base):
+    for x in (full, plain):
         x = np.maximum(x, line * 0.85) * alpha
         out.append(np.clip(x, 0, 1))
     return out[0], out[1], alpha
