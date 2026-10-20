@@ -11,10 +11,10 @@
 #
 #  TRACTS OF THE 3D ATLAS — one entry per tract (the card that opens on click).
 #
-#  id:        do not change (links the card to the 3D data): cc, atr, fat, ifof, uf
+#  id:        do not change (links the card to the 3D data): cc, atr, fat, ifof, uf, fornix
 #  name:      full name shown as the title of the card
 #  short:     short label used in the list of tracts under the brain
-#  system:    Commissural, Projection or Association
+#  system:    Commissural, Projection, Association or Limbic
 #  text:      one or two sentences of summary
 #  history:   discovery and historical descriptions
 #  anatomy:   course and terminations
@@ -79,3 +79,14 @@ anatomy: From the temporal pole, uncus and amygdala region the fibres curve upwa
 function: Part of the limbic and semantic networks; involved in episodic and semantic memory, emotion, social cognition and the attribution of value.
 clinical: Implicated in the semantic variant of primary progressive aphasia and in behavioural-variant frontotemporal dementia, as well as in psychiatric and developmental conditions.
 links: [Catani & Thiebaut de Schotten, *Cortex* (2008) — tractography atlas](https://doi.org/10.1016/j.cortex.2008.05.004)
+
+id: fornix
+name: Fornix
+short: Fornix
+system: Limbic
+text: The main output pathway of the hippocampus, arching beneath the corpus callosum to the mammillary bodies, the septal region and the anterior thalamus.
+history: Named for its arched shape (Latin *fornix*, vault or arch), it was already described by Galen and illustrated by Vesalius. Its role in memory was recognised in the 20th century, as part of the circuit described by James Papez (1937).
+anatomy: From the fimbria of the hippocampus the fibres form the crura, which converge beneath the splenium into the body of the fornix; anteriorly it divides into the columns, which curve down in front of the interventricular foramen to the mammillary bodies (postcommissural fibres) and to the septal and preoptic regions (precommissural fibres).
+function: Episodic memory and spatial navigation, as part of the hippocampal–diencephalic circuit (Papez circuit).
+clinical: Lesions (tumours, surgery of the third ventricle, trauma) cause anterograde amnesia; alterations are reported early in Alzheimer's disease, and the fornix is a target of deep brain stimulation trials for memory.
+links: [Catani, Dell'Acqua & Thiebaut de Schotten, *Neurosci Biobehav Rev* (2013) — limbic networks](https://doi.org/10.1016/j.neubiorev.2013.07.001)

@@ -14,6 +14,7 @@
     fat:  [[40, 92, 58], [132, 182, 122]],    // association — sage
     ifof: [[30, 98, 72], [124, 190, 150]],    // association — sea green
     uf:   [[82, 98, 36], [176, 190, 106]],    // association — olive green
+    fornix: [[92, 58, 112], [184, 152, 204]], // limbic — violet
   };
   const rgb = (c) => c.map((v) => v / 255);
 
@@ -114,6 +115,7 @@
       fat: [-0.7, -0.3, 0.65],  // from the inferior frontal gyrus up to SMA / pre-SMA
       ifof: [0, 1, 0.2],        // from the occipital to the frontal lobe
       uf: [-0.5, 0.7, 0.5],     // from the temporal pole to the orbitofrontal cortex
+      fornix: [0, 1, 0.3],      // from the hippocampus forward to the mammillary bodies
     };
     const meshes = {}, segs = {};
     for (const t of tracts) {
@@ -440,7 +442,7 @@
       planeJson("coronal").then(() => { buildPlane("coronal"); labels(); });
     }
     // ---------- view of the tracts: tractography colours, or a Klingler fibre dissection ----------
-    const KL_TINT = { cc: [1.0, 0.975, 0.94], atr: [0.97, 0.975, 1.0], fat: [0.985, 1.0, 0.965], ifof: [0.97, 0.99, 0.97], uf: [1.0, 0.99, 0.95] };
+    const KL_TINT = { cc: [1.0, 0.975, 0.94], atr: [0.97, 0.975, 1.0], fat: [0.985, 1.0, 0.965], ifof: [0.97, 0.99, 0.97], uf: [1.0, 0.99, 0.95], fornix: [0.99, 0.97, 1.0] };
     const styleSel = document.getElementById("atlas-style");
     let klTarget = 0;
     if (styleSel) styleSel.addEventListener("change", () => {
@@ -623,7 +625,7 @@
     const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { started = true; io.disconnect(); } }, { threshold: 0.2 });
     io.observe(box);
     el.addEventListener("pointerdown", () => { skip = true; });      // any interaction ends the intro
-    const ORDER = { cc: 0, atr: 0.5, fat: 0.9, ifof: 1.1, uf: 1.3 };
+    const ORDER = { cc: 0, atr: 0.5, fat: 0.9, ifof: 1.1, uf: 1.3, fornix: 1.5 };
     const DRAWN = (1.3 + 2.6 * 1.05) * speed + 0.5;                 // seconds until the drawing is complete
     let introDone = false, inkNow = 1;
     box.style.setProperty("--paper", 1);

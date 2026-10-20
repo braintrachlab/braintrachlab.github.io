@@ -113,7 +113,7 @@ atlas.opening: mri
 atlas.eyebrow: Atlas
 atlas.title: The white matter in three dimensions
 atlas.intro: Drag to rotate the brain, scroll or pinch to zoom, and click on a tract to discover its history, anatomy and functions.
-atlas.caption: Tractography reconstructions of the right hemisphere and of the corpus callosum. Colours follow the fibre system: red commissural, blue projection, green association.
+atlas.caption: Tractography reconstructions of the right hemisphere and of the corpus callosum. Colours follow the fibre system: red commissural, blue projection, green association, violet limbic.
 atlas.page_title: Atlas — BrainTraCh Lab
 atlas.page_description: Interactive 3D atlas of white matter tracts.
 
