@@ -121,6 +121,7 @@ def draw(t1s, labs, fib, seed=0, t2s=None, ps=None):
     if fib is not None:
         fl = cv2.GaussianBlur(fib, (0, 0), 0.30)
         fibink = 0.88 * (1.0 - np.exp(-fl * FIB_GAIN)) * tis
+        fibink *= 1.0 - 0.6 * np.clip(Dp, 0, 1)              # deep grey nuclei: only the stronger bundles show
     else:
         fibink = np.zeros_like(base)
     full = np.maximum(base, fibink)
