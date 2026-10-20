@@ -263,8 +263,8 @@
       P.sets[md] = { imgs, ready };
       return ready;
     }
-    const STAIN = { kb: 2, silver: 3 };                // kb: from the T1 of the slice; silver: from the fibre drawing
-    const setName = () => ((mode === "dejerine" || mode === "silver") ? (selected ? "base" : "dejerine") : mode === "kb" ? "t1" : mode);   // a selected tract: only its fibres
+    const STAIN = { kb: 2, silver: 3 };                // kb: from the T1 of the slice; silver: its own images (after BigBrain)
+    const setName = () => (mode === "dejerine" ? (selected ? "base" : "dejerine") : mode === "kb" ? "t1" : mode);   // a selected tract: only its fibres
     function showSlice(k) {                       // one section on screen: swap the image of the single texture
       const P = PL[plane]; if (!P) return;
       k = Math.max(0, Math.min(P.n - 1, Math.round(k))); kNow = k;
@@ -329,10 +329,9 @@
               col = mix(vec3(0.97, 0.95, 0.97), col, clamp(gm + my, 0.0, 1.0));
               float c = cells(p, 0.30 * gm + 0.04 * my, 0.32) * (0.8 + 0.2 * hash(floor(p) + 1.3));
               col = mix(col, vec3(0.38, 0.17, 0.42), c * 0.85);               // neurons and glia, violet
-            } else if (uMode > 2.5) {                                           // silver impregnation (Gallyas / Bielschowsky)
-              float ink = tx.r;                                                 // the drawing of the real fibres
-              vec3 amber = vec3(0.93, 0.83, 0.60), gold = vec3(0.68, 0.45, 0.20), black = vec3(0.11, 0.07, 0.04);
-              col = ink < 0.35 ? mix(amber, gold, ink / 0.35) : mix(gold, black, (ink - 0.35) / 0.65);
+            } else if (uMode > 2.5) {                                           // silver (cell-body) stain: grey matter dark
+              float g = 0.94 + 0.06 * hash(floor(vUv * uRes * 2.0));            // fine grain of the section
+              col = mix(vec3(0.10, 0.095, 0.09), vec3(0.95, 0.94, 0.92), tx.r) * g;
             }
             gl_FragColor = vec4(col, uOpacity * smoothstep(0.05, 0.6, tx.a));
           }`,
@@ -352,7 +351,7 @@
     // ---------- the selected tract on the section: its streamlines within the slice (lines or dots) ----------
     const ovLines = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x3c3c3c, transparent: true, depthTest: false }));
     const dotMat = new THREE.ShaderMaterial({                   // small round dots, like the stipple of the plates
-      transparent: true, depthTest: false, uniforms: { color: { value: new THREE.Color(0x3c3c3c) }, uSize: { value: 2.4 * Math.min(window.devicePixelRatio || 1, 2) } },
+      transparent: true, depthTest: false, uniforms: { color: { value: new THREE.Color(0x3c3c3c) }, uSize: { value: 1.6 * Math.min(window.devicePixelRatio || 1, 2) } },   // as wide as the lines
       vertexShader: `uniform float uSize; void main() { gl_PointSize = uSize; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
       fragmentShader: `uniform vec3 color; void main() { vec2 d = gl_PointCoord - 0.5; float r = length(d); if (r > 0.5) discard; gl_FragColor = vec4(color, smoothstep(0.5, 0.3, r)); }`,
     });
@@ -382,7 +381,7 @@
       }
       ovLines.geometry.setAttribute("position", new THREE.Float32BufferAttribute(L, 3));
       ovDots.geometry.setAttribute("position", new THREE.Float32BufferAttribute(D, 3));
-      const col = mode === "dejerine" ? 0x3c3c3c : mode === "silver" ? 0x1c120a : STAIN[mode] ? new THREE.Color(...rgb((PAL[selected] || [[60, 60, 60]])[0])).getHex() : new THREE.Color(...rgb((PAL[selected] || [[200, 60, 60], [230, 120, 110]])[1])).getHex();
+      const col = mode === "dejerine" ? 0x3c3c3c : mode === "silver" ? new THREE.Color(...rgb((PAL[selected] || [[0, 0, 0], [230, 120, 110]])[1])).getHex() : STAIN[mode] ? new THREE.Color(...rgb((PAL[selected] || [[60, 60, 60]])[0])).getHex() : new THREE.Color(...rgb((PAL[selected] || [[200, 60, 60], [230, 120, 110]])[1])).getHex();
       ovLines.material.color.set(col); ovDots.material.color.set(col);
       ovLines.position.set(0, 0, 0); ovLines.position.setComponent(ax, w + ovSide * 0.4);
       ovDots.position.copy(ovLines.position);

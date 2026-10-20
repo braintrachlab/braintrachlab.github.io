@@ -22,6 +22,6 @@
   -127.25,
   -73.25
  ],
- "style": "Dejerine (Weigert stain) drawings from T1w/T2w, wmparc and the whole-brain HARDI (spherical deconvolution) tractogram of the same subject: tools/sections/dejerine_acpc.py",
+ "style": "Dejerine (Weigert) drawings from T1w/T2w, wmparc and the whole-brain HARDI tractogram; silver (Merker) appearance with tones after BigBrain: tools/sections/dejerine_acpc.py",
  "note": "world = AC-PC RAS mm of subject 102109; atlas tracts in the same space align exactly"
 }

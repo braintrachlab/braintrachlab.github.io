@@ -77,6 +77,35 @@ def fine_tissue(tissue, t2s, ps):
     tis = cv2.medianBlur(tis.astype(np.uint8) * 255, 3) > 127           # clean edges without rounding the gyri
     return tis
 
+# silver (cell-body) stain, tones per structure after BigBrain (full16 400 um, co-registered to this T2):
+# grey matter dark, white matter pale (0 = black, 1 = paper)
+SILVER = {"wm": 0.86, "ctx": 0.24, "cbctx": 0.17, "put": 0.19, "caud": 0.21, "acc": 0.22, "pall": 0.33, "thal": 0.42,
+          "hipp": 0.27, "amyg": 0.22, "vdc": 0.50}
+SILVER_LABELS = {"put": [12, 51], "caud": [11, 50], "acc": [26, 58], "pall": [13, 52], "thal": [10, 49], "hipp": [17, 53],
+                 "amyg": [18, 54], "vdc": [28, 60], "cbctx": [8, 47]}
+
+def silver(t1s, ps, tis, rng):
+    """silver-stain tone of one section (upsampled grid): continuous tone from the T1, structure tones from the parcellation"""
+    t = cv2.GaussianBlur(cv2.resize(t1s, None, fx=UP, fy=UP, interpolation=cv2.INTER_CUBIC), (0, 0), UP * 0.35)
+    v = t[tis]; lo, hi = (np.percentile(v, 2), np.percentile(v, 99)) if v.size else (0, 1)
+    tn = np.clip((t - lo) / (hi - lo + 1e-6), 0, 1)
+    tone = 0.18 + 0.72 * smoothstep(0.30, 0.80, tn)                   # T1: grey matter dark, white matter pale
+    up = lambda m: cv2.GaussianBlur(cv2.resize(m.astype(np.float32), None, fx=UP, fy=UP, interpolation=cv2.INTER_LINEAR), (0, 0), UP * 0.6)
+    ctx = up(((ps >= 1000) & (ps < 3000)) | np.isin(ps, [3, 42]))
+    wmm = up(((ps >= 3000) & (ps < 5003)) | np.isin(ps, [2, 41, 7, 46, 16, 251, 252, 253, 254, 255, 85]))
+    # cortex: uniformly dark, a thin pale molecular layer at the surface, slightly lighter towards the white matter
+    dsurf = ndi.distance_transform_edt(tis).astype(np.float32) * (0.7 / UP)
+    dwm = ndi.distance_transform_edt(wmm < 0.5).astype(np.float32) * (0.7 / UP)
+    lam = SILVER["ctx"] + 0.30 * (1 - smoothstep(0.15, 0.45, dsurf)) + 0.10 * (1 - smoothstep(0.0, 0.6, dwm))
+    tone = tone * (1 - 0.8 * ctx) + lam * 0.8 * ctx
+    tone = tone * (1 - 0.6 * wmm) + (SILVER["wm"] - 0.10 + 0.14 * tn) * 0.6 * wmm
+    for k, labs in SILVER_LABELS.items():
+        mk = cv2.GaussianBlur(up(np.isin(ps, labs)), (0, 0), UP * 0.9) * 0.9     # nuclei: smooth outlines
+        tone = tone * (1 - mk) + (SILVER[k] + 0.22 * (tn - 0.5)) * mk     # keep the texture of the T1 inside the nuclei
+    grain = cv2.GaussianBlur(rng.normal(0, 1, t.shape).astype(np.float32), (0, 0), 0.7)
+    tone += 0.035 * grain                                              # fine grain of the stained section
+    return np.clip(tone, 0, 1)
+
 def draw(t1s, labs, fib, seed=0, t2s=None, ps=None):
     """Dejerine (Weigert) drawing of one section. Returns ink (with fibres), ink (without), tissue alpha."""
     rng = np.random.default_rng(seed)
@@ -131,6 +160,8 @@ def draw(t1s, labs, fib, seed=0, t2s=None, ps=None):
     cs = [c for c in cs if cv2.arcLength(c, True) > UP * 10]
     cv2.drawContours(canvas, cs, -1, 150, 1, cv2.LINE_AA)
     line = np.maximum(canvas.astype(np.float32) / 255, np.clip(sulc * 2.2, 0, 1) * 0.75)
+    global LAST_SILVER
+    LAST_SILVER = silver(t1s, ps, tis, rng) if ps is not None else None
     out = []
     for x in (full, base):
         x = np.maximum(x, line * 0.85) * alpha
@@ -195,6 +226,8 @@ def main():
             c0, c1, r0, r1 = crop(P)
             sec, labs, fib, (t2s, ps) = section(P, j, c0, c1, r0, r1)
             full, base, alpha = draw(sec, labs, fib, seed=j, t2s=t2s, ps=ps)
+            sv = LAST_SILVER * alpha + (1 - alpha) * 0.97
+            Image.fromarray((np.clip(sv, 0, 1) * 255).astype(np.uint8)).save(os.path.join(od, f"{pl}_{f}_silver.png"))
             for nm, x in (("full", full), ("base", base)):
                 rgb = (247 * (1 - x[..., None]) + 60 * x[..., None]).astype(np.uint8).repeat(3, -1)
                 Image.fromarray(rgb).save(os.path.join(od, f"{pl}_{f}_{nm}.png"))
@@ -205,7 +238,7 @@ def main():
     planes = A("--web").split(",")
     for name in planes:
         P = PLANES[name]; od = os.path.join(out, name)
-        for sub in ("", "base", "t1", "t2", "fa"): os.makedirs(os.path.join(od, sub), exist_ok=True)
+        for sub in ("", "base", "t1", "t2", "fa", "silver"): os.makedirs(os.path.join(od, sub), exist_ok=True)
         idx = np.where(tissue.any(tuple(d for d in range(3) if d != P["axis"])))[0]
         js = list(range(idx.max(), idx.min() - 1, -STEP)) if P["reverse"] else list(range(idx.min(), idx.max() + 1, STEP))
         c0, c1, r0, r1 = crop(P)
@@ -214,7 +247,7 @@ def main():
             full, base, alpha = draw(sec, labs, fib, seed=j, t2s=t2s, ps=ps)
             h = int(round(full.shape[0] * WIDTH / full.shape[1]))
             fname = f"s{k:03d}.webp"
-            for sub, x in (("", full), ("base", base)):
+            for sub, x in (("", full), ("base", base), ("silver", LAST_SILVER)):
                 la = np.stack([(x * 255).astype(np.uint8), (alpha * 255).astype(np.uint8)], -1)
                 Image.fromarray(la, "LA").resize((WIDTH, h), Image.LANCZOS).save(os.path.join(od, sub, fname), quality=74, method=4)
             # T1, T2, FA: brain only (the parcellation), at their own resolution
@@ -231,7 +264,7 @@ def main():
         O[P["rows"]] = world(P["rows"], sh[P["rows"]] - 1 - r0 + 0.5); V[P["rows"]] = -(r1 - r0) * vx
         meta = {"n": len(js), "axis": P["axis"], "labels": P["labels"], "from": P["from"], "step_mm": STEP * vx,
                 "pos": [world(P["axis"], j) for j in js], "O": O, "U": U, "V": V,
-                "modes": {"dejerine": "", "base": "base/", "t1": "t1/", "t2": "t2/", "fa": "fa/" if FA is not None else None}}
+                "modes": {"dejerine": "", "base": "base/", "t1": "t1/", "t2": "t2/", "silver": "silver/", "fa": "fa/" if FA is not None else None}}
         json.dump(meta, open(os.path.join(od, "plane.json"), "w"), indent=1)
     if "--index" in sys.argv:
         xs, ys, zs = [np.where(tissue.any(tuple(d for d in range(3) if d != a)))[0] for a in range(3)]

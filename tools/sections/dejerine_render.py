@@ -58,7 +58,7 @@ def splat(shape, pa, pb, step=0.35):
     f = (k + 0.5) / np.repeat(n, n)
     x = pa[idx, 0] + (pb[idx, 0] - pa[idx, 0]) * f
     y = pa[idx, 1] + (pb[idx, 1] - pa[idx, 1]) * f
-    wgt = np.repeat(np.where(L < 1.0, 1.6, L / n) if False else np.maximum(L, 1.6) / n, n)  # a crossing fibre leaves a dot
+    wgt = np.repeat(np.maximum(L, 1.0) / n, n)          # a crossing fibre leaves a dot as dark and as wide as a line
     acc = np.zeros(shape, np.float32)
     x0 = np.floor(x).astype(int); y0 = np.floor(y).astype(int); fx = x - x0; fy = y - y0
     for dx, dy, ww in ((0, 0, (1 - fx) * (1 - fy)), (1, 0, fx * (1 - fy)), (0, 1, (1 - fx) * fy), (1, 1, fx * fy)):

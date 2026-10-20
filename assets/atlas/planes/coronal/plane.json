@@ -166,6 +166,7 @@
   "base": "base/",
   "t1": "t1/",
   "t2": "t2/",
+  "silver": "silver/",
   "fa": "fa/"
  }
 }
