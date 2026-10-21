@@ -56,7 +56,7 @@ people: Emily Rogalski
 
 institution: University of Texas - Camp Swift, USA
 unit: Michale E. Keeling Center for Comparative Medicine and Research
-topic: Comparative neuroanatomy / evolution
+topic: Comparative neuroanatomy
 people: William Hopkins
 
 institution: Copenhagen University - Hvidovre, Denmark
@@ -76,7 +76,7 @@ people: Salvatore Mangiafico - Andrea Bartolo - Giovanni Grillea
 
 institution: King's College - London, UK
 unit: Neurodevelopmental and Forensic Psychiatry
-topic: Neurodevelopmental disorders -ADHD, autism spectrum disorder, psychopathy
+topic: Neurodevelopmental disorders - ADHD, autism spectrum disorder, psychopathy
 people: Michael Craig
 
 institution: King's College - London, UK
