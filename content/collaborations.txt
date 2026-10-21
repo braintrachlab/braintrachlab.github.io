@@ -44,8 +44,8 @@ institution: Rutgers University
 unit: Department of Psychiatry, Brain Health Institute
 topic: Tractography methodology - visual system
 people: Ahmad Beyh
-place: New Brunswick, USA
-coords: 40.5008, -74.4474
+place: Camden, New Jersey, USA
+coords: 39.9485, -75.1218
 
 institution: Northwestern University
 unit: Mesulam Institute for Cognitive Neurology & Alzheimer's Disease
