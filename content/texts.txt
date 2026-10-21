@@ -85,13 +85,13 @@ research.anatomy.legend2: Anterior segment
 research.anatomy.legend3: Posterior segment
 research.anatomy.caption: The three segments of the arcuate fasciculus, redrawn as streamlines.
 research.anatomy.title: White matter anatomy
-research.anatomy.p1: We describe the course, organisation and cortical terminations of the white matter tracts of the human brain, building an accurate anatomical map of its association, projection and commissural connections.
+research.anatomy.p1: We describe the course and organisation of the white matter tracts of the human brain.
 research.anatomy.p2: 
 research.comparative.species1: Macaque
 research.comparative.species2: Chimpanzee
 research.comparative.species3: Human
 research.comparative.title: Comparative neuroanatomy
-research.comparative.p1: By comparing the white matter of the human brain with that of non-human primates, we study how connections have changed during evolution and how these changes relate to abilities such as language and vocal communication.
+research.comparative.p1: By comparing the white matter of the human brain with that of non-human primates, we study how connections have changed during evolution and how these changes relate to human unique abilities such as language.
 research.comparative.p2: 
 research.comparative.legend1: Prefrontal FAT
 research.comparative.legend2: Precentral FAT
@@ -102,7 +102,7 @@ research.clinical.p2:
 research.clinical.photo: 
 research.history.caption: Coronal section from J. Dejerine, *Anatomie des centres nerveux* (1895–1901), drawing by H. Gillet, with the fibres of the white matter redrawn as streamlines.
 research.history.title: History of neuroscience
-research.history.p1: The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain's connections.
+research.history.p1: The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain.
 research.history.p2: 
 research.page_title: Research — BrainTraCh Lab
 research.page_description: Research areas of BrainTraCh Lab: white matter anatomy, comparative neuroanatomy, connections in disease, history of neuroscience.
