@@ -94,7 +94,7 @@ research.comparative.species1: Macaque
 research.comparative.species2: Chimpanzee
 research.comparative.species3: Human
 research.comparative.title: Comparative neuroanatomy
-research.comparative.p1: By comparing the white matter of the human brain with that of non-human primates, we study how connections have changed during evolution and how these changes relate to human unique abilities such as language.
+research.comparative.p1: Tractography permits, for the first time, quantitative comparisons of white matter anatomy across species. Our purpose is to identify the anatomy we share with species closest to humans and to identify evolutionary changes underlying unique human abilities.
 research.comparative.p2: 
 research.comparative.legend1: Prefrontal FAT
 research.comparative.legend2: Precentral FAT
