@@ -350,16 +350,18 @@ def history():
     key = "research.history"
     return f'''    <section class="soft">
       <div class="container">
-        <div class="grid-2" style="align-items:end">
+        <div class="grid-2" style="align-items:center">
           <div>
             <span class="eyebrow reveal">04</span>
             {T("h2", key + ".title", "History of neuroscience", "reveal d1")}
             <hr class="divider reveal d1">
-          </div>
-          <div>
             {T("p", key + ".p1", "The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain's connections.", "reveal d2")}
             {T("p", key + ".p2", "", "reveal d2")}
           </div>
+          <figure class="reveal d1 cover-fig">
+            <div class="cover-figure" data-brain="assets/img/brain-renaissance-lines.svg" role="img" aria-label="Cover of the book Brain Renaissance: From Vesalius to Modern Neuroscience, by Marco Catani and Stefano Sandrone"></div>
+            {T("figcaption", key + ".caption", "Cover of M. Catani & S. Sandrone, [*Brain Renaissance: From Vesalius to Modern Neuroscience*](https://academic.oup.com/book/24568) (New York: Oxford University Press, 2015), a biography of Vesalius with a new English translation of Book VII of the *Fabrica* and five centuries of brain discoveries.", "plate-caption")}
+          </figure>
         </div>
         <div class="pn reveal" id="pioneers" data-eras="{html.escape(val(key + ".eras", "Antiquity 129; Renaissance 1514; 17th century 1641; 18th century 1748; 19th century 1776; 20th century 1888"))}">
           {T("h3", key + ".timeline_title", "White matter pioneers", "pn-title")}
