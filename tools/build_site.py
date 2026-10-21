@@ -234,7 +234,8 @@ home = f'''
 
     <section class="soft">
       <div class="container">
-        {T("p", "home.quote", "Every function of the brain depends on the pathways that carry information from one region to another.", "quote reveal")}
+        {T("p", "home.quote", "In a brain composed of localized but connected specialized areas, disconnection leads to dysfunction.", "quote reveal")}
+        {T("p", "home.quote_source", "Catani & ffytche, *Brain* 2005", "quote-source reveal d1")}
       </div>
     </section>
 

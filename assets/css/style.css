@@ -677,3 +677,7 @@ a.tool-card:hover { border-color: var(--ink); transform: translateY(-2px); box-s
 
 .collab-topic { margin: 6px 0 4px; }
 .collab-topic .badge { margin: 0; padding: 0; border: 0; background: none; color: var(--accent); font-size: 0.78rem; letter-spacing: 0.14em; }   /* plain text: aligned with the names */
+
+.quote-source { text-align: center; margin: 18px auto 0; font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+.quote-source a { color: var(--muted); } .quote-source a:hover { color: var(--accent); }
+.quote-source em { font-style: italic; text-transform: none; letter-spacing: 0.04em; }
