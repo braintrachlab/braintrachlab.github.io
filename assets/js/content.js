@@ -148,65 +148,71 @@
       if (count) count.textContent = `${list.length} collaborations · ${cities.filter((c) => c.place || c.lat != null).length} cities`;
       if (!svg || !MAP) { if (svg) svg.closest(".cm-map").hidden = true; return; }
 
-      // the map: coastlines are drawn in advance (assets/data/collab-map.json, Natural Earth 1:10m);
-      // the cities are projected here with the same conic equal-area projection
+      // the map: one continuous Equal Earth projection (equal-area, true width of the Atlantic);
+      // coastlines are drawn in advance (assets/data/collab-map.json, Natural Earth 1:10m),
+      // the cities are projected here with the same formula
       const NS = "http://www.w3.org/2000/svg", R = Math.PI / 180;
       const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); (parent || svg).appendChild(e); return e; };
-      const projector = (p) => {
-        const sy0 = Math.sin(p.par[0] * R), n = (sy0 + Math.sin(p.par[1] * R)) / 2, cc = 1 + sy0 * (2 * n - sy0), r0 = Math.sqrt(cc) / n;
-        const raw = (l, f) => { const r = Math.sqrt(cc - 2 * n * Math.sin(f)) / n; return [r * Math.sin(l * n), r0 - r * Math.cos(l * n)]; };
-        const c0 = raw(p.center[0] * R, p.center[1] * R);
-        return (lat, lon) => { let l = (lon + p.rot) * R; l = Math.atan2(Math.sin(l), Math.cos(l)); const q = raw(l, lat * R);
-          return [p.translate[0] + p.scale * (q[0] - c0[0]), p.translate[1] - p.scale * (q[1] - c0[1])]; };
-      };
-      const defs = el("defs", {});
-      MAP.panels.forEach((p) => {
-        p.project = projector(p);
-        const cp = el("clipPath", { id: "cm-clip-" + p.id }, defs); el("rect", { x: p.x0, y: 0, width: p.x1 - p.x0, height: MAP.H }, cp);
-        const g = el("g", { "clip-path": `url(#cm-clip-${p.id})` });
-        el("path", { class: "cm-grat", d: p.grat }, g);
-        p.land.forEach((d) => el("path", { class: "cm-land", d }, g));
-        el("text", { class: "cm-panel", x: p.x0 + 20, y: 30 }).textContent = p.title;
+      const P = MAP.proj;
+      const A1 = 1.340264, A2 = -0.081106, A3 = 0.000893, A4 = 0.003796, M = Math.sqrt(3) / 2;
+      const raw = (l, f) => { const t = Math.asin(M * Math.sin(f)), t2 = t * t, t6 = t2 * t2 * t2;
+        return [l * Math.cos(t) / (M * (A1 + 3 * A2 * t2 + t6 * (7 * A3 + 9 * A4 * t2))), t * (A1 + A2 * t2 + t6 * (A3 + A4 * t2))]; };
+      const c0 = raw(P.center[0] * R, P.center[1] * R);
+      const project = (lat, lon) => { let l = (lon + P.rot) * R; l = Math.atan2(Math.sin(l), Math.cos(l)); const q = raw(l, lat * R);
+        return [P.translate[0] + P.scale * (q[0] - c0[0]), P.translate[1] - P.scale * (q[1] - c0[1])]; };
+      svg.setAttribute("viewBox", `0 0 ${MAP.W} ${MAP.H}`);
+      el("path", { class: "cm-grat", d: MAP.grat });
+      MAP.land.forEach((d) => el("path", { class: "cm-land", d }));
+      { const box = svg.closest(".cm-map"); if (box.scrollWidth > box.clientWidth + 4) box.scrollLeft = (box.scrollWidth - box.clientWidth) * 0.92; }   // phones: open on Europe
+
+      // cities closer than a few pixels (London and Cambridge; Chieti, Pozzilli and Naples) share one marker
+      const pts = cities.map((c, i) => (c.lat == null ? null : { i, xy: project(c.lat, c.lon) })).filter((q) => q && q.xy[0] >= 0 && q.xy[0] <= MAP.W && q.xy[1] >= 0 && q.xy[1] <= MAP.H);
+      const groups = [];
+      pts.forEach((q) => {
+        const g = groups.find((g) => g.members.some((m) => Math.hypot(m.xy[0] - q.xy[0], m.xy[1] - q.xy[1]) < 22));
+        if (g) g.members.push(q); else groups.push({ members: [q] });
       });
-      MAP.panels.slice(1).forEach((p) => el("line", { class: "cm-sep", x1: p.x0, x2: p.x0, y1: 0, y2: MAP.H }));
-      { const box = svg.closest(".cm-map"); if (box.scrollWidth > box.clientWidth + 4) box.scrollLeft = box.scrollWidth * (MAP.panels[1].x0 / MAP.W) - 8; }   // phones: open on Europe
       const marks = el("g", {});
-      const mk = [];
-      cities.forEach((c, i) => {
-        if (c.lat == null) return;
-        const p = MAP.panels.find((q) => (c.lon < -30 ? q.id === "na" : q.id === "eu"));
-        const [x, y] = p.project(c.lat, c.lon);
-        if (x < p.x0 || x > p.x1 || y < 0 || y > MAP.H) return;
-        const nn = c.items.length;
-        const g = el("g", { class: "cm-mk", tabindex: 0, role: "button", "data-i": i, transform: `translate(${x.toFixed(1)},${y.toFixed(1)})`,
-          "aria-label": `${c.place}: ${nn} collaboration${nn > 1 ? "s" : ""}` }, marks);
-        el("circle", { class: "cm-halo", r: 9 + nn * 3 }, g);
-        el("circle", { class: "cm-dot", r: nn > 1 ? 8 : 5 }, g);
-        if (nn > 1) el("text", { class: "cm-n", "text-anchor": "middle", dy: "0.35em" }, g).textContent = nn;
-        el("text", { x: (c.left ? -1 : 1) * (nn > 1 ? 13 : 10), y: 5, "text-anchor": c.left ? "end" : "start" }, g).textContent = (c.place || "").split(",")[0];
-        mk[i] = g;
+      const mk = [];          // marker element per city index
+      groups.forEach((g, gi) => {
+        const ids = g.members.map((m) => m.i).sort((a, b) => (cities[b].lat - cities[a].lat));
+        const x = g.members.reduce((s, m) => s + m.xy[0], 0) / g.members.length, y = g.members.reduce((s, m) => s + m.xy[1], 0) / g.members.length;
+        const nn = ids.reduce((s, i) => s + cities[i].items.length, 0);
+        const names = ids.map((i) => (cities[i].place || "").split(",")[0]);
+        const left = ids.some((i) => cities[i].left);
+        const node = el("g", { class: "cm-mk", tabindex: 0, role: "button", "data-ids": ids.join(","), transform: `translate(${x.toFixed(1)},${y.toFixed(1)})`,
+          "aria-label": `${names.join(", ")}: ${nn} collaboration${nn > 1 ? "s" : ""}` }, marks);
+        el("circle", { class: "cm-halo", r: 9 + Math.min(nn, 6) * 2.5 }, node);
+        // the exact position of each city, as a small point, when several share a marker
+        if (g.members.length > 1) g.members.forEach((m) => el("circle", { class: "cm-pt", r: 2.2, cx: (m.xy[0] - x).toFixed(1), cy: (m.xy[1] - y).toFixed(1) }, node));
+        el("circle", { class: "cm-dot", r: nn > 1 ? 8 : 5, ...(g.members.length > 1 ? { opacity: 0.92 } : {}) }, node);
+        if (nn > 1) el("text", { class: "cm-n", "text-anchor": "middle", dy: "0.35em" }, node).textContent = nn;
+        const tx = el("text", { x: (left ? -1 : 1) * (nn > 1 ? 13 : 10), y: 5 - (names.length - 1) * 8.5, "text-anchor": left ? "end" : "start" }, node);
+        names.forEach((nm, k) => { const ts = el("tspan", { x: (left ? -1 : 1) * (nn > 1 ? 13 : 10), dy: k ? 17 : 0 }, tx); ts.textContent = nm; });
+        ids.forEach((i) => { mk[i] = node; });
       });
       let selected = null;
       const hover = matchMedia("(hover: hover)").matches;
-      const light = (i) => { mk.forEach((g, j) => g && g.classList.toggle("on", j === i || j === selected)); };
-      const select = (i, fromMap) => {
-        selected = i; light(null);
-        collab.querySelectorAll(".cm-city").forEach((s) => s.classList.toggle("on", +s.dataset.i === i));
-        if (fromMap) document.getElementById("cm-city-" + i).scrollIntoView({ block: "nearest", behavior: "smooth" });
+      const idsOf = (g) => g.dataset.ids.split(",").map(Number);
+      const light = (ids) => { marks.querySelectorAll(".cm-mk").forEach((g) => g.classList.toggle("on", idsOf(g).some((i) => (ids || []).includes(i) || (selected || []).includes(i)))); };
+      const select = (ids, fromMap) => {
+        selected = ids; light(null);
+        collab.querySelectorAll(".cm-city").forEach((s) => s.classList.toggle("on", ids.includes(+s.dataset.i)));
+        if (fromMap) document.getElementById("cm-city-" + ids[0]).scrollIntoView({ block: "nearest", behavior: "smooth" });
       };
-      marks.addEventListener("click", (e) => { const g = e.target.closest(".cm-mk"); if (g) select(+g.dataset.i, true); });
-      marks.addEventListener("keydown", (e) => { const g = e.target.closest(".cm-mk"); if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select(+g.dataset.i, true); } });
-      marks.addEventListener("mouseover", (e) => { const g = e.target.closest(".cm-mk"); if (g && hover) light(+g.dataset.i); });
+      marks.addEventListener("click", (e) => { const g = e.target.closest(".cm-mk"); if (g) select(idsOf(g), true); });
+      marks.addEventListener("keydown", (e) => { const g = e.target.closest(".cm-mk"); if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select(idsOf(g), true); } });
+      marks.addEventListener("mouseover", (e) => { const g = e.target.closest(".cm-mk"); if (g && hover) light(idsOf(g)); });
       marks.addEventListener("mouseleave", () => light(null));
-      collab.addEventListener("click", (e) => { const s = e.target.closest(".cm-city"); if (s && !e.target.closest("a")) select(+s.dataset.i, false); });
-      collab.addEventListener("keydown", (e) => { const s = e.target.closest(".cm-city"); if (s && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select(+s.dataset.i, false); } });
-      collab.addEventListener("mouseover", (e) => { const s = e.target.closest(".cm-city"); if (s && hover) light(+s.dataset.i); });
+      collab.addEventListener("click", (e) => { const s = e.target.closest(".cm-city"); if (s && !e.target.closest("a")) select([+s.dataset.i], false); });
+      collab.addEventListener("keydown", (e) => { const s = e.target.closest(".cm-city"); if (s && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select([+s.dataset.i], false); } });
+      collab.addEventListener("mouseover", (e) => { const s = e.target.closest(".cm-city"); if (s && hover) light([+s.dataset.i]); });
       collab.addEventListener("mouseleave", () => light(null));
-      // the cities appear one by one, east to west, when the map comes into view
-      const order = mk.map((g, i) => [g, cities[i].lon]).filter((x) => x[0]).sort((a, b) => b[1] - a[1]).map((x) => x[0]);
+      // the markers appear one by one, east to west, when the map comes into view
+      const order = [...marks.querySelectorAll(".cm-mk")].sort((a, b) => b.transform.baseVal[0].matrix.e - a.transform.baseVal[0].matrix.e);
       if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) { order.forEach((g) => g.classList.add("in")); return; }
       svg.classList.add("cm-anim");
-      const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); order.forEach((g, k) => setTimeout(() => g.classList.add("in"), 200 + k * 110)); } }, { threshold: 0.3 });
+      const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); order.forEach((g, k) => setTimeout(() => g.classList.add("in"), 200 + k * 120)); } }, { threshold: 0.3 });
       io.observe(svg);
     });
   }

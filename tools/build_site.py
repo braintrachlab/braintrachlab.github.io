@@ -303,7 +303,7 @@ about = f'''
           {T("h2", "about.network.title", "Collaborations", "reveal d1")}
         </div>
         <div class="cm-map reveal">
-          <svg id="collab-map" viewBox="0 0 1100 540" role="img" aria-label="Map of the lab's collaborations in Europe and North America"></svg>
+          <svg id="collab-map" viewBox="0 0 1400 560" role="img" aria-label="Map of the lab's collaborations in Europe and North America"></svg>
           <span class="cm-count" id="collab-count"></span>
         </div>
         <div class="cm-list" id="collab-list"></div>

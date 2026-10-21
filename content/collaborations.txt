@@ -29,7 +29,8 @@
 #                latitude, longitude; copy it here. Entries without coords are
 #                listed but not drawn. The map shows Europe and North America.
 #  label:        left = write the city name on the left of its dot
-#                (useful when two cities are close, e.g. Pozzilli and Naples)
+#                (useful when another city is close on the right, e.g. London)
+#                Cities a few kilometres apart share one marker, with their names listed.
 # ======================================================================
 
 institution: King's College London
@@ -102,7 +103,6 @@ topic: Angiotractosomics
 people: Salvatore Mangiafico - Andrea Bartolo - Giovanni Grillea
 place: Pozzilli, Italy
 coords: 41.5124, 14.0617
-label: left
 
 institution: King's College London
 unit: Neurodevelopmental and Forensic Psychiatry
