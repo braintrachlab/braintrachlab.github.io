@@ -36,6 +36,7 @@ nav.contacts: Contacts
 footer.tagline: White matter neuroanatomy & history of neuroscience
 
 # ---------------- HOME PAGE
+home.figure_caption: Coronal section from J. Dejerine, *Anatomie des centres nerveux* (1895–1901), drawing by H. Gillet, with the fibres of the white matter redrawn as streamlines.
 home.eyebrow: Neuroanatomy lab
 home.title: Mapping brain *connections*
 home.lead: In 1999, the development of tractography revolutionized the study of brain connections. Since, we have discovered with tractography how connections develop in the human brain, the functional correlates and what is unique to humans compared to other species. The application of tractography to neurological and psychiatric disorders has revealed symptoms associated with damage to specific tracts and has opened the possibility of describing novel disconnection syndromes. Our results have contributed to international neuroanatomical nomenclature - *Nomina Anatomica* - and the last two editions of the *Gray's Anatomy*.

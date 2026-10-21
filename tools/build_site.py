@@ -195,8 +195,9 @@ for _, k, d in NAV:
 val("footer.tagline", "White matter neuroanatomy & history of neuroscience")
 
 section("HOME PAGE")
-HERO = ('<div class="hero-art hero-plate" data-brain="assets/img/dejerine-lines.svg" role="img" '
-        'aria-label="Coronal section of the human brain from Dejerine\'s atlas, with the white matter fibres redrawn as streamlines"></div>')
+HERO = ('<figure class="hero-art hero-plate"><div class="hero-plate-art" data-brain="assets/img/dejerine-lines.svg" role="img" '
+        'aria-label="Coronal section of the human brain from Dejerine\'s atlas, with the white matter fibres redrawn as streamlines"></div>'
+        + T("figcaption", "home.figure_caption", "Coronal section from J. Dejerine, *Anatomie des centres nerveux* (1895–1901), drawing by H. Gillet, with the fibres of the white matter redrawn as streamlines.", "plate-caption hero-caption") + '</figure>')
 home = f'''
     <section class="hero">
       <div class="container">

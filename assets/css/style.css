@@ -221,13 +221,16 @@ p { margin: 0 0 1.1em; color: var(--ink-soft); }
 @media (max-width: 760px) { .fat-row { grid-template-columns: 1fr; gap: 36px; max-width: 420px; margin-left: auto; margin-right: auto; } }
 .hero-plate {
   width: auto;
-  height: min(calc(100vh - 150px), 760px);
+  height: min(calc(100vh - 200px), 720px);
   aspect-ratio: 1291 / 1488;
   right: 4%;
+  margin: 0;
 }
-.hero-plate svg { width: 100%; height: 100%; }
+.hero-plate-art, .hero-plate-art svg { width: 100%; height: 100%; }
+.hero-caption { position: absolute; top: 100%; left: 0; right: 0; margin: 10px 0 0; text-align: center; font-size: 0.74rem; }
 @media (max-width: 860px) {
   .hero-plate { height: auto; width: min(100%, 460px); }
+  .hero-caption { position: static; }
   .hero > .hero-plate { width: min(calc(100% - 48px), 460px); }
 }
 .plate-figure { position: relative; max-width: 560px; margin: 0 auto; }

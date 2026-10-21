@@ -87,6 +87,7 @@ geo = np.pad(geo, ((0, max(0, H - geo.shape[0])), (0, max(0, W - geo.shape[1])))
 gmax = np.percentile(dist[np.isfinite(dist)], 99)
 
 rng = np.random.default_rng(3)
+SPAN = float(os.environ.get("SPAN", 4.8))          # seconds from the first to the last stroke
 STEP, MAX_STEPS = 1.3, 160
 TURN, TOTAL = np.cos(np.radians(7)), np.cos(np.radians(50))
 
@@ -117,14 +118,14 @@ w, h = int(W * SCALE), int(H * SCALE)
 parts = []
 for name, m in segs.items():
     mm = morphology.erosion(m, morphology.disk(1))
-    cell = 5
+    cell = int(os.environ.get("CELL", 5))          # larger = fewer, longer strokes (lighter for small figures)
     occ = np.zeros((H // cell + 1, W // cell + 1), np.uint8)
     cand = np.argwhere(mm); rng.shuffle(cand)
     lines = []
     for (y0, x0) in cand:
         if occ[y0 // cell, x0 // cell] >= 2: continue
         L = trace(mm, x0, y0, -1)[::-1] + [(float(x0), float(y0))] + trace(mm, x0, y0, 1)
-        if len(L) < 10: continue
+        if len(L) < int(os.environ.get("MINLEN", 10)): continue
         for (x, y) in L[::3]: occ[int(y) // cell, int(x) // cell] += 1
         p = np.array(L[::5])
         g0 = geo[int(p[0, 1]), int(p[0, 0])]; g1 = geo[int(p[-1, 1]), int(p[-1, 0])]
@@ -136,7 +137,7 @@ for name, m in segs.items():
         t = np.clip((sh - lo) / (hi - lo + 1e-6), 0, 1)
         r, g_, b = (dk * (1 - t) + lt * t).astype(int)
         q = p * SCALE
-        d = 0.5 + min(g0 / gmax, 1.0) * 4.8 + rng.uniform(0, 0.5)
+        d = 0.2 + min(g0 / gmax, 1.0) * SPAN + rng.uniform(0, 0.25)
         path = "M" + " ".join(f"{x:.0f} {y:.0f}" for x, y in q)
         parts.append((d, f'<path d="{path}" stroke="rgb({r},{g_},{b})" stroke-opacity="{0.9 - 0.2 * t:.2f}" '
                          f'stroke-width="{0.45 + 0.45 * rng.random():.2f}" data-delay="{d:.2f}" data-dur="{1.4 + rng.uniform(0, 0.8):.2f}"/>'))
@@ -152,7 +153,7 @@ for name, m in segs.items():
     tint[..., 3] = np.maximum(tint[..., 3], (v * 255).astype(np.uint8))
 Image.fromarray(tint, "RGBA").resize((w, h), Image.LANCZOS).save(os.path.join(OUT, f"{NAME}-tint.png"), optimize=True)
 svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" fill="none" stroke-linecap="round" stroke-linejoin="round">\n'
-       f'<image class="plate-tint" href="assets/img/{NAME}-tint.png" x="0" y="0" width="{w}" height="{h}" style="--tint-delay:4.5s"/>\n'
+       f'<image class="plate-tint" href="assets/img/{NAME}-tint.png" x="0" y="0" width="{w}" height="{h}" style="--tint-delay:{SPAN + 0.6:.1f}s"/>\n'
        + "\n".join(p for _, p in parts) + "\n</svg>\n")
 open(os.path.join(OUT, f"{NAME}.svg"), "w").write(svg)
 print("svg KB", len(svg) // 1024, w, h)
