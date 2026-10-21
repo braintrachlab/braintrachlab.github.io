@@ -681,3 +681,10 @@ a.tool-card:hover { border-color: var(--ink); transform: translateY(-2px); box-s
 .quote-source { text-align: center; margin: 18px auto 0; font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
 .quote-source a { color: var(--muted); } .quote-source a:hover { color: var(--accent); }
 .quote-source em { font-style: italic; text-transform: none; letter-spacing: 0.04em; }
+
+/* research: arcuate fasciculus in six patients with primary progressive aphasia (Forkel et al. 2020) */
+.rep-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px 32px; align-items: end; margin-top: 50px; }
+.rep-cell { margin: 0; }
+.rep-cell [data-brain] { width: 100%; }
+.rep-score { text-align: center; font-family: var(--serif); font-style: italic; font-size: 1.05rem; color: var(--ink-soft); margin-top: 8px; min-height: 1.4em; }
+@media (max-width: 760px) { .rep-grid { grid-template-columns: repeat(2, 1fr); gap: 24px 16px; } }

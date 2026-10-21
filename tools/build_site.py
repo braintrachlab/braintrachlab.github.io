@@ -361,6 +361,40 @@ def comparative():
     </section>
 '''
 
+
+def clinical():
+    key = "research.clinical"
+    pan = [("Aa", "Repetition = 36"), ("Ab", "Repetition = 42"), ("Ac", "Repetition = 88"), ("Ba", ""), ("Bb", ""), ("Bc", "")]
+    cells = "\n".join(f'''          <figure class="rep-cell">
+            <div data-brain="assets/img/repetition-{k}.svg" role="img" aria-label="Arcuate fasciculus of a patient with primary progressive aphasia"></div>
+            {T("figcaption", f"{key}.panel{i + 1}", label, "rep-score")}
+          </figure>''' for i, (k, label) in enumerate(pan))
+    return f'''    <section>
+      <div class="container">
+        <div class="grid-2" style="align-items:end">
+          <div>
+            <span class="eyebrow reveal">03</span>
+            {T("h2", key + ".title", "Connections in health and disease", "reveal d1")}
+            <hr class="divider reveal d1">
+          </div>
+          <div>
+            {T("p", key + ".p1", "By studying the functions of white matter pathways, we investigate how their damage or alteration contributes to the clinical picture of patients with neurological and psychiatric conditions.", "reveal d2")}
+            {T("p", key + ".p2", "", "reveal d2")}
+          </div>
+        </div>
+        <div class="rep-grid reveal">
+{cells}
+        </div>
+        <div class="fat-legend reveal">
+          <span class="fat-item"><span class="fat-key arc-key-long"></span>{T("span", key + ".legend1", "Long segment")}</span>
+          <span class="fat-item"><span class="fat-key arc-key-anterior"></span>{T("span", key + ".legend2", "Anterior segment")}</span>
+          <span class="fat-item"><span class="fat-key arc-key-posterior"></span>{T("span", key + ".legend3", "Posterior segment")}</span>
+        </div>
+        {T("p", key + ".caption", "Individual atrophy patterns of the arcuate fasciculus in patients with primary progressive aphasia, with their word repetition scores: damage to the temporo-parietal cortex and to the indirect pathway (anterior and posterior segments) is associated with impaired repetition. Redrawn as streamlines from [Forkel et al., *Neurology* (2020)](https://doi.org/10.1212/WNL.0000000000008746).", "plate-caption fat-caption reveal")}
+      </div>
+    </section>
+'''
+
 research = f'''
     <header class="page-header">
       <div class="container">
@@ -372,7 +406,7 @@ research = f'''
 
 {rblock("01", "research.anatomy", "White matter anatomy", "We describe the course, organisation and cortical terminations of the white matter tracts of the human brain, building an accurate anatomical map of its association, projection and commissural connections.", "", "Image", False, True, figure=ARC())}
 {comparative()}
-{rblock("03", "research.clinical", "Connections in health and disease", "By studying the functions of white matter pathways, we investigate how their damage or alteration contributes to the clinical picture of patients with neurological and psychiatric conditions.", "", "Image", False, True)}
+{clinical()}
 {rblock("04", "research.history", "History of neuroscience", "The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain's connections.", "", "", True, False, figure=DEJ())}'''
 page("research.html", "research.page_title", "Research — TrachLab", "research.page_description",
      "Research areas of TrachLab: white matter anatomy, comparative neuroanatomy, connections in disease, history of neuroscience.", research)

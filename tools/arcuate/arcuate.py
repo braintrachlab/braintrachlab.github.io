@@ -6,7 +6,10 @@ segments). Strokes stop before bending more than ~7 degrees per step or ~50
 degrees in total, so no pathway is invented. The drawing unfurls along the tract,
 from the temporal terminations round the arch to the frontal lobe.
 
-usage: arcuate.py source.png out_dir"""
+usage: arcuate.py source.png out_dir [name] [width]
+  name:  output files <name>.svg and <name>-tint.png (default: arcuate)
+  width: width of the drawing in px (default: 0.62 x source width)
+  set DEBUG=1 in the environment for a debug image"""
 import sys, os
 import numpy as np
 from PIL import Image
@@ -16,7 +19,8 @@ from scipy.sparse.csgraph import dijkstra
 from skimage import morphology
 
 SRC, OUT = sys.argv[1], sys.argv[2]
-DEBUG = len(sys.argv) > 3
+NAME = sys.argv[3] if len(sys.argv) > 3 else "arcuate"
+DEBUG = bool(os.environ.get("DEBUG"))
 im = Image.open(SRC).convert("RGBA")
 rgba = np.asarray(im).astype(np.float32) / 255.0
 a = rgba[..., :3] * rgba[..., 3:] + (1 - rgba[..., 3:])       # on white
@@ -108,7 +112,7 @@ def trace(mask, x0, y0, sgn):
 PAL = {"long": ((128, 40, 38), (206, 104, 92)),
        "posterior": ((150, 112, 30), (222, 186, 98)),
        "anterior": ((40, 92, 58), (128, 176, 118))}
-SCALE = 0.62
+SCALE = float(sys.argv[4]) / W if len(sys.argv) > 4 else 0.62
 w, h = int(W * SCALE), int(H * SCALE)
 parts = []
 for name, m in segs.items():
@@ -146,11 +150,11 @@ for name, m in segs.items():
     sel = v > 0.02
     tint[sel, :3] = PAL[name][1]
     tint[..., 3] = np.maximum(tint[..., 3], (v * 255).astype(np.uint8))
-Image.fromarray(tint, "RGBA").resize((w, h), Image.LANCZOS).save(os.path.join(OUT, "arcuate-tint.png"), optimize=True)
+Image.fromarray(tint, "RGBA").resize((w, h), Image.LANCZOS).save(os.path.join(OUT, f"{NAME}-tint.png"), optimize=True)
 svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" fill="none" stroke-linecap="round" stroke-linejoin="round">\n'
-       f'<image class="plate-tint" href="assets/img/arcuate-tint.png" x="0" y="0" width="{w}" height="{h}" style="--tint-delay:4.5s"/>\n'
+       f'<image class="plate-tint" href="assets/img/{NAME}-tint.png" x="0" y="0" width="{w}" height="{h}" style="--tint-delay:4.5s"/>\n'
        + "\n".join(p for _, p in parts) + "\n</svg>\n")
-open(os.path.join(OUT, "arcuate.svg"), "w").write(svg)
+open(os.path.join(OUT, f"{NAME}.svg"), "w").write(svg)
 print("svg KB", len(svg) // 1024, w, h)
 
 if DEBUG:
@@ -158,4 +162,4 @@ if DEBUG:
     vis[segs["long"]] = [220, 40, 40]; vis[segs["posterior"]] = [230, 200, 0]; vis[segs["anterior"]] = [0, 160, 60]
     gg = (np.clip(geo / gmax, 0, 1) * 255).astype(np.uint8)
     dbg = np.concatenate([vis, np.stack([gg] * 3, -1) * tract[..., None]], 1)
-    Image.fromarray(dbg).resize((W, H // 2)).save(os.path.join(OUT, "_arc_debug.png"))
+    Image.fromarray(dbg).resize((W, H // 2)).save(os.path.join(OUT, f"_{NAME}_debug.png"))
