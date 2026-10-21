@@ -206,3 +206,25 @@ text: 'Disconnexion syndromes in animals and man' (*Brain* 1965) revived the the
 figure: Geschwind's diagram of the disconnection of the language areas
 image:
 ref: Catani & ffytche, *Brain* 2005
+
+# born: approximate (only places the portrait on the axis) — replace with the year of birth
+name: Peter J. Basser
+born: 1958
+year: 1994
+life: Contemporary
+portrait: pioneers/basser.webp
+text: Introduced diffusion tensor imaging (1994): measuring in each voxel the direction in which water diffuses most easily, and with it the orientation of the fibres; later developed streamline tractography (2000).
+figure: The diffusion tensor: an ellipsoid in each voxel, its long axis along the fibres
+image:
+ref: Basser, Mattiello & Le Bihan, *Biophysical Journal* 1994; Basser et al., *Magnetic Resonance in Medicine* 2000
+
+# born: approximate (only places the portrait on the axis) — replace with the year of birth
+name: Susumu Mori
+born: 1964
+year: 1999
+life: Contemporary
+portrait: pioneers/mori.webp
+text: Reconstructed white matter pathways in three dimensions from diffusion MRI for the first time (1999), following the fibre orientation from voxel to voxel; later built atlases of the tracts of the human brain.
+figure: The first three-dimensional reconstruction of white matter pathways from diffusion MRI
+image:
+ref: Mori et al., *Annals of Neurology* 1999; Wakana et al., *Radiology* 2004

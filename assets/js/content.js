@@ -159,7 +159,7 @@
         ERAS.map(([e, y]) => `<span class="pn-era" style="left:${xOf(y) - 44}px">${esc(e)}</span>`).join("") +
         P.map((p, i) => `<button class="pn-person" id="pn${i}" role="tab" aria-selected="false" data-i="${i}" style="left:${xs[i]}px" aria-label="${esc(p.name)}, ${esc(p.life || "")}">
             <span class="pn-face">${face(p)}</span><span class="pn-name">${esc(p.name)}</span>
-            <span class="pn-tick"></span><span class="pn-life">${esc((p.life || "").replace(/\s/g, ""))}</span></button>`).join("");
+            <span class="pn-tick"></span><span class="pn-life">${esc((p.life || "").replace(/\s*–\s*/g, "–"))}</span></button>`).join("");
       let current = Math.max(0, P.findIndex((p) => /^y(es)?$/i.test(p.start || "")));
       const show = (i) => {
         current = i;
