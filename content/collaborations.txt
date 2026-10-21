@@ -29,6 +29,11 @@ unit: Neuroimaging & Biophysics Lab (NBL)
 topic: Tractography methodology
 people: Flavio Dell'Acqua
 
+institution: Rutgers University - New Brunswick, USA
+unit: Department of Psychiatry, Brain Health Institute
+topic: Tractography methodology - visual system
+people: Ahmad Beyh
+
 institution: Northwestern University - Chicago, USA
 unit: Mesulam Institute for Cognitive Neurology & Alzheimer's Disease
 topic: Primary progressive aphasia
@@ -38,6 +43,11 @@ institution: University of Edinburgh - Edinburgh, UK
 unit: Human Cognitive Neuroscience, Psychology Department
 topic: Neuropsychology
 people: Sergio Della Sala
+
+institution: University of Chieti-Pescara - Chieti, Italy
+unit: Department of Neuroradiology - ITAB
+topic: Angiotractosomics
+people: Massimo Caulo
 
 institution: University of Chicago - Chicago, USA
 unit: Healthy Aging & Alzheimer's Research Care (HAARC) Center
@@ -49,20 +59,45 @@ unit: Michale E. Keeling Center for Comparative Medicine and Research
 topic: Comparative neuroanatomy / evolution
 people: William Hopkins
 
-institution: Copenhagen University - Hvidovre, Denmark.
+institution: Copenhagen University - Hvidovre, Denmark
 unit: Department of Radiology and Nuclear Medicine
 topic: Tractography methodology
 people: Tim Dyrby
 
 institution: IRCSS Synlab SDN - Naples, Italy
 unit: Neuroradiology Unit
-topic: Data acquisition and analysis
+topic: Single case reports - Dementia - Congenital blindness
 people: Carlo Cavaliere
 
 institution: IRCSS Neuromed - Pozzilli, Italy
 unit: Interventional Neuroradiology Unit
-topic: Data acquisition and analysis
+topic: Angiotractosomics
 people: Salvatore Mangiafico - Andrea Bartolo - Giovanni Grillea
+
+institution: King's College - London, UK
+unit: Neurodevelopmental and Forensic Psychiatry
+topic: Neurodevelopmental disorders -ADHD, autism spectrum disorder, psychopathy
+people: Michael Craig
+
+institution: King's College - London, UK
+unit: Department of Neurosurgery
+topic: Neurosurgery
+people: Francesco Vergani
+
+institution: University of Cambridge - Cambridge, UK
+unit: Department of Psychology
+topic: Neurodevelopmental disorders - autism spectrum disorder
+people: Simon Baron-Cohen
+
+institution: Psychology
+unit: 
+topic: History of Neuroscience
+people: Luciano Mecacci
+
+institution: Radboud University - Nijmegen, Netherlands
+unit: 
+topic: Nomenclature
+people: Hans J. ten Donkelaar
 
 # Example (remove the # signs to use it):
 # institution: University of Somewhere
