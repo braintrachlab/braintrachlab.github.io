@@ -11,6 +11,7 @@
 #  text:      a short note on the person and the discovery
 #  figure:    description of the figure of the discovery
 #  image:     picture of the figure in assets/img/ (while empty, the description is shown)
+#  source:    reference of the figure, shown under it
 #  ref:       reference
 #  start:     yes = the person shown when the page opens
 #
@@ -34,8 +35,9 @@ year: 1543
 life: 1514 – 1564
 portrait: pioneers/vesalius.webp
 text: In the *Fabrica* (1543) drew the first accurate views of the corpus callosum and of the white matter of the hemispheres, from human dissection.
-figure: Fabrica, Book VII: horizontal section showing the corpus callosum and the centrum ovale
-image:
+figure: Horizontal section through the hemispheres, opening the lateral ventricles within the white matter
+image: pioneers/fig-vesalius.jpg
+source: A. Vesalius, *De humani corporis fabrica libri septem*, Book VII (Basel: Oporinus, 1543)
 ref: Catani & Sandrone, *Brain Renaissance: From Vesalius to Modern Neuroscience* (Oxford University Press, 2015)
 
 name: Raymond Vieussens
@@ -44,8 +46,9 @@ year: 1684
 life: 1641 – 1715
 portrait: pioneers/vieussens.webp
 text: Named the *centrum ovale* (1684): the white matter as a structure of its own, continuous with the internal capsule.
-figure: Neurographia universalis (1684): the centrum ovale exposed from above
-image:
+figure: The fibres of the centrum ovale converging through the internal capsule towards the brainstem
+image: pioneers/fig-vieussens.jpg
+source: R. Vieussens, *Neurographia universalis*, Tabula XVI (Lyon, 1684); engraving by Beaudeau, Montpellier
 ref: *Terminologia Neuroanatomica* (FIPAT 2017), endnote 131
 
 name: Félix Vicq d'Azyr
@@ -55,8 +58,9 @@ year: 1786
 life: 1748 – 1794
 portrait: pioneers/vicq-dazyr.webp
 text: Cut the brain in thin horizontal and coronal slices and printed them in colour plates of new precision; described the mammillothalamic tract that bears his name and the white stripe of the visual cortex.
-figure: Traité d'anatomie et de physiologie (1786): a coronal slice with the mammillothalamic tract
-image:
+figure: Horizontal section in colour: grey and white matter distinguished, the ventricles opened
+image: pioneers/fig-vicq-dazyr.jpg
+source: F. Vicq d'Azyr, *Traité d'anatomie et de physiologie* (Paris: Didot, 1786)
 ref: Parent, *Can J Neurol Sci* 2007 — Félix Vicq d'Azyr: anatomy, medicine and revolution
 
 name: Johann Christian Reil
@@ -65,8 +69,9 @@ year: 1809
 life: 1759 – 1813
 portrait: pioneers/reil.webp
 text: Hardened brains in alcohol and dissected the fibre bundles: the first descriptions of the arcuate fasciculus, the insula and the corona radiata.
-figure: Reil's dissection of the lateral surface: the arcuate fibres around the insula
-image:
+figure: The base of the brain dissected to show its fibre systems
+image: pioneers/fig-reil.jpg
+source: J. C. Reil, *Archiv für die Physiologie* 11 (1812), Tab. XIII; drawing by Gier, engraving by Schröter
 ref: Catani & Mesulam, *Cortex* 2008 — the arcuate fasciculus and the disconnection theme
 
 name: Karl Friedrich Burdach
@@ -75,8 +80,9 @@ year: 1822
 life: 1776 – 1847
 portrait: pioneers/burdach.webp
 text: Gave the names still in use: arcuate fasciculus, cingulum, uncinate fasciculus, longitudinal fasciculi.
-figure: Vom Baue und Leben des Gehirns (1819–1826): the long association bundles
-image:
+figure: A hemisphere dissected to expose the radiating fibres of the white matter
+image: pioneers/fig-burdach.jpg
+source: K. F. Burdach, *Vom Baue und Leben des Gehirns*, Tafel VII (Leipzig, 1819–1826)
 ref: Catani & Mesulam, *Cortex* 2008
 
 name: Friedrich Arnold
@@ -85,8 +91,9 @@ year: 1838
 life: 1803 – 1890
 portrait: pioneers/arnold.webp
 text: Dissected the fibre systems of the brainstem and hemispheres in fine detail; the frontopontine fibres of the cerebral peduncle are still called Arnold's bundle.
-figure: Tabulae anatomicae (1838): the fibre systems of the cerebral peduncle and hemisphere
-image:
+figure: Dissections of the hemisphere in horizontal and medial views, following the course of the fibre systems
+image: pioneers/fig-arnold.jpg
+source: F. Arnold, *Tabulae anatomicae*, Fasc. I: *Icones cerebri et medullae spinalis*, Tab. X (Zürich, 1838); [UB Heidelberg](https://doi.org/10.11588/diglit.11220#0046)
 ref: Catani & Thiebaut de Schotten, *Atlas of Human Brain Connections* (Oxford University Press, 2012)
 
 name: Pierre Louis Gratiolet

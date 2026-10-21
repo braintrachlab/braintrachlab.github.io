@@ -169,8 +169,9 @@
         card.innerHTML = `
           <div class="pn-portrait">${face(p)}</div>
           <figure class="pn-figure${p.image ? " has-img" : ""}">${p.image
-            ? `<img src="${esc(photoUrl(p.image))}" alt="${esc(p.figure || "")}"><figcaption>${md(p.figure || "")}</figcaption>`
-            : `<div>${title}${md(p.figure || "")}<span class="pn-ph">Figure in preparation</span></div>`}</figure>
+            ? `<a class="pn-img" href="${esc(photoUrl(p.image))}" target="_blank" rel="noopener" title="Open the full figure"><img src="${esc(photoUrl(p.image))}" alt="${esc(p.figure || "")}"></a>
+               <figcaption>${md(p.figure || "")}${p.source ? `<span class="pn-source">${md(p.source)}</span>` : ""}</figcaption>`
+            : `<div>${title}${md(p.figure || "")}${p.source ? `<span class="pn-source">${md(p.source)}</span>` : ""}<span class="pn-ph">Figure in preparation</span></div>`}</figure>
           <div class="pn-text">
             <span class="eyebrow">Key work · ${when(p.y)}</span>
             <h3>${esc(p.name)}</h3>
