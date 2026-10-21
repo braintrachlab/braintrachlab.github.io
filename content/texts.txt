@@ -82,13 +82,13 @@ about.page_description: Team and collaborations of BrainTraCh Lab.
 # ---------------- RESEARCH PAGE (an empty value hides the paragraph; images: file name in assets/img/)
 research.eyebrow: Research
 research.title: Our research
-research.intro: From the detailed anatomy of single pathways and their evolution across primates, to their role in disease and the history of how they were discovered.
+research.intro: 
 research.anatomy.legend1: Long segment
 research.anatomy.legend2: Anterior segment
 research.anatomy.legend3: Posterior segment
-research.anatomy.caption: The three segments of the arcuate fasciculus, redrawn as streamlines.
+research.anatomy.caption: The three segments of the arcuate fasciculus.
 research.anatomy.title: White matter anatomy
-research.anatomy.p1: We describe the course and organisation of the white matter tracts of the human brain.
+research.anatomy.p1: We study the origin, course and terminations of the major association, commissural, and projection pathways forming large-scale networks for movements, communications, social behaviour, emotions, memory, and visual processing.
 research.anatomy.p2: 
 research.comparative.species1: Macaque
 research.comparative.species2: Chimpanzee
