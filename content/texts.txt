@@ -88,17 +88,17 @@ research.anatomy.legend2: Anterior segment
 research.anatomy.legend3: Posterior segment
 research.anatomy.caption: The three segments of the arcuate fasciculus.
 research.anatomy.title: White matter anatomy
-research.anatomy.p1: We study the origin, course and terminations of the major association, commissural, and projection pathways forming large-scale networks for movements, communications, social behaviour, emotions, memory, and visual processing.
+research.anatomy.p1: We study the origin, course and terminations of the major association, commissural and projection pathways of the human brain, and how they form large-scale networks for movement, language and communication, social behaviour, emotion, memory and vision. Using tractography, we have also described white matter tracts previously unknown. 
 research.anatomy.p2: 
 research.comparative.species1: Macaque
 research.comparative.species2: Chimpanzee
 research.comparative.species3: Human
 research.comparative.title: Comparative neuroanatomy
-research.comparative.p1: Tractography permits, for the first time, quantitative comparisons of white matter anatomy across species. Our purpose is to identify the anatomy we share with species closest to humans and to identify evolutionary changes underlying unique human abilities.
+research.comparative.p1: Tractography has made it possible, for the first time, to compare the anatomy of white matter quantitatively across species. We aim to identify the connections we share with our closest relatives, the non-human primates, and the evolutionary changes that underlie abilities unique to humans, such as language.
 research.comparative.p2: 
 research.comparative.legend1: Prefrontal FAT
 research.comparative.legend2: Precentral FAT
-research.comparative.caption: The frontal aslant tract (FAT) in the macaque, chimpanzee and human brain, redrawn as streamlines from [Citro et al., *Nature Communications* (2026)](https://doi.org/10.1038/s41467-026-73731-8).
+research.comparative.caption: The frontal aslant tract (FAT) in the macaque, chimpanzee and human brain from [Citro et al., *Nature Communications* (2026)](https://doi.org/10.1038/s41467-026-73731-8).
 research.clinical.panel1: Repetition = 36
 research.clinical.panel2: Repetition = 42
 research.clinical.panel3: Repetition = 88
@@ -106,14 +106,14 @@ research.clinical.panel4: Repetition = 40
 research.clinical.panel5: Repetition = 72
 research.clinical.panel6: Repetition = 100
 research.clinical.title: Connections in health and disease
-research.clinical.p1: By studying the functions of white matter pathways, we investigate how their damage or alteration contributes to the clinical picture of patients with neurological and psychiatric conditions.
+research.clinical.p1: In health, tractography shows how differences in white matter relate to individual abilities. In patients, from neurodevelopmental disorders to dementia, it reveals the anatomical basis of symptoms, and it has led us to describe new clinical syndromes caused by damage to specific white matter pathways.
 research.clinical.p2: 
 research.clinical.legend1: Long segment
 research.clinical.legend2: Anterior segment
 research.clinical.legend3: Posterior segment
-research.clinical.caption: Individual atrophy patterns of the arcuate fasciculus in patients with primary progressive aphasia, with their word repetition scores: damage to the temporo-parietal cortex and to the indirect pathway (anterior and posterior segments) is associated with impaired repetition. Redrawn as streamlines from [Forkel et al., *Neurology* (2020)](https://doi.org/10.1212/WNL.0000000000008746).
+research.clinical.caption: Individual atrophy patterns of the arcuate fasciculus in patients with primary progressive aphasia, with their word repetition scores: damage to the temporo-parietal cortex and to the indirect pathway (anterior and posterior segments) is associated with impaired repetition. Redrawn from [Forkel et al., *Neurology* (2020)](https://doi.org/10.1212/WNL.0000000000008746).
 research.history.title: History of neuroscience
-research.history.p1: The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain.
+research.history.p1: We are passionate about the history of brain anatomy and neuroscience. We delve into the lives and work of the great neuroanatomists, in search of untold stories, anecdotes and forgotten discoveries.
 research.history.p2: 
 research.history.eras: Antiquity 129; Renaissance 1514; 17th century 1641; 18th century 1748; 19th century 1776; 20th century 1888
 research.history.timeline_title: White matter pioneers
