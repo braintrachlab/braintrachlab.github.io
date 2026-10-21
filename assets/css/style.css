@@ -742,3 +742,20 @@ a.tool-card:hover { border-color: var(--ink); transform: translateY(-2px); box-s
   .pn-text h3 { font-size: 1.6rem; }
 }
 @media (prefers-reduced-motion: reduce) { .pn-face { transition: none; } }
+/* intro: the axis is drawn from antiquity to today and the pioneers appear as it reaches them */
+.pn-axis { right: auto; transform-origin: left center; }
+.pn-today { position: absolute; top: 175px; transform: translateX(-50%); font-size: 0.64rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.pn-today::before { content: ""; position: absolute; left: 50%; top: -12px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--muted); }
+.pn-head { position: absolute; top: 168px; left: 0; width: 0; height: 0; display: none; }
+.pn-head::before { content: ""; position: absolute; left: -3.5px; top: -3px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.pn-year { position: absolute; left: 0; top: -28px; transform: translateX(-50%); font-family: var(--serif); font-size: 1.05rem; color: var(--accent); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pn-intro-on .pn-head { display: block; }
+.pn-intro-on .pn-today { opacity: 0; }
+.pn-intro-on .pn-person, .pn-intro-on .pn-era { opacity: 0; transform: translateY(12px); }
+.pn-intro-on .pn-person.in, .pn-intro-on .pn-era.in { opacity: 1; transform: none; }
+.pn-person, .pn-era, .pn-today { transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
+.pn-intro-on .pn-ribbon { scrollbar-width: none; }
+.pn-card { transition: opacity .6s ease, transform .6s ease; }
+.pn-card.pn-wait { opacity: 0; transform: translateY(10px); }
+.pn-card.pn-wait:empty { min-height: 300px; }
+@media (prefers-reduced-motion: reduce) { .pn-person, .pn-era, .pn-card { transition: none; } }

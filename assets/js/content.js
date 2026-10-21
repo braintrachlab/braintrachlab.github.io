@@ -154,8 +154,9 @@
       const when = (y) => (y < 1000 ? "c. " + y : String(y));
       const face = (p) => (p.portrait ? `<img src="${esc(photoUrl(p.portrait))}" alt="" draggable="false" loading="lazy">` : "");
       const track = pnBox.querySelector(".pn-track"), card = pnBox.querySelector(".pn-card"), ribbon = pnBox.querySelector(".pn-ribbon");
-      track.style.width = xs[xs.length - 1] + 66 + "px";
-      track.innerHTML = `<span class="pn-axis"></span>` +
+      const END = xs[xs.length - 1] + 110;                       // the axis runs on to today
+      track.style.width = END + 20 + "px";
+      track.innerHTML = `<span class="pn-axis" style="width:${END}px"></span><span class="pn-today" style="left:${END}px">Today</span><span class="pn-head"><span class="pn-year"></span></span>` +
         ERAS.map(([e, y]) => `<span class="pn-era" style="left:${xOf(y) - 44}px">${esc(e)}</span>`).join("") +
         P.map((p, i) => `<button class="pn-person" id="pn${i}" role="tab" aria-selected="false" data-i="${i}" style="left:${xs[i]}px" aria-label="${esc(p.name)}, ${esc(p.life || "")}">
             <span class="pn-face">${face(p)}</span><span class="pn-name">${esc(p.name)}</span>
@@ -188,8 +189,55 @@
         const n = Math.max(0, Math.min(P.length - 1, current + (e.key === "ArrowRight" ? 1 : -1)));
         show(n); document.getElementById("pn" + n).focus({ preventScroll: false });
       });
-      show(current);
-      ribbon.scrollLeft = Math.max(0, xs[current] - ribbon.clientWidth / 2);
+      const centre = (i, smooth) => ribbon.scrollTo({ left: Math.max(0, xs[i] - ribbon.clientWidth / 2), behavior: smooth ? "smooth" : "auto" });
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce || !("IntersectionObserver" in window)) { show(current); centre(current); return; }
+
+      // ---- intro: the axis is drawn from antiquity to today, each pioneer appears as the line reaches them
+      const persons = [...track.querySelectorAll(".pn-person")], eras = [...track.querySelectorAll(".pn-era")];
+      const eraX = ERAS.map(([, y]) => xOf(y) - 44);
+      const axis = track.querySelector(".pn-axis"), head = track.querySelector(".pn-head"), yearEl = track.querySelector(".pn-year");
+      const NOW = new Date().getFullYear();
+      const stops = xs.map((x, i) => [x, P[i].b]).concat([[END, NOW]]);
+      const yearAt = (x) => {                                   // the axis is compressed: read the year back from the stops
+        if (x <= stops[0][0]) return stops[0][1];
+        for (let k = 1; k < stops.length; k++) if (x <= stops[k][0]) {
+          const [x0, y0] = stops[k - 1], [x1, y1] = stops[k];
+          return Math.round(y0 + (y1 - y0) * (x - x0) / (x1 - x0));
+        }
+        return NOW;
+      };
+      pnBox.classList.add("pn-intro-on");
+      card.classList.add("pn-wait");
+      let raf = 0, t0 = 0, done = false;
+      const D = Math.min(9000, 2600 + P.length * 280);        // about 8 s for twenty people
+      const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+      const frame = (now) => {
+        if (!t0) t0 = now;
+        const k = Math.min(1, (now - t0) / D), x = 4 + ease(k) * (END - 4);
+        axis.style.transform = `scaleX(${x / END})`;
+        head.style.left = x + "px";
+        const y = yearAt(x);
+        yearEl.textContent = y >= NOW ? "Today" : y < 1000 ? y + " AD" : y;
+        persons.forEach((b, i) => b.classList.toggle("in", xs[i] <= x + 30));
+        eras.forEach((e, i) => e.classList.toggle("in", eraX[i] + 44 <= x + 30));
+        ribbon.scrollLeft = Math.max(0, x - ribbon.clientWidth * 0.62);
+        if (k < 1) raf = requestAnimationFrame(frame); else finish(true);
+      };
+      const finish = (natural) => {
+        if (done) return; done = true;
+        cancelAnimationFrame(raf);
+        pnBox.classList.remove("pn-intro-on");
+        pnBox.classList.add("pn-intro-done");
+        axis.style.transform = "";
+        show(current); card.classList.remove("pn-wait");
+        setTimeout(() => centre(current, true), natural ? 500 : 0);
+      };
+      ["pointerdown", "wheel", "touchstart", "keydown"].forEach((ev) => ribbon.addEventListener(ev, () => finish(false), { once: true, passive: true }));
+      const io = new IntersectionObserver((es) => {
+        if (es.some((e) => e.isIntersecting)) { io.disconnect(); setTimeout(() => { if (!done) raf = requestAnimationFrame(frame); }, 250); }
+      }, { threshold: 0.45 });
+      io.observe(ribbon);
     });
   }
 
