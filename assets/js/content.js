@@ -117,11 +117,15 @@
     load("content/collaborations.txt").then((list) => {
       collab.innerHTML = list.filter((c) => c.institution).map((c) => `<li class="collab${c.photo ? " has-photo" : ""}">
           ${c.photo ? `<img class="collab-logo" src="${esc(photoUrl(c.photo))}" alt="">` : ""}
-          <h3>${linked(md(c.institution), c.link)}</h3>
-          ${c.unit ? `<p>${md(c.unit)}</p>` : ""}
-          ${c.topic ? `<p class="collab-topic"><span class="badge">${md(c.topic)}</span></p>` : ""}
-          ${c.people ? `<p class="who">${md(c.people)}</p>` : ""}
-          ${c.text ? `<p class="who">${md(c.text)}</p>` : ""}
+          <div class="collab-where">
+            <h3>${linked(md(c.institution), c.link)}</h3>
+            ${c.unit ? `<p class="unit">${md(c.unit)}</p>` : ""}
+          </div>
+          <div class="collab-what">
+            ${c.topic ? `<p class="collab-topic"><span class="badge">${md(c.topic)}</span></p>` : ""}
+            ${c.people ? `<p class="who">${md(c.people)}</p>` : ""}
+            ${c.text ? `<p class="who">${md(c.text)}</p>` : ""}
+          </div>
         </li>`).join("");
     });
   }
