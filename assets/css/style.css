@@ -673,3 +673,6 @@ a.tool-card:hover { border-color: var(--ink); transform: translateY(-2px); box-s
 /* atlas: Klingler dissection view (dark background of the dissection photographs) */
 .atlas-view { transition: background 0.8s ease; }
 .atlas-view.klingler { background: radial-gradient(circle at 50% 45%, #3a3632 0%, #24211f 65%, #191716 100%); }
+
+.collab-topic { margin: 6px 0 4px; }
+.collab-topic .badge { margin: 0; }

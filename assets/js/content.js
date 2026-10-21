@@ -119,6 +119,7 @@
           ${c.photo ? `<img class="collab-logo" src="${esc(photoUrl(c.photo))}" alt="">` : ""}
           <h3>${linked(md(c.institution), c.link)}</h3>
           ${c.unit ? `<p>${md(c.unit)}</p>` : ""}
+          ${c.topic ? `<p class="collab-topic"><span class="badge">${md(c.topic)}</span></p>` : ""}
           ${c.people ? `<p class="who">${md(c.people)}</p>` : ""}
           ${c.text ? `<p class="who">${md(c.text)}</p>` : ""}
         </li>`).join("");
