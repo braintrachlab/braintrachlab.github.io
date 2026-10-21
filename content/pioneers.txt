@@ -1,0 +1,201 @@
+# ======================================================================
+#  WHITE MATTER PIONEERS — the portrait timeline in Research > History of neuroscience.
+#  The general rules for writing in these files are at the top of collaborations.txt.
+#
+#  name:      full name                                          (required)
+#  short:     name used in the figure title (default: last word of the name)
+#  born:      year of birth: sets the place on the timeline      (required)
+#  year:      year of the key work                               (required)
+#  life:      dates shown under the portrait, e.g. 1848 – 1905
+#  portrait:  picture in assets/img/ (lithograph style, transparent background)
+#  text:      a short note on the person and the discovery
+#  figure:    description of the figure of the discovery
+#  image:     picture of the figure in assets/img/ (while empty, the description is shown)
+#  ref:       reference
+#  start:     yes = the person shown when the page opens
+#
+#  The order here does not matter: the timeline is sorted by year of birth.
+#  The period labels on the axis are in texts.txt (research.history.eras).
+# ======================================================================
+
+name: Galen
+born: 129
+year: 170
+life: 129 – c. 216
+portrait: pioneers/galen.webp
+text: Described the corpus callosum and the fornix in dissections of animal brains; his anatomy shaped medicine for 1,300 years.
+figure: The ventricles and the 'callosal body' — a later Renaissance edition of Galen's anatomical works
+image:
+ref: 
+
+name: Andreas Vesalius
+born: 1514
+year: 1543
+life: 1514 – 1564
+portrait: pioneers/vesalius.webp
+text: In the *Fabrica* (1543) drew the first accurate views of the corpus callosum and of the white matter of the hemispheres, from human dissection.
+figure: Fabrica, Book VII: horizontal section showing the corpus callosum and the centrum ovale
+image:
+ref: Catani & Sandrone, *Brain Renaissance: From Vesalius to Modern Neuroscience* (Oxford University Press, 2015)
+
+name: Raymond Vieussens
+born: 1641
+year: 1684
+life: 1641 – 1715
+portrait: pioneers/vieussens.webp
+text: Named the *centrum ovale* (1684): the white matter as a structure of its own, continuous with the internal capsule.
+figure: Neurographia universalis (1684): the centrum ovale exposed from above
+image:
+ref: *Terminologia Neuroanatomica* (FIPAT 2017), endnote 131
+
+name: Félix Vicq d'Azyr
+short: Vicq d'Azyr
+born: 1748
+year: 1786
+life: 1748 – 1794
+portrait: pioneers/vicq-dazyr.webp
+text: Cut the brain in thin horizontal and coronal slices and printed them in colour plates of new precision; described the mammillothalamic tract that bears his name and the white stripe of the visual cortex.
+figure: Traité d'anatomie et de physiologie (1786): a coronal slice with the mammillothalamic tract
+image:
+ref: Parent, *Can J Neurol Sci* 2007 — Félix Vicq d'Azyr: anatomy, medicine and revolution
+
+name: Johann Christian Reil
+born: 1759
+year: 1809
+life: 1759 – 1813
+portrait: pioneers/reil.webp
+text: Hardened brains in alcohol and dissected the fibre bundles: the first descriptions of the arcuate fasciculus, the insula and the corona radiata.
+figure: Reil's dissection of the lateral surface: the arcuate fibres around the insula
+image:
+ref: Catani & Mesulam, *Cortex* 2008 — the arcuate fasciculus and the disconnection theme
+
+name: Karl Friedrich Burdach
+born: 1776
+year: 1822
+life: 1776 – 1847
+portrait: pioneers/burdach.webp
+text: Gave the names still in use: arcuate fasciculus, cingulum, uncinate fasciculus, longitudinal fasciculi.
+figure: Vom Baue und Leben des Gehirns (1819–1826): the long association bundles
+image:
+ref: Catani & Mesulam, *Cortex* 2008
+
+name: Friedrich Arnold
+born: 1803
+year: 1838
+life: 1803 – 1890
+portrait: pioneers/arnold.webp
+text: Dissected the fibre systems of the brainstem and hemispheres in fine detail; the frontopontine fibres of the cerebral peduncle are still called Arnold's bundle.
+figure: Tabulae anatomicae (1838): the fibre systems of the cerebral peduncle and hemisphere
+image:
+ref: Catani & Thiebaut de Schotten, *Atlas of Human Brain Connections* (Oxford University Press, 2012)
+
+name: Pierre Louis Gratiolet
+born: 1815
+year: 1854
+life: 1815 – 1865
+portrait: pioneers/gratiolet.webp
+text: Traced the optic radiations from the thalamus to the occipital lobe, and mapped the folds of the cortex in humans and other primates.
+figure: Anatomie comparée du système nerveux (with Leuret, 1839–57): the optic radiations
+image:
+ref: Catani & Thiebaut de Schotten, *Atlas of Human Brain Connections* (Oxford University Press, 2012)
+
+name: Theodor Meynert
+born: 1833
+year: 1872
+life: 1833 – 1892
+portrait: pioneers/meynert.webp
+text: Classified the fibres as association, commissural and projection, and described the short U-fibres between neighbouring gyri.
+figure: Meynert's diagram of association, commissural and projection systems
+image:
+ref: *Terminologia Neuroanatomica*, endnote 134
+
+name: Camillo Golgi
+born: 1843
+year: 1873
+life: 1843 – 1926
+portrait: pioneers/golgi.webp
+text: The 'black reaction' (1873): silver impregnation that shows a whole neuron with its axon, opening the study of the fibres at the cellular level. Nobel Prize with Cajal, 1906.
+figure: Golgi's drawing of neurons and their axons stained with the black reaction
+image:
+ref: 
+
+name: Ludwig Lichtheim
+born: 1845
+year: 1885
+life: 1845 – 1928
+portrait: pioneers/lichtheim.webp
+text: The 'house' model of language: centres joined by pathways, each lesion a different aphasia.
+figure: Lichtheim's house diagram (1885)
+image:
+ref: Catani & ffytche, *Brain* 2005
+
+name: Carl Wernicke
+born: 1848
+year: 1874
+life: 1848 – 1905
+portrait: pioneers/wernicke.webp
+text: Predicted conduction aphasia from the anatomy of the pathway linking the speech areas: the first disconnection syndrome.
+figure: Wernicke's 1874 diagram of the sensory and motor speech centres and their connection
+image:
+ref: Catani & ffytche, *Brain* 2005 — the rises and falls of disconnection syndromes
+start: yes
+
+name: Leonardo Bianchi
+born: 1848
+year: 1895
+life: 1848 – 1927
+portrait: pioneers/bianchi.webp
+text: Studied the frontal lobes with ablations in monkeys and clinical cases, describing them as the seat of the coordination of perceptions and behaviour, later collected in *The Mechanism of the Brain and the Function of the Frontal Lobes*.
+figure: Bianchi's figures of the frontal lobe ablations in the monkey brain
+image:
+ref: 
+
+name: Jules Dejerine
+born: 1849
+year: 1892
+life: 1849 – 1917
+portrait: pioneers/dejerine.webp
+text: With Augusta Dejerine-Klumpke, the atlas *Anatomie des centres nerveux*; described pure alexia as a disconnection of the visual areas from language (1892).
+figure: Anatomie des centres nerveux: coronal section by H. Gillet — the plate used on our home page
+image:
+ref: Catani & ffytche, *Brain* 2005; Catani & Mesulam, *Cortex* 2008
+
+name: Santiago Ramón y Cajal
+born: 1852
+year: 1906
+life: 1852 – 1934
+portrait: pioneers/cajal.webp
+text: The neuron doctrine: the course of each axon, and the direction of the nerve impulse.
+figure: Cajal's drawing of the axons of the corpus callosum or of the cortex
+image:
+ref: 
+
+name: Hugo Liepmann
+born: 1863
+year: 1900
+life: 1863 – 1925
+portrait: pioneers/liepmann.webp
+text: Explained apraxia as a disconnection, and showed the role of the corpus callosum in the left hand's movements.
+figure: Liepmann's schema of the praxis pathways across the corpus callosum
+image:
+ref: Catani & ffytche, *Brain* 2005
+
+name: Josef Klingler
+born: 1888
+year: 1935
+life: 1888 – 1963
+portrait: pioneers/klingler.webp
+text: Freezing the fixed brain separates the fibres: the Klingler method of white matter dissection, still in use.
+figure: Klingler's dissection of the lateral hemisphere: the long association bundles
+image:
+ref: Basis of the 'Klingler dissection' view of our atlas
+
+name: Norman Geschwind
+born: 1926
+year: 1965
+life: 1926 – 1984
+portrait: pioneers/geschwind.webp
+text: 'Disconnexion syndromes in animals and man' (*Brain* 1965) revived the theory and gave neurology a new way to read symptoms.
+figure: Geschwind's diagram of the disconnection of the language areas
+image:
+ref: Catani & ffytche, *Brain* 2005

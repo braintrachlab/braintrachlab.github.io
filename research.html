@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css?v=1a80572b">
+  <link rel="stylesheet" href="assets/css/style.css?v=54db5f62">
   <script>document.documentElement.classList.add("texts-loading");setTimeout(function(){document.documentElement.classList.remove("texts-loading")},1500);</script>
 </head>
 <body data-page="research">
@@ -149,18 +149,24 @@
     </section>
 
     <section class="soft">
-      <div class="container grid-2" style="align-items:center">
-        <div>
-          <span class="eyebrow reveal">04</span>
-          <h2 class="reveal d1" data-text="research.history.title">History of neuroscience</h2>
-          <hr class="divider reveal d1">
-          <p class="reveal d2" data-text="research.history.p1">The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain.</p>
-          <p class="reveal d2" data-text="research.history.p2" hidden></p>
+      <div class="container">
+        <div class="grid-2" style="align-items:end">
+          <div>
+            <span class="eyebrow reveal">04</span>
+            <h2 class="reveal d1" data-text="research.history.title">History of neuroscience</h2>
+            <hr class="divider reveal d1">
+          </div>
+          <div>
+            <p class="reveal d2" data-text="research.history.p1">The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain.</p>
+            <p class="reveal d2" data-text="research.history.p2" hidden></p>
+          </div>
         </div>
-        <figure class="reveal d1" style="margin:0">
-          <div class="plate-figure" data-brain="assets/img/dejerine-lines.svg?v=5f3d911e" role="img" aria-label="Coronal section of the human brain from Dejerine's atlas, with the white matter fibres redrawn as streamlines"></div>
-          <figcaption class="plate-caption" data-text="research.history.caption">Coronal section from J. Dejerine, <em>Anatomie des centres nerveux</em> (1895–1901), drawing by H. Gillet, with the fibres of the white matter redrawn as streamlines.</figcaption>
-        </figure>
+        <div class="pn reveal" id="pioneers" data-eras="Antiquity 129; Renaissance 1514; 17th century 1641; 18th century 1748; 19th century 1776; 20th century 1888">
+          <h3 class="pn-title" data-text="research.history.timeline_title">White matter pioneers</h3>
+          <p class="pn-intro" data-text="research.history.timeline_intro">Hover or tap a portrait for a short note on the person and the figure of the discovery.</p>
+          <div class="pn-ribbon"><div class="pn-track" role="tablist" aria-label="White matter pioneers"></div></div>
+          <div class="pn-card" aria-live="polite"></div>
+        </div>
       </div>
     </section>
 
@@ -188,6 +194,6 @@
   </footer>
 
   <script src="assets/js/main.js?v=5b8795e9"></script>
-  <script src="assets/js/content.js?v=1085028f"></script>
+  <script src="assets/js/content.js?v=f20d2ca6"></script>
 </body>
 </html>

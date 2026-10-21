@@ -342,6 +342,31 @@ DEJ = lambda: f'''        <figure class="reveal d1" style="margin:0">
           {T("figcaption", "research.history.caption", "Coronal section from J. Dejerine, *Anatomie des centres nerveux* (1895–1901), drawing by H. Gillet, with the fibres of the white matter redrawn as streamlines.", "plate-caption")}
         </figure>'''
 
+def history():
+    key = "research.history"
+    return f'''    <section class="soft">
+      <div class="container">
+        <div class="grid-2" style="align-items:end">
+          <div>
+            <span class="eyebrow reveal">04</span>
+            {T("h2", key + ".title", "History of neuroscience", "reveal d1")}
+            <hr class="divider reveal d1">
+          </div>
+          <div>
+            {T("p", key + ".p1", "The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain's connections.", "reveal d2")}
+            {T("p", key + ".p2", "", "reveal d2")}
+          </div>
+        </div>
+        <div class="pn reveal" id="pioneers" data-eras="{html.escape(val(key + ".eras", "Antiquity 129; Renaissance 1514; 17th century 1641; 18th century 1748; 19th century 1776; 20th century 1888"))}">
+          {T("h3", key + ".timeline_title", "White matter pioneers", "pn-title")}
+          {T("p", key + ".timeline_intro", "Hover or tap a portrait for a short note on the person and the figure of the discovery.", "pn-intro")}
+          <div class="pn-ribbon"><div class="pn-track" role="tablist" aria-label="White matter pioneers"></div></div>
+          <div class="pn-card" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+'''
+
 def comparative():
     key = "research.comparative"
     species = [("macaque", "Macaque"), ("chimpanzee", "Chimpanzee"), ("human", "Human")]
@@ -420,7 +445,7 @@ research = f'''
 {rblock("01", "research.anatomy", "White matter anatomy", "We describe the course, organisation and cortical terminations of the white matter tracts of the human brain, building an accurate anatomical map of its association, projection and commissural connections.", "", "Image", False, True, figure=ARC())}
 {comparative()}
 {clinical()}
-{rblock("04", "research.history", "History of neuroscience", "The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain's connections.", "", "", True, False, figure=DEJ())}'''
+{history()}'''
 page("research.html", "research.page_title", "Research — TrachLab", "research.page_description",
      "Research areas of TrachLab: white matter anatomy, comparative neuroanatomy, connections in disease, history of neuroscience.", research)
 

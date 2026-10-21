@@ -112,10 +112,12 @@ research.clinical.legend1: Long segment
 research.clinical.legend2: Anterior segment
 research.clinical.legend3: Posterior segment
 research.clinical.caption: Individual atrophy patterns of the arcuate fasciculus in patients with primary progressive aphasia, with their word repetition scores: damage to the temporo-parietal cortex and to the indirect pathway (anterior and posterior segments) is associated with impaired repetition. Redrawn as streamlines from [Forkel et al., *Neurology* (2020)](https://doi.org/10.1212/WNL.0000000000008746).
-research.history.caption: Coronal section from J. Dejerine, *Anatomie des centres nerveux* (1895–1901), drawing by H. Gillet, with the fibres of the white matter redrawn as streamlines.
 research.history.title: History of neuroscience
 research.history.p1: The lab explores the history of brain anatomy and neuroscience: the scientists, methods and ideas that, over the centuries, led to our current understanding of the brain.
 research.history.p2: 
+research.history.eras: Antiquity 129; Renaissance 1514; 17th century 1641; 18th century 1748; 19th century 1776; 20th century 1888
+research.history.timeline_title: White matter pioneers
+research.history.timeline_intro: Hover or tap a portrait for a short note on the person and the figure of the discovery.
 research.page_title: Research — BrainTraCh Lab
 research.page_description: Research areas of BrainTraCh Lab: white matter anatomy, comparative neuroanatomy, connections in disease, history of neuroscience.
 

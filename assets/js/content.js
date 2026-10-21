@@ -51,7 +51,8 @@
 
   // ---------- Page texts (content/texts.txt) ----------
   const done = () => document.documentElement.classList.remove("texts-loading");
-  fetch("content/texts.txt", { cache: "no-cache" }).then((r) => r.text()).then((txt) => {
+  const textsTxt = fetch("content/texts.txt", { cache: "no-cache" }).then((r) => r.text());
+  textsTxt.then((txt) => {
     const T = {};
     txt.split(/\r?\n/).forEach((line) => {
       if (/^\s*#/.test(line)) return;
@@ -130,6 +131,66 @@
     });
   }
 
+
+  // ---------- White matter pioneers (content/pioneers.txt): portrait timeline in Research ----------
+  const pnBox = document.getElementById("pioneers");
+  if (pnBox) {
+    const erasP = textsTxt.then((txt) => {
+      const m = txt.match(/^\s*research\.history\.eras\s*:\s?(.*)$/m);
+      return m && m[1].trim() ? m[1].trim() : pnBox.dataset.eras || "";
+    }).catch(() => pnBox.dataset.eras || "");
+    Promise.all([load("content/pioneers.txt"), erasP]).then(([list, erasTxt]) => {
+      const P = list.filter((p) => p.name && p.born).map((p) => ({ ...p, b: parseInt(p.born, 10), y: parseInt(p.year || p.born, 10) }))
+        .sort((a, b) => a.b - b.b);
+      if (!P.length) return;
+      const ERAS = erasTxt.split(";").map((e) => e.trim().match(/^(.*\S)\s+(\d+)$/)).filter(Boolean).map((m) => [m[1], +m[2]]);
+      // compressed time scale: log of the distance from today blended with the order, then a minimum spacing
+      const lg = (y) => -Math.log(2030 - y);
+      const L0 = lg(P[0].b), L1 = lg(P[P.length - 1].b) || L0 + 1;
+      const GAP = 104, W = Math.max(GAP * (P.length - 1) * 1.3, 1000);
+      const xs = P.map((p, i) => 0.38 * (lg(p.b) - L0) / (L1 - L0 || 1) + 0.62 * i / Math.max(1, P.length - 1)).map((f) => 56 + f * W);
+      for (let i = 1; i < xs.length; i++) xs[i] = Math.max(xs[i], xs[i - 1] + GAP);
+      const xOf = (y) => { const k = P.findIndex((p) => p.b >= y); return k < 0 ? xs[xs.length - 1] : xs[k]; };
+      const when = (y) => (y < 1000 ? "c. " + y : String(y));
+      const face = (p) => (p.portrait ? `<img src="${esc(photoUrl(p.portrait))}" alt="" draggable="false" loading="lazy">` : "");
+      const track = pnBox.querySelector(".pn-track"), card = pnBox.querySelector(".pn-card"), ribbon = pnBox.querySelector(".pn-ribbon");
+      track.style.width = xs[xs.length - 1] + 66 + "px";
+      track.innerHTML = `<span class="pn-axis"></span>` +
+        ERAS.map(([e, y]) => `<span class="pn-era" style="left:${xOf(y) - 44}px">${esc(e)}</span>`).join("") +
+        P.map((p, i) => `<button class="pn-person" id="pn${i}" role="tab" aria-selected="false" data-i="${i}" style="left:${xs[i]}px" aria-label="${esc(p.name)}, ${esc(p.life || "")}">
+            <span class="pn-face">${face(p)}</span><span class="pn-name">${esc(p.name)}</span>
+            <span class="pn-tick"></span><span class="pn-life">${esc((p.life || "").replace(/\s/g, ""))}</span></button>`).join("");
+      let current = Math.max(0, P.findIndex((p) => /^y(es)?$/i.test(p.start || "")));
+      const show = (i) => {
+        current = i;
+        const p = P[i];
+        track.querySelectorAll(".pn-person").forEach((b) => b.setAttribute("aria-selected", String(+b.dataset.i === i)));
+        const title = `<b>${esc(p.short || p.name.split(/\s+/).pop())}, ${when(p.y)}</b>`;
+        card.innerHTML = `
+          <div class="pn-portrait">${face(p)}</div>
+          <figure class="pn-figure${p.image ? " has-img" : ""}">${p.image
+            ? `<img src="${esc(photoUrl(p.image))}" alt="${esc(p.figure || "")}"><figcaption>${md(p.figure || "")}</figcaption>`
+            : `<div>${title}${md(p.figure || "")}<span class="pn-ph">Figure in preparation</span></div>`}</figure>
+          <div class="pn-text">
+            <span class="eyebrow">Key work · ${when(p.y)}</span>
+            <h3>${esc(p.name)}</h3>
+            ${p.life ? `<p class="pn-dates">${esc(p.life)}</p>` : ""}
+            ${p.text ? `<p>${md(p.text)}</p>` : ""}
+            ${p.ref ? `<p class="pn-ref">${md(p.ref)}</p>` : ""}
+          </div>`;
+      };
+      track.addEventListener("mouseover", (e) => { const b = e.target.closest(".pn-person"); if (b && matchMedia("(hover: hover)").matches && +b.dataset.i !== current) show(+b.dataset.i); });
+      track.addEventListener("click", (e) => { const b = e.target.closest(".pn-person"); if (b) show(+b.dataset.i); });
+      track.addEventListener("keydown", (e) => {
+        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+        e.preventDefault();
+        const n = Math.max(0, Math.min(P.length - 1, current + (e.key === "ArrowRight" ? 1 : -1)));
+        show(n); document.getElementById("pn" + n).focus({ preventScroll: false });
+      });
+      show(current);
+      ribbon.scrollLeft = Math.max(0, xs[current] - ribbon.clientWidth / 2);
+    });
+  }
 
   // ---------- Nomina Anatomica (content/nomina.txt): Terminologia Neuroanatomica, in TNA order ----------
   const nomList = document.getElementById("nomina-list");
