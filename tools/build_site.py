@@ -364,7 +364,7 @@ def comparative():
 
 def clinical():
     key = "research.clinical"
-    pan = [("Aa", "Repetition = 36"), ("Ab", "Repetition = 42"), ("Ac", "Repetition = 88"), ("Ba", ""), ("Bb", ""), ("Bc", "")]
+    pan = [("Aa", "Repetition = 36"), ("Ab", "Repetition = 42"), ("Ac", "Repetition = 88"), ("Ba", "Repetition = 40"), ("Bb", "Repetition = 72"), ("Bc", "Repetition = 100")]
     cells = "\n".join(f'''          <figure class="rep-cell">
             <div data-brain="assets/img/repetition-{k}.svg" role="img" aria-label="Arcuate fasciculus of a patient with primary progressive aphasia"></div>
             {T("figcaption", f"{key}.panel{i + 1}", label, "rep-score")}
