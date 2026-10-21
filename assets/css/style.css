@@ -418,8 +418,8 @@ html.texts-loading [data-text] { visibility: hidden; }
 .collab h3 a { color: var(--ink); }
 .collab-logo { max-height: 44px; max-width: 160px; object-fit: contain; }
 .collab.has-photo { grid-template-columns: 160px 1.5fr 1fr; align-items: center; }
-.news-photo { margin-top: 14px; max-width: 100%; max-height: 360px; object-fit: cover; }
-.card-photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; margin-bottom: 18px; }
+.news-photo { display: block; margin-top: 14px; max-width: 100%; max-height: 420px; width: auto; height: auto; }
+.card-photo { display: block; width: auto; max-width: 100%; height: auto; max-height: 420px; margin: 0 auto 18px; }   /* whole picture, never cropped */
 .pub.has-photo { grid-template-columns: 96px 1fr; }
 .pub-photo { width: 96px; height: 96px; object-fit: cover; }
 .pub-text { font-size: 0.9rem; margin: 6px 0 0; }

@@ -30,14 +30,14 @@ date: 2026-06
 type: Publication
 title: Evolution of the frontal aslant tract
 text: Our study on the evolution of the frontal aslant tract and its role in primate vocalization and human speech is out in Nature Communications.
-photo: FAT.pdf
+photo: fat-evolution-news.jpg
 link: https://doi.org/10.1038/s41467-026-73731-8
 
 date: 2025-11
 type: Gray's Anatomy 43rd edition launch
-title: at the launch of the latest edition of Gray's Anatomy, presented at the Royal College of Surgeons of England
+title: At the launch of the latest edition of Gray's Anatomy, presented at the Royal College of Surgeons of England
 text: Prof. Marco Catani served as section editor for the central nervous system.
-photo: Catani_Gray's.png
+photo: catani-grays-anatomy.jpg
 link: 
 
 # Example (remove the # signs to use it):
