@@ -112,25 +112,104 @@
     });
   }
 
-  // ---------- Collaborations (content/collaborations.txt) ----------
+  // ---------- Collaborations (content/collaborations.txt): map + list grouped by city ----------
   const collab = document.getElementById("collab-list");
   if (collab) {
-    load("content/collaborations.txt").then((list) => {
-      collab.innerHTML = list.filter((c) => c.institution).map((c) => `<li class="collab${c.photo ? " has-photo" : ""}">
-          ${c.photo ? `<img class="collab-logo" src="${esc(photoUrl(c.photo))}" alt="">` : ""}
-          <div class="collab-where">
-            <h3>${linked(md(c.institution), c.link)}</h3>
-            ${c.unit ? `<p class="unit">${md(c.unit)}</p>` : ""}
-          </div>
-          <div class="collab-what">
-            ${c.topic ? `<p class="collab-topic"><span class="badge">${md(c.topic)}</span></p>` : ""}
-            ${c.people ? `<p class="who">${md(c.people)}</p>` : ""}
-            ${c.text ? `<p class="who">${md(c.text)}</p>` : ""}
-          </div>
-        </li>`).join("");
+    const svg = document.getElementById("collab-map");
+    const mapP = svg ? fetch("assets/data/collab-map.json").then((r) => r.json()).catch(() => null) : Promise.resolve(null);
+    Promise.all([load("content/collaborations.txt"), mapP]).then(([list, MAP]) => {
+      list = list.filter((c) => c.institution || c.people);
+      // group by place (or by coordinates when the place is missing)
+      const cities = [];
+      list.forEach((c) => {
+        const m = (c.coords || "").match(/(-?\d+(?:\.\d+)?)\s*[,;\s]\s*(-?\d+(?:\.\d+)?)/);
+        const key = (c.place || "").trim() || (m ? m[0] : "Other");
+        let k = cities.find((x) => x.key === key);
+        if (!k) { k = { key, place: c.place || "", lat: m ? +m[1] : null, lon: m ? +m[2] : null, left: /^l/i.test(c.label || ""), items: [] }; cities.push(k); }
+        if (/^l/i.test(c.label || "")) k.left = true;
+        k.items.push(c);
+      });
+      const region = (c) => (c.lat == null ? 2 : c.lon < -30 ? 1 : 0);
+      cities.sort((a, b) => region(a) - region(b) || (b.lat || 0) - (a.lat || 0));
+      const cityName = (c) => esc((c.place || "").split(",")[0].trim() || "Other");
+      const country = (c) => esc((c.place || "").split(",").slice(1).join(",").trim());
+      collab.innerHTML = cities.map((c, i) => `
+        <section class="cm-city" id="cm-city-${i}" data-i="${i}" tabindex="0">
+          <h3>${cityName(c)}<small>${country(c)}</small></h3>
+          ${c.items.map((x) => `<div class="cm-col${x.photo ? " has-photo" : ""}">
+            ${x.photo ? `<img class="collab-logo" src="${esc(photoUrl(x.photo))}" alt="">` : ""}
+            ${x.institution ? `<p class="cm-inst">${linked(md(x.institution), x.link)}</p>` : ""}
+            ${x.unit ? `<p class="cm-unit">${md(x.unit)}</p>` : ""}
+            <div class="cm-meta">${x.topic ? `<span class="badge">${md(x.topic)}</span>` : ""}${x.people ? `<span class="cm-who">${md(x.people)}</span>` : ""}</div>
+            ${x.text ? `<p class="cm-unit">${md(x.text)}</p>` : ""}
+          </div>`).join("")}
+        </section>`).join("");
+      const count = document.getElementById("collab-count");
+      if (count) count.textContent = `${list.length} collaborations · ${cities.filter((c) => c.place || c.lat != null).length} cities`;
+      if (!svg || !MAP) { if (svg) svg.closest(".cm-map").hidden = true; return; }
+
+      // the map: coastlines are drawn in advance (assets/data/collab-map.json, Natural Earth 1:10m);
+      // the cities are projected here with the same conic equal-area projection
+      const NS = "http://www.w3.org/2000/svg", R = Math.PI / 180;
+      const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); (parent || svg).appendChild(e); return e; };
+      const projector = (p) => {
+        const sy0 = Math.sin(p.par[0] * R), n = (sy0 + Math.sin(p.par[1] * R)) / 2, cc = 1 + sy0 * (2 * n - sy0), r0 = Math.sqrt(cc) / n;
+        const raw = (l, f) => { const r = Math.sqrt(cc - 2 * n * Math.sin(f)) / n; return [r * Math.sin(l * n), r0 - r * Math.cos(l * n)]; };
+        const c0 = raw(p.center[0] * R, p.center[1] * R);
+        return (lat, lon) => { let l = (lon + p.rot) * R; l = Math.atan2(Math.sin(l), Math.cos(l)); const q = raw(l, lat * R);
+          return [p.translate[0] + p.scale * (q[0] - c0[0]), p.translate[1] - p.scale * (q[1] - c0[1])]; };
+      };
+      const defs = el("defs", {});
+      MAP.panels.forEach((p) => {
+        p.project = projector(p);
+        const cp = el("clipPath", { id: "cm-clip-" + p.id }, defs); el("rect", { x: p.x0, y: 0, width: p.x1 - p.x0, height: MAP.H }, cp);
+        const g = el("g", { "clip-path": `url(#cm-clip-${p.id})` });
+        el("path", { class: "cm-grat", d: p.grat }, g);
+        p.land.forEach((d) => el("path", { class: "cm-land", d }, g));
+        el("text", { class: "cm-panel", x: p.x0 + 20, y: 30 }).textContent = p.title;
+      });
+      MAP.panels.slice(1).forEach((p) => el("line", { class: "cm-sep", x1: p.x0, x2: p.x0, y1: 0, y2: MAP.H }));
+      { const box = svg.closest(".cm-map"); if (box.scrollWidth > box.clientWidth + 4) box.scrollLeft = box.scrollWidth * (MAP.panels[1].x0 / MAP.W) - 8; }   // phones: open on Europe
+      const marks = el("g", {});
+      const mk = [];
+      cities.forEach((c, i) => {
+        if (c.lat == null) return;
+        const p = MAP.panels.find((q) => (c.lon < -30 ? q.id === "na" : q.id === "eu"));
+        const [x, y] = p.project(c.lat, c.lon);
+        if (x < p.x0 || x > p.x1 || y < 0 || y > MAP.H) return;
+        const nn = c.items.length;
+        const g = el("g", { class: "cm-mk", tabindex: 0, role: "button", "data-i": i, transform: `translate(${x.toFixed(1)},${y.toFixed(1)})`,
+          "aria-label": `${c.place}: ${nn} collaboration${nn > 1 ? "s" : ""}` }, marks);
+        el("circle", { class: "cm-halo", r: 9 + nn * 3 }, g);
+        el("circle", { class: "cm-dot", r: nn > 1 ? 8 : 5 }, g);
+        if (nn > 1) el("text", { class: "cm-n", "text-anchor": "middle", dy: "0.35em" }, g).textContent = nn;
+        el("text", { x: (c.left ? -1 : 1) * (nn > 1 ? 13 : 10), y: 5, "text-anchor": c.left ? "end" : "start" }, g).textContent = (c.place || "").split(",")[0];
+        mk[i] = g;
+      });
+      let selected = null;
+      const hover = matchMedia("(hover: hover)").matches;
+      const light = (i) => { mk.forEach((g, j) => g && g.classList.toggle("on", j === i || j === selected)); };
+      const select = (i, fromMap) => {
+        selected = i; light(null);
+        collab.querySelectorAll(".cm-city").forEach((s) => s.classList.toggle("on", +s.dataset.i === i));
+        if (fromMap) document.getElementById("cm-city-" + i).scrollIntoView({ block: "nearest", behavior: "smooth" });
+      };
+      marks.addEventListener("click", (e) => { const g = e.target.closest(".cm-mk"); if (g) select(+g.dataset.i, true); });
+      marks.addEventListener("keydown", (e) => { const g = e.target.closest(".cm-mk"); if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select(+g.dataset.i, true); } });
+      marks.addEventListener("mouseover", (e) => { const g = e.target.closest(".cm-mk"); if (g && hover) light(+g.dataset.i); });
+      marks.addEventListener("mouseleave", () => light(null));
+      collab.addEventListener("click", (e) => { const s = e.target.closest(".cm-city"); if (s && !e.target.closest("a")) select(+s.dataset.i, false); });
+      collab.addEventListener("keydown", (e) => { const s = e.target.closest(".cm-city"); if (s && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select(+s.dataset.i, false); } });
+      collab.addEventListener("mouseover", (e) => { const s = e.target.closest(".cm-city"); if (s && hover) light(+s.dataset.i); });
+      collab.addEventListener("mouseleave", () => light(null));
+      // the cities appear one by one, east to west, when the map comes into view
+      const order = mk.map((g, i) => [g, cities[i].lon]).filter((x) => x[0]).sort((a, b) => b[1] - a[1]).map((x) => x[0]);
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) { order.forEach((g) => g.classList.add("in")); return; }
+      svg.classList.add("cm-anim");
+      const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); order.forEach((g, k) => setTimeout(() => g.classList.add("in"), 200 + k * 110)); } }, { threshold: 0.3 });
+      io.observe(svg);
     });
   }
-
 
   // ---------- White matter pioneers (content/pioneers.txt): portrait timeline in Research ----------
   const pnBox = document.getElementById("pioneers");

@@ -88,7 +88,7 @@ research.anatomy.legend2: Anterior segment
 research.anatomy.legend3: Posterior segment
 research.anatomy.caption: The three segments of the arcuate fasciculus.
 research.anatomy.title: White matter anatomy
-research.anatomy.p1: We study the origin, course and terminations of the major association, commissural and projection pathways of the human brain, and how they form large-scale networks for movement, language and communication, social behaviour, emotion, memory and vision. Using tractography, we have also described white matter tracts previously unknown. 
+research.anatomy.p1: We study the origin, course and terminations of the major association, commissural and projection pathways of the human brain, and how they form large-scale networks for movement, language and communication, social behaviour, emotion, memory and vision. Using tractography, we have also described white matter tracts previously unknown.
 research.anatomy.p2: 
 research.comparative.species1: Macaque
 research.comparative.species2: Chimpanzee

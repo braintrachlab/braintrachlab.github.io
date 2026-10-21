@@ -759,3 +759,44 @@ a.tool-card:hover { border-color: var(--ink); transform: translateY(-2px); box-s
 .pn-card.pn-wait { opacity: 0; transform: translateY(10px); }
 .pn-card.pn-wait:empty { min-height: 300px; }
 @media (prefers-reduced-motion: reduce) { .pn-person, .pn-era, .pn-card { transition: none; } }
+
+/* ---------- International collaborations: map (Europe | North America) + list by city ---------- */
+.cm-map { position: relative; background: var(--bg-soft); border: 1px solid var(--line); margin-top: 8px; }
+.soft .cm-map { background: var(--bg); }
+.cm-map svg { display: block; width: 100%; height: auto; }
+.cm-count { position: absolute; right: 14px; bottom: 10px; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.06em; }
+.cm-land { fill: #ecebe6; stroke: #c9c8c0; stroke-width: 0.6; }
+.cm-grat { fill: none; stroke: var(--line); stroke-width: 0.6; }
+.cm-panel { font-family: var(--sans); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; fill: var(--muted); }
+.cm-sep { stroke: var(--line); stroke-width: 1; }
+.cm-mk { cursor: pointer; outline: none; }
+.cm-anim .cm-mk { opacity: 0; transition: opacity .6s ease; }
+.cm-anim .cm-mk.in { opacity: 1; }
+.cm-halo { fill: var(--accent); opacity: 0.12; transition: opacity .3s ease; }
+.cm-dot { fill: var(--accent); stroke: #fff; stroke-width: 1.5; }
+.cm-mk text { font-family: var(--serif); font-size: 15px; fill: var(--ink); paint-order: stroke; stroke: var(--bg); stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
+.cm-mk .cm-n { font-family: var(--sans); font-size: 10px; font-weight: 500; fill: #fff; stroke: none; }
+.cm-mk.on .cm-halo, .cm-mk:focus-visible .cm-halo { opacity: 0.32; }
+.cm-mk.on text:not(.cm-n) { fill: var(--accent); }
+.cm-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 0 32px; border-top: 1px solid var(--ink); margin-top: 28px; }
+.cm-city { border-bottom: 1px solid var(--line); padding: 14px 8px 16px; cursor: pointer; transition: background .2s ease; min-width: 0; }
+.cm-city.on { background: var(--accent-soft); }
+.cm-city:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cm-city h3 { font-family: var(--serif); font-weight: 500; font-size: 1.3rem; line-height: 1.2; margin: 0 0 6px; display: flex; justify-content: space-between; gap: 12px; }
+.cm-city h3 small { font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 400; align-self: center; white-space: nowrap; }
+.cm-col { padding-top: 8px; }
+.cm-col + .cm-col { border-top: 1px dashed var(--line); margin-top: 8px; }
+.cm-col .collab-logo { display: block; margin-bottom: 6px; max-height: 36px; }
+.cm-inst { font-weight: 500; font-size: 0.9rem; margin: 0; }
+.cm-inst a { color: var(--ink); }
+.cm-unit { color: var(--ink-soft); font-size: 0.82rem; margin: 0; }
+.cm-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; margin-top: 4px; }
+.cm-meta .badge { font-size: 0.68rem; letter-spacing: 0.06em; }
+.cm-city.on .badge { background: var(--bg); }
+.cm-who { font-size: 0.84rem; color: var(--muted); }
+@media (max-width: 700px) {
+  .cm-map { overflow-x: auto; }
+  .cm-map svg { width: 760px; max-width: none; }
+  .cm-count { position: static; display: block; padding: 6px 12px 8px; }
+}
+@media (prefers-reduced-motion: reduce) { .cm-anim .cm-mk, .cm-city { transition: none; } }

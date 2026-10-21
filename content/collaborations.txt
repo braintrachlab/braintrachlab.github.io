@@ -13,91 +13,134 @@
 #  - Leave a field empty, or delete the line, if you do not need it.
 # ======================================================================
 #
-#  COLLABORATIONS — one entry per partner. The order here is the order on the website.
+#  COLLABORATIONS — one entry per partner. On the website the entries are grouped by city
+#  (Europe from north to south, then North America); within a city, the order here is kept.
 #
-#  institution:  name of the institution               (required)
+#  institution:  name of the institution               (required, unless people is given)
 #  unit:         lab, centre or department             (optional)
 #  topic:        research topic of the collaboration   (optional, shown as a label)
 #  people:       contact person(s)                     (optional)
 #  text:         short description                     (optional)
 #  photo:        logo                                  (optional)
 #  link:         website, makes the name clickable     (optional)
+#  place:        city and country, shown on the map    (e.g. Florence, Italy)
+#  coords:       latitude, longitude of the place      (e.g. 43.7696, 11.2558)
+#                In Google Maps, right-click the building: the first line is
+#                latitude, longitude; copy it here. Entries without coords are
+#                listed but not drawn. The map shows Europe and North America.
+#  label:        left = write the city name on the left of its dot
+#                (useful when two cities are close, e.g. Pozzilli and Naples)
 # ======================================================================
 
-institution: King's College - London, UK
+institution: King's College London
 unit: Neuroimaging & Biophysics Lab (NBL)
 topic: Tractography methodology
 people: Flavio Dell'Acqua
+place: London, UK
+coords: 51.5115, -0.1160
+label: left
 
-institution: Rutgers University - New Brunswick, USA
+institution: Rutgers University
 unit: Department of Psychiatry, Brain Health Institute
 topic: Tractography methodology - visual system
 people: Ahmad Beyh
+place: New Brunswick, USA
+coords: 40.5008, -74.4474
 
-institution: Northwestern University - Chicago, USA
+institution: Northwestern University
 unit: Mesulam Institute for Cognitive Neurology & Alzheimer's Disease
 topic: Primary progressive aphasia
 people: Marsel Mesulam
+place: Chicago, USA
+coords: 41.8781, -87.6298
 
-institution: University of Edinburgh - Edinburgh, UK
+institution: University of Edinburgh
 unit: Human Cognitive Neuroscience, Psychology Department
 topic: Neuropsychology
 people: Sergio Della Sala
+place: Edinburgh, UK
+coords: 55.9445, -3.1892
 
-institution: University of Chieti-Pescara - Chieti, Italy
+institution: University of Chieti-Pescara
 unit: Department of Neuroradiology - ITAB
 topic: Angiotractosomics
 people: Massimo Caulo
+place: Chieti, Italy
+coords: 42.3510, 14.1675
 
-institution: University of Chicago - Chicago, USA
+institution: University of Chicago
 unit: Healthy Aging & Alzheimer's Research Care (HAARC) Center
 topic: SuperAgers
 people: Emily Rogalski
+place: Chicago, USA
+coords: 41.8781, -87.6298
 
-institution: University of Texas - Camp Swift, USA
+institution: University of Texas
 unit: Michale E. Keeling Center for Comparative Medicine and Research
 topic: Comparative neuroanatomy
 people: William Hopkins
+place: Bastrop, Texas, USA
+coords: 30.1105, -97.3153
 
-institution: Copenhagen University - Hvidovre, Denmark
+institution: Copenhagen University
 unit: Department of Radiology and Nuclear Medicine
 topic: Tractography methodology
 people: Tim Dyrby
+place: Copenhagen, Denmark
+coords: 55.6496, 12.4590
 
-institution: IRCSS Synlab SDN - Naples, Italy
+institution: IRCSS Synlab SDN
 unit: Neuroradiology Unit
 topic: Single case reports - Dementia - Congenital blindness
 people: Carlo Cavaliere
+place: Naples, Italy
+coords: 40.8518, 14.2681
 
-institution: IRCSS Neuromed - Pozzilli, Italy
+institution: IRCSS Neuromed
 unit: Interventional Neuroradiology Unit
 topic: Angiotractosomics
 people: Salvatore Mangiafico - Andrea Bartolo - Giovanni Grillea
+place: Pozzilli, Italy
+coords: 41.5124, 14.0617
+label: left
 
-institution: King's College - London, UK
+institution: King's College London
 unit: Neurodevelopmental and Forensic Psychiatry
 topic: Neurodevelopmental disorders - ADHD, autism spectrum disorder, psychopathy
 people: Michael Craig
+place: London, UK
+coords: 51.5115, -0.1160
+label: left
 
-institution: King's College - London, UK
+institution: King's College London
 unit: Department of Neurosurgery
 topic: Neurosurgery
 people: Francesco Vergani
+place: London, UK
+coords: 51.5115, -0.1160
+label: left
 
-institution: University of Cambridge - Cambridge, UK
+institution: University of Cambridge
 unit: Department of Psychology
 topic: Neurodevelopmental disorders - autism spectrum disorder
 people: Simon Baron-Cohen
+place: Cambridge, UK
+coords: 52.2053, 0.1218
 
-institution: Psychology
-unit: 
+institution: 
+unit: Psychology
 topic: History of Neuroscience
 people: Luciano Mecacci
+place: Florence, Italy
+coords: 43.7696, 11.2558
+label: left
 
-institution: Radboud University - Nijmegen, Netherlands
+institution: Radboud University
 unit: 
 topic: Nomenclature
 people: Hans J. ten Donkelaar
+place: Nijmegen, Netherlands
+coords: 51.8426, 5.8546
 
 # Example (remove the # signs to use it):
 # institution: University of Somewhere
@@ -105,3 +148,5 @@ people: Hans J. ten Donkelaar
 # people: Jane Doe
 # photo: somewhere-logo.png
 # link: https://example.org
+# place: Florence, Italy
+# coords: 43.7696, 11.2558

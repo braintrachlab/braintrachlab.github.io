@@ -302,7 +302,11 @@ about = f'''
           {T("span", "about.network.eyebrow", "Network", "eyebrow reveal")}
           {T("h2", "about.network.title", "Collaborations", "reveal d1")}
         </div>
-        <ul class="collabs" id="collab-list"></ul>
+        <div class="cm-map reveal">
+          <svg id="collab-map" viewBox="0 0 1100 540" role="img" aria-label="Map of the lab's collaborations in Europe and North America"></svg>
+          <span class="cm-count" id="collab-count"></span>
+        </div>
+        <div class="cm-list" id="collab-list"></div>
       </div>
     </section>
 '''
