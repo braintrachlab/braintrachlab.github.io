@@ -103,19 +103,29 @@ def stamp_svgs():
             open(svg, "w", encoding="utf-8").write(t2)
 stamp_svgs()
 
+# pages in preparation: reachable at their address, but not in the menu, footer, Tools cards or search engines
+PREVIEW = {"atlas.html": "site.public.atlas", "nomina.html": "site.public.nomina"}
+def hidden_pages():
+    return [h for h, k in PREVIEW.items() if val(k, "no").strip().lower() not in ("yes", "y", "true", "1")]
+
 def page(filename, title_key, title_default, desc_key, desc_default, body, extra=""):
     pagekey = title_key.split(".")[0]
     title = html.escape(val(title_key, title_default))
     desc = html.escape(val(desc_key, desc_default))
-    nav = "\n".join(f'          <li><a href="{h}" data-text="{k}">{md(val(k, d))}</a></li>' for h, k, d in NAV)
-    foot = "\n".join(f'          <li><a href="{h}">{md(val(k, d))}</a></li>' for h, k, d in NAV)
+    hid = hidden_pages()
+    shown = [x for x in NAV if x[0] not in hid]
+    nav = "\n".join(f'          <li><a href="{h}" data-text="{k}">{md(val(k, d))}</a></li>' for h, k, d in shown)
+    foot = "\n".join(f'          <li><a href="{h}">{md(val(k, d))}</a></li>' for h, k, d in shown)
+    robots = '\n  <meta name="robots" content="noindex, nofollow">' if filename in hid else ""
+    hidmeta = f'\n  <meta name="hidden-pages" content="{" ".join(hid)}">' if hid else ""
+    banner = '\n  <div class="preview-banner">Preview — this page is not yet public (not in the menu, not indexed)</div>' if filename in hid else ""
     out = f'''<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{title}</title>
-  <meta name="description" content="{desc}">
+  <meta name="description" content="{desc}">{robots}{hidmeta}
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -123,7 +133,7 @@ def page(filename, title_key, title_default, desc_key, desc_default, body, extra
   <link rel="stylesheet" href="assets/css/style.css">
   <script>document.documentElement.classList.add("texts-loading");setTimeout(function(){{document.documentElement.classList.remove("texts-loading")}},1500);</script>
 </head>
-<body data-page="{pagekey}">
+<body data-page="{pagekey}">{banner}
   <header class="site-header">
     <div class="container nav">
       <a class="brand" href="index.html" data-text="site.logo">{md(val("site.logo", "Trach*Lab*"))}</a>
@@ -178,6 +188,8 @@ section("GENERAL — logo, menu and footer (shown on every page). In the logo, t
 val("site.logo", "Trach*Lab*")
 val("site.name", "TrachLab")
 val("site.animation_speed", "0.75")
+val("site.public.atlas", "no")
+val("site.public.nomina", "no")
 for _, k, d in NAV:
     val(k, d)
 val("footer.tagline", "White matter neuroanatomy & history of neuroscience")

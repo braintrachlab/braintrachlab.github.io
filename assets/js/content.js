@@ -185,7 +185,8 @@
   const toolList = document.getElementById("tool-list");
   if (toolList) {
     load("content/tools.txt").then((items) => {
-      items = items.filter((t) => t.name);
+      const hiddenPages = ((document.querySelector('meta[name="hidden-pages"]') || {}).content || "").split(" ").filter(Boolean);
+      items = items.filter((t) => t.name && !hiddenPages.includes((t.link || "").trim()));   // no cards for pages in preparation
       toolList.innerHTML = items.length ? items.map((t) => {
         const inner = `${t.photo ? `<img class="tool-photo" src="${esc(photoUrl(t.photo))}" alt="" loading="lazy">` : ""}
             ${t.type ? `<span class="badge">${esc(t.type)}</span>` : ""}

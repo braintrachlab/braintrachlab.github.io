@@ -691,3 +691,5 @@ a.tool-card:hover { border-color: var(--ink); transform: translateY(-2px); box-s
 .rep-cell [data-brain] { width: 100%; }
 .rep-score { text-align: center; font-family: var(--serif); font-style: italic; font-size: 1.05rem; color: var(--ink-soft); margin-top: 8px; min-height: 1.4em; }
 @media (max-width: 760px) { .rep-grid { grid-template-columns: repeat(2, 1fr); gap: 24px 16px; } }
+
+.preview-banner { background: #23395d; color: #fff; text-align: center; font-size: 0.78rem; letter-spacing: 0.06em; padding: 6px 12px; }
