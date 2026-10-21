@@ -24,42 +24,42 @@
 #  link:         website, makes the name clickable     (optional)
 # ======================================================================
 
-institution: King's College London
+institution: King's College - London, UK
 unit: Neuroimaging & Biophysics Lab (NBL)
 topic: Tractography methodology
 people: Flavio Dell'Acqua
 
-institution: Northwestern University, Chicago
+institution: Northwestern University - Chicago, USA
 unit: Mesulam Institute for Cognitive Neurology & Alzheimer's Disease
 topic: Primary progressive aphasia
 people: Marsel Mesulam
 
-institution: University of Edinburgh UK
+institution: University of Edinburgh - Edinburgh, UK
 unit: Human Cognitive Neuroscience, Psychology Department
 topic: Neuropsychology
 people: Sergio Della Sala
 
-institution: University of Chicago
+institution: University of Chicago - Chicago, USA
 unit: Healthy Aging & Alzheimer's Research Care (HAARC) Center
 topic: SuperAgers
 people: Emily Rogalski
 
-institution: University of Texas
+institution: University of Texas - Camp Swift, USA
 unit: Michale E. Keeling Center for Comparative Medicine and Research
 topic: Comparative neuroanatomy / evolution
 people: William Hopkins
 
-institution: Copenhagen University Hospital - Amager and Hvidovre; Hvidovre, 2650, Denmark.
-unit: Danish Research Centre for Magnetic Resonance (DRCMR), Department of Radiology and Nuclear Medicine
+institution: Copenhagen University - Hvidovre, Denmark.
+unit: Department of Radiology and Nuclear Medicine
 topic: Tractography methodology
 people: Tim Dyrby
 
-institution: IRCSS Synlab SDN Naples
+institution: IRCSS Synlab SDN - Naples, Italy
 unit: Neuroradiology Unit
 topic: Data acquisition and analysis
 people: Carlo Cavaliere
 
-institution: IRCSS Neuromed
+institution: IRCSS Neuromed - Pozzilli, Italy
 unit: Interventional Neuroradiology Unit
 topic: Data acquisition and analysis
 people: Salvatore Mangiafico - Andrea Bartolo - Giovanni Grillea
