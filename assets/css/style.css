@@ -804,14 +804,15 @@ a.tool-card:hover { border-color: var(--ink); transform: translateY(-2px); box-s
 }
 @media (prefers-reduced-motion: reduce) { .cm-anim .cm-mk, .cm-city { transition: none; } }
 
-/* ---------- History of neuroscience: Brain Renaissance cover, drawn in coloured lines, then the painting appears ---------- */
+/* ---------- History of neuroscience: Brain Renaissance cover redrawn as lines, over a faint ghost of the painting ---------- */
 .cover-fig { margin: 0; }
-.cover-figure { max-width: 340px; margin: 0 auto; box-shadow: 0 18px 40px -24px rgba(27, 29, 34, .45); }
-[data-brain] image.plate-cover { filter: none; opacity: 0; transition: opacity 2.2s ease 3.2s; }
-[data-brain].ready image.plate-cover { opacity: 1; }
-[data-brain] .cover-lines { transition: opacity 2s ease 4.4s; }
-[data-brain].ready .cover-lines { opacity: 0; }
-.cover-fig .plate-caption { max-width: 340px; margin-left: auto; margin-right: auto; }
+.cover-figure { max-width: 360px; margin: 0 auto; }
+[data-brain] image.plate-cover { filter: grayscale(0.7) sepia(0.25); opacity: 0; transition: opacity 2.4s ease 2.6s; }
+[data-brain].ready image.plate-cover { opacity: 0; }
+.cover-fig .plate-caption { max-width: 360px; margin-left: auto; margin-right: auto; }
 @media (prefers-reduced-motion: reduce) {
-  [data-brain] image.plate-cover, [data-brain] .cover-lines { transition: none; }
+  [data-brain] image.plate-cover { transition: none; }
 }
+[data-brain] .cover-type { opacity: 0; transition: opacity 1.6s ease 2.4s; }
+[data-brain].ready .cover-type { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { [data-brain] .cover-type { transition: none; } }
