@@ -59,8 +59,8 @@ home.area3.text:
 home.area4.title: History of neuroscience
 home.area4.text: The figures, ideas and discoveries that shaped our understanding of brain anatomy and connectivity, from early anatomists to the present.
 home.areas.link: Explore our research
-home.quote: In a brain composed of localized but connected specialized areas, disconnection leads to dysfunction.
-home.quote_source: [Catani & ffytche, *Brain* 2005](https://doi.org/10.1093/brain/awh622)
+home.quote: Follow your path.
+home.quote_source: 
 home.news.eyebrow: Latest
 home.news.title: News & Events
 home.news.link: All news & events
