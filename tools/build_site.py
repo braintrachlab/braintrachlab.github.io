@@ -489,18 +489,19 @@ nomina = f'''
       <div class="container">
         {T("span", "nomina.eyebrow", "Nomina Anatomica", "eyebrow reveal")}
         {T("h1", "nomina.title", "The names of the white matter", "reveal d1")}
-        {T("p", "nomina.intro", "A glossary of white matter tracts: their names, synonyms and the history of their description.", "reveal d2")}
+        {T("p", "nomina.intro", "The official terms of the white matter in *Terminologia Neuroanatomica* (FIPAT, 2017): Latin and English names, synonyms, eponyms and notes, in the order and hierarchy of the TNA.", "reveal d2")}
       </div>
     </header>
 
     <section style="padding-top:30px">
       <div class="container narrow">
         <div class="nomina-tools">
-          <input type="search" id="nomina-search" placeholder="Search a term, a synonym, an author…" aria-label="Search the glossary">
+          <input type="search" id="nomina-search" placeholder="Search a Latin or English term, a synonym, an eponym, a TNA number…" aria-label="Search the glossary">
           <div class="filters" id="nomina-filters"></div>
         </div>
         <div id="nomina-letters" class="nomina-letters"></div>
         <div id="nomina-list"></div>
+        {T("p", "nomina.source", "Source: FIPAT. *Terminologia Neuroanatomica*. Federative International Programme for Anatomical Terminology, 2017 ([FIPAT.library.dal.ca](https://fipat.library.dal.ca)), Chapter 1 — terms of the white matter. Licence CC BY-ND 4.0; the terms are in the public domain.", "nomina-source")}
       </div>
     </section>
 '''

@@ -8,81 +8,763 @@
 #        *italic*     **bold**     [label](https://...)     " | " = new line
 #  - photo:  file name of a picture uploaded to the folder assets/img/
 #            (e.g.  photo: seminar-2026.jpg)
+#  - link:   a web address; it makes the title clickable
+#  - text:   a paragraph of description
 #  - Leave a field empty, or delete the line, if you do not need it.
 # ======================================================================
+
 #
-#  NOMINA ANATOMICA — one entry per term (shown in alphabetical order).
+#  NOMINA ANATOMICA — the white matter in Terminologia Neuroanatomica (TNA), FIPAT 2017, Chapter 1.
+#  Source: FIPAT. Terminologia Neuroanatomica. FIPAT.library.dal.ca. Federative International Programme
+#  for Anatomical Terminology, February 2017 (CC BY-ND 4.0; the terms are in the public domain).
 #
-#  term:      name of the tract or structure                  (required)
-#  latin:     Latin name
-#  synonyms:  other names, separated by commas
-#  system:    Association, Commissural, Projection or Limbic   (used by the filter buttons)
-#  text:      definition: course and connections
-#  history:   who described or named it, and when
-#  links:     further reading, e.g. [Author, Journal (Year)](https://doi.org/...)
-#
-#  NOTE: first draft, to be reviewed by the lab before publication.
+#  One entry per term, in TNA order. Fields:
+#  tna:        TNA number
+#  group:      section of the page (entries with the same group are shown together)
+#  level:      0, 1, 2, 3 = position in the TNA hierarchy (indentation)
+#  latin:      official Latin term                                   (required)
+#  latin_syn:  Latin synonym
+#  english:    UK English term
+#  us:         US English term, when different
+#  synonyms:   English synonyms
+#  other:      eponyms and older terms
+#  note:       TNA endnote
 # ======================================================================
 
-term: Arcuate fasciculus
+tna: 14
+group: General terms
+level: 0
+latin: Substantia alba
+english: White matter
+synonyms: White substance
+
+tna: 15
+group: General terms
+level: 0
+latin: Funiculus
+english: Funiculus
+
+tna: 16
+group: General terms
+level: 0
+latin: Tractus
+english: Tract
+
+tna: 17
+group: General terms
+level: 1
+latin: Tractus commissuralis
+english: Commissural tract
+
+tna: 18
+group: General terms
+level: 1
+latin: Tractus proprius
+english: Intrinsic tract
+
+tna: 19
+group: General terms
+level: 2
+latin: Tractus associationis
+english: Association tract
+
+tna: 20
+group: General terms
+level: 1
+latin: Tractus longus
+latin_syn: Tractus projectionis
+english: Long tract
+synonyms: Projection tract
+
+tna: 21
+group: General terms
+level: 2
+latin: Tractus ascendens
+english: Ascending tract
+
+tna: 22
+group: General terms
+level: 2
+latin: Tractus descendens
+english: Descending tract
+
+tna: 23
+group: General terms
+level: 0
+latin: Stria
+english: Stria
+
+tna: 24
+group: General terms
+level: 0
+latin: Fasciculus
+english: Fasciculus
+synonyms: Fascicle
+
+tna: 25
+group: General terms
+level: 0
+latin: Lemniscus
+english: Lemniscus
+
+tna: 26
+group: General terms
+level: 0
+latin: Decussatio
+english: Decussation
+
+tna: 27
+group: General terms
+level: 0
+latin: Commissura
+english: Commissure
+
+tna: 28
+group: General terms
+level: 0
+latin: Neurofibrae centrales
+english: Central nerve fibres
+us: Central nerve fibers
+
+tna: 31
+group: General terms
+level: 1
+latin: Neurofibra associationis
+english: Association nerve fibre
+us: Association nerve fiber
+
+tna: 32
+group: General terms
+level: 1
+latin: Neurofibra commissuralis
+english: Commissural nerve fibre
+us: Commissural nerve fiber
+
+tna: 33
+group: General terms
+level: 1
+latin: Neurofibra projectionis
+english: Projection nerve fibre
+us: Projection nerve fiber
+
+tna: 2417
+group: White matter of the cerebral hemisphere
+level: 0
+latin: Substantia alba hemispherii cerebri
+english: White matter of cerebral hemisphere
+synonyms: White substance of cerebral hemisphere
+
+tna: 2418
+group: White matter of the cerebral hemisphere
+level: 1
+latin: Centrum semiovale
+english: Semi-oval centre
+us: Semioval center
+note: This term, introduced in 1684 by Vieussens as 'Centrum ovale' to indicate the oval shape of the cerebral white matter, continuous with the internal capsule, was later changed into Centrum semiovale by Flatau (1894) and others. In the clinical literature, this term is common usage. It was included by His and colleagues in the BNA.
+
+tna: 2419
+group: White matter of the cerebral hemisphere
+level: 1
+latin: Capsula extrema
+english: Extreme capsule
+
+tna: 2420
+group: White matter of the cerebral hemisphere
+level: 1
+latin: Capsula externa
+english: External capsule
+
+tna: 2421
+group: White matter of the cerebral hemisphere
+level: 1
+latin: Fasciculus peduncularis
+english: Peduncular fasciculus
+
+tna: 2422
+group: White matter of the cerebral hemisphere
+level: 1
+latin: Corona radiata
+english: Corona radiata
+
+tna: 2423
+group: Internal capsule
+level: 0
+latin: Capsula interna
+english: Internal capsule
+
+tna: 2424
+group: Internal capsule
+level: 1
+latin: Crus anterius
+english: Anterior limb
+
+tna: 2425
+group: Internal capsule
+level: 2
+latin: Radiatio anterior thalami
+english: Anterior thalamic radiation
+
+tna: 2426
+group: Internal capsule
+level: 2
+latin: Tractus frontopontinus
+english: Frontopontine tract
+
+tna: 2427
+group: Internal capsule
+level: 1
+latin: Genu capsulae internae
+english: Genu of internal capsule
+
+tna: 2428
+group: Internal capsule
+level: 2
+latin: Fibrae corticonucleares
+english: Corticonuclear fibres
+us: Corticonuclear fibers
+
+tna: 2429
+group: Internal capsule
+level: 1
+latin: Crus posterius
+english: Posterior limb
+
+tna: 2430
+group: Internal capsule
+level: 2
+latin: Radiatio centralis thalami
+english: Central thalamic radiation
+
+tna: 2431
+group: Internal capsule
+level: 2
+latin: Fibrae corticoreticulares
+english: Corticoreticular fibres
+us: Corticoreticular fibers
+
+tna: 2432
+group: Internal capsule
+level: 2
+latin: Fibrae corticorubrales
+english: Corticorubral fibres
+us: Corticorubral fibers
+
+tna: 2433
+group: Internal capsule
+level: 2
+latin: Fibrae corticospinales
+english: Corticospinal fibres
+us: Corticospinal fibers
+
+tna: 2434
+group: Internal capsule
+level: 2
+latin: Fibrae corticothalamicae
+english: Corticothalamic fibres
+us: Corticothalamic fibers
+
+tna: 2435
+group: Internal capsule
+level: 2
+latin: Fibrae parietopontinae
+english: Parietopontine fibres
+us: Parietopontine fibers
+
+tna: 2436
+group: Internal capsule
+level: 2
+latin: Fibrae thalamoparietales
+english: Thalamoparietal fibres
+us: Thalamoparietal fibers
+
+tna: 2437
+group: Internal capsule
+level: 1
+latin: Pars retrolentiformis
+latin_syn: Crus retrolentiforme
+english: Retrolentiform limb
+synonyms: Retrolenticular limb
+note: The Pars retrolentiformis of the internal capsule should be treated as a separate component, not as part of the posterior limb; Crus retrolentiforme suggested as synonym.
+
+tna: 2438
+group: Internal capsule
+level: 2
+latin: Fibrae occipitopontinae
+english: Occipitopontine fibres
+us: Occipitopontine fibers
+
+tna: 2439
+group: Internal capsule
+level: 2
+latin: Fibrae occipitotectales
+english: Occipitotectal fibres
+us: Occipitotectal fibers
+
+tna: 2440
+group: Internal capsule
+level: 2
+latin: Radiatio optica
+latin_syn: Fibrae geniculocalcarinae
+english: Optic radiation
+synonyms: Geniculocalcarine fibres
+other: Tract of Gratiolet
+
+tna: 2441
+group: Internal capsule
+level: 2
+latin: Radiatio posterior thalami
+english: Posterior thalamic radiation
+
+tna: 2442
+group: Internal capsule
+level: 1
+latin: Pars sublentiformis
+latin_syn: Crus sublentiforme
+english: Sublentiform limb
+synonyms: Sublenticular limb
+note: The Pars sublentiformis also forms a separate component of the internal capsule; Crus sublentiforme suggested as synonym.
+
+tna: 2443
+group: Internal capsule
+level: 2
+latin: Radiatio acustica
+latin_syn: Fibrae geniculotemporales
+english: Acoustic radiation
+synonyms: Geniculotemporal fibres
+
+tna: 2444
+group: Internal capsule
+level: 2
+latin: Fibrae corticotectales
+english: Corticotectal fibres
+us: Corticotectal fibers
+
+tna: 2445
+group: Internal capsule
+level: 2
+latin: Radiatio optica
+latin_syn: Fibrae geniculocalcarinae
+english: Optic radiation
+synonyms: Geniculocalcarine fibres
+
+tna: 2446
+group: Internal capsule
+level: 2
+latin: Fibrae temporopontinae
+english: Temporopontine fibres
+us: Temporopontine fibers
+
+tna: 2447
+group: Internal capsule
+level: 2
+latin: Fibrae corticothalamicae
+english: Corticothalamic fibres
+us: Corticothalamic fibers
+
+tna: 2448
+group: Association tracts
+level: 0
+latin: Tractus associationis telencephali
+latin_syn: Tractus associationis cerebri
+english: Association tracts of telencephalon
+synonyms: Association tracts of cerebrum
+
+tna: 2449
+group: Association tracts
+level: 1
+latin: Fibrae associationis breves
+latin_syn: Fibrae U-figuratae
+english: Short association fibres
+us: Short association fibers
+synonyms: U-fibres
+other: Fibrae arcuatae cerebri
+note: The Fibrae U-figuratae (U-shaped fibres) were first described by Meynert (1872), and replaced the term Fibrae arcuatae cerebri (Arnold 1838) that became obsolete.
+
+tna: 2450
+group: Association tracts
+level: 1
+latin: Fibrae associationis longae
+english: Long association fibres
+us: Long association fibers
+
+tna: 2451
+group: Association tracts
+level: 2
 latin: Fasciculus arcuatus
-synonyms: Superior longitudinal fasciculus (in part, in older texts)
-system: Association
-text: A perisylvian association tract that arches around the Sylvian fissure, connecting the temporal lobe with the frontal and parietal lobes. It is a key pathway of the language network.
-history: Described by Reil at the beginning of the 19th century and named *fasciculus arcuatus* by Burdach (1822) for its arched course.
-links: [Catani & Thiebaut de Schotten, *Cortex* (2008)](https://doi.org/10.1016/j.cortex.2008.05.004)
+english: Arcuate fasciculus
+note: The Fasciculus arcuatus (Arcuate fascicle) was long considered to be similar to or part of the Superior longitudinal fascicle. More recent research (Catani, Jones & ffytche 2005, Ann Neurol 57:8-16) identified the Arcuate fascicle as a distinct entity with three components.
 
-term: Anterior commissure
-latin: Commissura anterior
-system: Commissural
-text: A compact bundle crossing the midline in front of the fornix columns, connecting parts of the temporal lobes and the olfactory regions of the two hemispheres.
+tna: 2452
+group: Association tracts
+level: 3
+latin: Segmentum anterius
+english: Anterior segment
 
-term: Anterior thalamic radiations
-latin: Radiatio thalami anterior
-synonyms: Anterior thalamic peduncle
-system: Projection
-text: Fibres linking the anterior and medial thalamic nuclei with the prefrontal and anterior cingulate cortex through the anterior limb of the internal capsule.
+tna: 2453
+group: Association tracts
+level: 3
+latin: Segmentum longum
+english: Long segment
 
-term: Cingulum
+tna: 2454
+group: Association tracts
+level: 3
+latin: Segmentum posterius
+english: Posterior segment
+
+tna: 2455
+group: Association tracts
+level: 2
 latin: Cingulum
-system: Limbic
-text: A long association tract running within the white matter of the cingulate gyrus, from the orbitofrontal region around the corpus callosum to the parahippocampal gyrus and the temporal pole.
-history: The name, from the Latin for "girdle", was given by Burdach (1822).
+english: Cingulum
 
-term: Corpus callosum
-latin: Corpus callosum
-synonyms: Great commissure
-system: Commissural
-text: The largest commissure of the brain, linking the two cerebral hemispheres. Its parts are the rostrum, genu, body and splenium; the forceps minor and forceps major are its frontal and occipital radiations.
-history: Known since antiquity and described by Galen; illustrated by Vesalius in the *De humani corporis fabrica* (1543).
+tna: 2456
+group: Association tracts
+level: 2
+latin: Capsula extrema
+english: Extreme capsule
+note: The Capsula extrema (Extreme capsule) forms one of the long association systems involved in language processing (see Catani & Thiebaut de Schotten 2012, Atlas of Human Brain Connections, Oxford University Press).
 
-term: Fornix
-latin: Fornix
-system: Limbic
-text: The main output pathway of the hippocampus, arching under the corpus callosum to the mammillary bodies, the septal region and the anterior thalamus.
-
-term: Frontal aslant tract
-synonyms: FAT
-system: Association
-text: A short frontal tract linking the posterior inferior frontal gyrus with the supplementary and pre-supplementary motor areas, involved in speech initiation and verbal fluency.
-history: Named in the tractography era, as one of the short frontal lobe connections of the human brain.
-links: [Citro et al., *Nature Communications* (2026)](https://doi.org/10.1038/s41467-026-73731-8)
-
-term: Inferior fronto-occipital fasciculus
-latin: Fasciculus fronto-occipitalis inferior
-synonyms: IFOF, inferior occipito-frontal fasciculus
-system: Association
-text: A long ventral pathway from the occipital and posterior temporal cortex to the frontal lobe, passing through the temporal stem and the extreme/external capsule.
-
-term: Inferior longitudinal fasciculus
+tna: 2457
+group: Association tracts
+level: 2
 latin: Fasciculus longitudinalis inferior
-synonyms: ILF
-system: Association
-text: A ventral association tract connecting the occipital lobe with the anterior temporal lobe, along the lateral wall of the temporal horn of the lateral ventricle.
+english: Inferior longitudinal fasciculus
 
-term: Uncinate fasciculus
+tna: 2458
+group: Association tracts
+level: 2
+latin: Fasciculus longitudinalis superior
+english: Superior longitudinal fasciculus
+note: The Fasciculus longitudinalis superior appears to be composed of three bundles (SLF I-III, or superior, middle and inferior; Makris et al. 2005, Cereb Cortex 15:854-869) as in monkeys (Schmahmann & Pandya 2006; Thiebaut de Schotten, Dell'Acqua, Valabregue & Catani 2012, Cortex 48:82-96).
+
+tna: 2459
+group: Association tracts
+level: 2
+latin: Pedunculus temporalis
+english: Temporal peduncle
+synonyms: Temporal stem
+
+tna: 2460
+group: Association tracts
+level: 3
 latin: Fasciculus uncinatus
-synonyms: UF
-system: Association
-text: A hook-shaped tract connecting the anterior temporal lobe with the orbitofrontal cortex through the limen insulae.
-history: The name refers to its hooked course (Latin *uncus*, hook).
+english: Uncinate fasciculus
+
+tna: 2461
+group: Association tracts
+level: 3
+latin: Fasciculus occipitofrontalis inferior
+english: Inferior occipitofrontal fasciculus
+
+tna: 2462
+group: Association tracts
+level: 2
+latin: Fasciculus occipitofrontalis superior
+english: Superior occipitofrontal fasciculus
+
+tna: 2463
+group: Association tracts
+level: 2
+latin: Fasciculus subcallosus
+english: Subcallosal fasciculus
+other: Bundle of Muratoff
+note: The Fasciculus subcallosus (Subcallosal fasciculus or Bundle of Muratoff; Muratoff 1893) forms a separate bundle of corticostriatal fibres (see Schmahmann & Pandya 2007, The complex history of the fronto-occipital fasciculus, J Hist Neurosci 16:362-377).
+
+tna: 2464
+group: Association tracts
+level: 2
+latin: Fasciculus frontalis obliquus
+english: Frontal aslant tract
+synonyms: Frontal oblique tract
+note: The Fasciculus frontalis obliquus (Frontal aslant tract or Frontal oblique tract) connects the SMA and pre-SMA with the opercular part of the inferior frontal gyrus (Catani, Dell'Acqua, Vergani et al. 2012, Short frontal lobe connections of the human brain, Cortex 48:273-291).
+
+tna: 2465
+group: Association tracts
+level: 2
+latin: Fasciculus frontalis orbitopolaris
+english: Frontal orbitopolar fasciculus
+
+tna: 2466
+group: Association tracts
+level: 2
+latin: Fasciculus frontomarginalis
+english: Frontomarginal tract
+
+tna: 2467
+group: Association tracts
+level: 2
+latin: Fasciculi occipitales verticales
+english: Vertical occipital fasciculi
+
+tna: 2468
+group: Association tracts
+level: 3
+latin: Fibrae laterales
+english: Lateral fibres
+us: Lateral fibers
+
+tna: 2469
+group: Association tracts
+level: 3
+latin: Fibrae caudales
+english: Caudal fibres
+us: Caudal fibers
+
+tna: 2470
+group: Association tracts
+level: 2
+latin: Fasciculi occipitales horizontales
+english: Transverse occipital fasciculi
+
+tna: 2471
+group: Association tracts
+level: 3
+latin: Fibrae cuneatae
+english: Cuneate fibres
+us: Cuneate fibers
+
+tna: 2472
+group: Association tracts
+level: 3
+latin: Fibrae linguales
+english: Lingual fibres
+us: Lingual fibers
+
+tna: 2473
+group: Commissural tracts
+level: 0
+latin: Tractus commissurales telencephali
+latin_syn: Tractus commissurales cerebri
+english: Commissural tracts of telencephalon
+synonyms: Commissural tracts of cerebrum
+
+tna: 2474
+group: Commissural tracts
+level: 1
+latin: Corpus callosum
+english: Corpus callosum
+note: For the gross division of the Corpus callosum (Rostrum, Genu, Truncus, Splenium; TNA 2190-2194), see Morphologia externa.
+
+tna: 2475
+group: Commissural tracts
+level: 2
+latin: Fibrae corporis callosi
+english: Corpus callosum fibres
+us: Corpus callosum fibers
+
+tna: 2476
+group: Commissural tracts
+level: 2
+latin: Radiatio corporis callosi
+english: Radiation of corpus callosum
+
+tna: 2477
+group: Commissural tracts
+level: 3
+latin: Forceps minor
+latin_syn: Forceps frontalis
+english: Forceps minor
+synonyms: Frontal forceps
+
+tna: 2478
+group: Commissural tracts
+level: 3
+latin: Forceps major
+latin_syn: Forceps occipitalis
+english: Forceps major
+synonyms: Occipital forceps
+
+tna: 2479
+group: Commissural tracts
+level: 3
+latin: Tapetum
+english: Tapetum
+
+tna: 2480
+group: Commissural tracts
+level: 1
+latin: Commissura hippocampi
+latin_syn: Psalterium
+english: Hippocampal commissure
+synonyms: Psalterium
+other: Commissura fornicis
+note: The old term Psalterium has been added, much in use by clinicians (see Amaral, Insausti & Cowan 1984, J Comp Neurol 224:307-336).
+
+tna: 2481
+group: Commissural tracts
+level: 1
+latin: Commissura anterior
+english: Anterior commissure
+
+tna: 2482
+group: Commissural tracts
+level: 2
+latin: Pars anterior
+english: Anterior part
+
+tna: 2483
+group: Commissural tracts
+level: 2
+latin: Pars posterior
+english: Posterior part
+
+tna: 2484
+group: Long tracts (projection)
+level: 0
+latin: Tractus longi telencephali
+latin_syn: Tractus longi cerebri
+english: Long tracts of telencephalon
+
+tna: 2485
+group: Long tracts (projection)
+level: 1
+latin: Tractus descendentes
+english: Descending tracts
+
+tna: 2486
+group: Long tracts (projection)
+level: 2
+latin: Fibrae corticostriatales
+english: Corticostriatal fibres
+us: Corticostriatal fibers
+
+tna: 2487
+group: Long tracts (projection)
+level: 2
+latin: Fibrae corticothalamicae
+english: Corticothalamic fibres
+us: Corticothalamic fibers
+
+tna: 2488
+group: Long tracts (projection)
+level: 2
+latin: Fibrae corticotectales
+english: Corticotectal fibres
+us: Corticotectal fibers
+
+tna: 2489
+group: Long tracts (projection)
+level: 2
+latin: Tractus pyramidalis
+english: Pyramidal tract
+
+tna: 2490
+group: Long tracts (projection)
+level: 3
+latin: Fibrae corticorubrales
+english: Corticorubral fibres
+us: Corticorubral fibers
+
+tna: 2491
+group: Long tracts (projection)
+level: 3
+latin: Fibrae corticoreticulares
+english: Corticoreticular fibres
+us: Corticoreticular fibers
+
+tna: 2492
+group: Long tracts (projection)
+level: 3
+latin: Fibrae corticonucleares
+english: Corticonuclear fibres
+us: Corticonuclear fibers
+
+tna: 2493
+group: Long tracts (projection)
+level: 3
+latin: Fibrae corticospinales
+english: Corticospinal fibres
+us: Corticospinal fibers
+
+tna: 2494
+group: Long tracts (projection)
+level: 2
+latin: Fibrae corticopontinae
+english: Corticopontine fibres
+us: Corticopontine fibers
+
+tna: 2495
+group: Long tracts (projection)
+level: 3
+latin: Tractus frontopontinus
+english: Frontopontine tract
+
+tna: 2496
+group: Long tracts (projection)
+level: 3
+latin: Fibrae parietopontinae
+english: Parietopontine fibres
+us: Parietopontine fibers
+
+tna: 2497
+group: Long tracts (projection)
+level: 3
+latin: Fibrae temporopontinae
+english: Temporopontine fibres
+us: Temporopontine fibers
+
+tna: 2498
+group: Long tracts (projection)
+level: 3
+latin: Fibrae occipitopontinae
+english: Occipitopontine fibres
+us: Occipitopontine fibers
+
+tna: 2361
+group: Fornix and hippocampal white matter
+level: 0
+latin: Alveus hippocampi
+english: Alveus
+
+tna: 2362
+group: Fornix and hippocampal white matter
+level: 0
+latin: Fimbria hippocampi
+english: Fimbria
+
+tna: 2363
+group: Fornix and hippocampal white matter
+level: 0
+latin: Fornix
+english: Fornix
+
+tna: 2364
+group: Fornix and hippocampal white matter
+level: 1
+latin: Crus fornicis
+english: Crus of fornix
+
+tna: 2365
+group: Fornix and hippocampal white matter
+level: 1
+latin: Commissura hippocampi
+latin_syn: Psalterium
+english: Hippocampal commissure
+synonyms: Psalterium
+other: Commissura fornicis
+note: The old term Psalterium has been added, much in use by clinicians.
+
+tna: 2366
+group: Fornix and hippocampal white matter
+level: 1
+latin: Corpus fornicis
+english: Body of fornix
+
+tna: 2367
+group: Fornix and hippocampal white matter
+level: 1
+latin: Columna fornicis
+english: Column of fornix
+
+tna: 2368
+group: Fornix and hippocampal white matter
+level: 2
+latin: Fibrae precommissurales
+english: Precommissural fornix
+
+tna: 2369
+group: Fornix and hippocampal white matter
+level: 2
+latin: Fibrae postcommissurales
+english: Postcommissural fornix

@@ -126,40 +126,51 @@
   }
 
 
-  // ---------- Nomina Anatomica (content/nomina.txt) ----------
+  // ---------- Nomina Anatomica (content/nomina.txt): Terminologia Neuroanatomica, in TNA order ----------
   const nomList = document.getElementById("nomina-list");
   if (nomList) {
     load("content/nomina.txt").then((items) => {
-      items = items.filter((n) => n.term).sort((a, b) => a.term.localeCompare(b.term));
+      items = items.filter((n) => n.latin);
       const search = document.getElementById("nomina-search");
       const filters = document.getElementById("nomina-filters");
-      const letters = document.getElementById("nomina-letters");
-      const systems = [...new Set(items.map((n) => n.system).filter(Boolean))].sort();
-      filters.innerHTML = ["All", ...systems].map((x, i) => `<button class="${i ? "" : "active"}" data-sys="${esc(x)}">${esc(x)}</button>`).join("");
-      let sys = "All";
-      const row = (n) => `<article class="nomen" id="${esc(n.term.toLowerCase().replace(/[^a-z0-9]+/g, "-"))}">
-          <h3>${md(n.term)}${n.latin ? ` <span class="latin">${md(n.latin)}</span>` : ""}</h3>
-          <p class="nomen-meta">${[n.system ? `<span class="badge">${esc(n.system)}</span>` : "", n.synonyms ? `<span>Synonyms: ${md(n.synonyms)}</span>` : ""].join("")}</p>
-          ${n.text ? `<p>${md(n.text)}</p>` : ""}
-          ${n.history ? `<p class="nomen-history"><span>History</span>${md(n.history)}</p>` : ""}
-          ${n.links ? `<p class="nomen-links">${md(n.links)}</p>` : ""}
-        </article>`;
+      const index = document.getElementById("nomina-letters");
+      const groups = [...new Set(items.map((n) => n.group || "Terms"))];
+      const slug = (g) => "g-" + g.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      filters.innerHTML = ["All", ...groups].map((x, i) => `<button class="${i ? "" : "active"}" data-g="${esc(x)}">${esc(x)}</button>`).join("");
+      let grp = "All";
+      const uk = (t) => t.replace(/fibers/g, "fibres").replace(/fiber/g, "fibre").replace(/center/g, "centre").replace(/Semioval/g, "Semi-oval");   // only spelling
+      const row = (n) => {
+        const lv = Math.max(0, Math.min(3, parseInt(n.level || "0", 10) || 0));
+        const en = n.english ? `${md(n.english)}${n.us && uk(n.us) !== n.english ? ` <span class="us">(US ${md(n.us)})</span>` : ""}` : "";
+        const meta = [
+          n.latin_syn ? `<span><em>Lat. syn.</em> ${md(n.latin_syn)}</span>` : "",
+          n.synonyms ? `<span><em>Syn.</em> ${md(n.synonyms)}</span>` : "",
+          n.other ? `<span><em>Also</em> ${md(n.other)}</span>` : "",
+        ].join("");
+        return `<article class="nomen lv${lv}" id="tna-${esc(n.tna || "")}">
+            <span class="tna">${esc(n.tna || "")}</span>
+            <div>
+              <h3 lang="la">${md(n.latin)}</h3>
+              ${en ? `<p class="en">${en}</p>` : ""}
+              ${meta ? `<p class="nomen-meta">${meta}</p>` : ""}
+              ${n.note ? `<p class="nomen-note">${md(n.note)}</p>` : ""}
+              ${n.text ? `<p>${md(n.text)}</p>` : ""}
+            </div>
+          </article>`;
+      };
       function draw() {
         const q = (search.value || "").trim().toLowerCase();
-        const shown = items.filter((n) => (sys === "All" || n.system === sys) &&
-          (!q || Object.values(n).join(" ").toLowerCase().includes(q)));
-        const groups = {};
-        shown.forEach((n) => { const L = n.term[0].toUpperCase(); (groups[L] = groups[L] || []).push(n); });
-        const L = Object.keys(groups).sort();
-        letters.innerHTML = L.map((x) => `<a href="#letter-${x}">${x}</a>`).join("");
-        nomList.innerHTML = L.length
-          ? L.map((x) => `<section class="nomina-group" id="letter-${x}"><h2 class="nomina-letter">${x}</h2>${groups[x].map(row).join("")}</section>`).join("")
+        const shown = items.filter((n) => (grp === "All" || (n.group || "Terms") === grp) && (!q || Object.values(n).join(" ").toLowerCase().includes(q)));
+        const gs = groups.filter((g) => shown.some((n) => (n.group || "Terms") === g));
+        index.innerHTML = gs.map((g) => `<a href="#${slug(g)}">${esc(g)}</a>`).join("");
+        nomList.innerHTML = gs.length
+          ? gs.map((g) => `<section class="nomina-group" id="${slug(g)}"><h2 class="nomina-letter">${esc(g)}</h2>${shown.filter((n) => (n.group || "Terms") === g).map(row).join("")}</section>`).join("")
           : `<p class="muted">No term found.</p>`;
       }
       search.addEventListener("input", draw);
       filters.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
         filters.querySelectorAll("button").forEach((x) => x.classList.toggle("active", x === b));
-        sys = b.dataset.sys; draw();
+        grp = b.dataset.g; draw();
       }));
       draw();
     });

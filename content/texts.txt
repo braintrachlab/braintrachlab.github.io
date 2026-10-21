@@ -132,9 +132,10 @@ news.page_description: News and events from BrainTraCh Lab.
 # ---------------- NOMINA ANATOMICA PAGE (the terms are in content/nomina.txt)
 nomina.eyebrow: Nomina Anatomica
 nomina.title: Nomenclature of the white matter
-nomina.intro: A glossary of white matter tracts: their names, synonyms and the history of their description.
+nomina.intro: The official terms of the white matter in *Terminologia Neuroanatomica* (FIPAT, 2017): Latin and English names, synonyms, eponyms and notes, in the order and hierarchy of the TNA.
+nomina.source: Source: FIPAT. *Terminologia Neuroanatomica*. Federative International Programme for Anatomical Terminology, 2017 ([FIPAT.library.dal.ca](https://fipat.library.dal.ca)), Chapter 1 — terms of the white matter. Licence CC BY-ND 4.0; the terms are in the public domain.
 nomina.page_title: Nomina Anatomica — BrainTraCh Lab
-nomina.page_description: A glossary of white matter tracts: names, synonyms and history.
+nomina.page_description: The white matter terms of Terminologia Neuroanatomica (FIPAT 2017): Latin and English names, synonyms and notes.
 
 # ---------------- TOOLS PAGE (the tools are in content/tools.txt)
 tools.eyebrow: Tools
