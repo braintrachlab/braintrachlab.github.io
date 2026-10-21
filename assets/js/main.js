@@ -42,12 +42,16 @@
         im.style.setProperty("--tint-delay", d * ANIMATION_SPEED + "s");
       });
       // start drawing when the figure scrolls into view
+      // figures in a group (e.g. the three FAT brains) start together, as soon as the group comes into view
+      const group = box.closest(".fat-row, .rep-grid");
+      const target = group || box;
+      const start = () => (group ? group.querySelectorAll("[data-brain]") : [box]).forEach((b) => b.classList.add("ready"));
       if ("IntersectionObserver" in window) {
         const io = new IntersectionObserver((es) => {
-          if (es.some((e) => e.isIntersecting)) { box.classList.add("ready"); io.disconnect(); }
-        }, { threshold: 0.25 });
-        io.observe(box);
-      } else box.classList.add("ready");
+          if (es.some((e) => e.isIntersecting)) { start(); io.disconnect(); }
+        }, { threshold: group ? 0.05 : 0.25 });
+        io.observe(target);
+      } else start();
     });
   });
 
