@@ -133,16 +133,21 @@
       cities.sort((a, b) => region(a) - region(b) || (b.lat || 0) - (a.lat || 0));
       const cityName = (c) => esc((c.place || "").split(",")[0].trim() || "Other");
       const country = (c) => esc((c.place || "").split(",").slice(1).join(",").trim());
-      collab.innerHTML = cities.map((c, i) => `
-        <section class="cm-city" id="cm-city-${i}" data-i="${i}" tabindex="0">
+      // one card per collaboration, in alphabetical order of the city (3 per row)
+      const cards = [];
+      cities.forEach((c, i) => c.items.forEach((x, k) => cards.push({ c, i, x, k })));
+      cards.sort((a, b) => cityName(a.c).localeCompare(cityName(b.c)) || a.k - b.k);
+      collab.innerHTML = cards.map(({ c, i, x }) => `
+        <section class="cm-city" data-i="${i}" tabindex="0">
           <h3>${cityName(c)}<small>${country(c)}</small></h3>
-          ${c.items.map((x) => `<div class="cm-col${x.photo ? " has-photo" : ""}">
+          <div class="cm-col${x.photo ? " has-photo" : ""}">
             ${x.photo ? `<img class="collab-logo" src="${esc(photoUrl(x.photo))}" alt="">` : ""}
             ${x.institution ? `<p class="cm-inst">${linked(md(x.institution), x.link)}</p>` : ""}
             ${x.unit ? `<p class="cm-unit">${md(x.unit)}</p>` : ""}
-            <div class="cm-meta">${x.topic ? `<span class="badge">${md(x.topic)}</span>` : ""}${x.people ? `<span class="cm-who">${md(x.people)}</span>` : ""}</div>
+            ${x.topic ? `<p class="cm-topic"><span class="badge">${md(x.topic)}</span></p>` : ""}
+            ${x.people ? `<p class="cm-who">${md(x.people)}</p>` : ""}
             ${x.text ? `<p class="cm-unit">${md(x.text)}</p>` : ""}
-          </div>`).join("")}
+          </div>
         </section>`).join("");
       const count = document.getElementById("collab-count");
       if (count) count.textContent = `${list.length} collaborations · ${cities.filter((c) => c.place || c.lat != null).length} cities`;
@@ -198,7 +203,7 @@
       const select = (ids, fromMap) => {
         selected = ids; light(null);
         collab.querySelectorAll(".cm-city").forEach((s) => s.classList.toggle("on", ids.includes(+s.dataset.i)));
-        if (fromMap) document.getElementById("cm-city-" + ids[0]).scrollIntoView({ block: "nearest", behavior: "smooth" });
+        if (fromMap) { const t = collab.querySelector(`.cm-city[data-i="${ids[0]}"]`); if (t) t.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
       };
       marks.addEventListener("click", (e) => { const g = e.target.closest(".cm-mk"); if (g) select(idsOf(g), true); });
       marks.addEventListener("keydown", (e) => { const g = e.target.closest(".cm-mk"); if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select(idsOf(g), true); } });
