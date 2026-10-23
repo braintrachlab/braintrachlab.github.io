@@ -229,6 +229,20 @@ home = f'''
       </div>
     </section>
 
+    <section class="arnold-sec">
+      <div class="container">
+        <div class="section-head">
+          {T("span", "home.arnold.eyebrow", "From history to discoveries", "eyebrow reveal")}
+          {T("h2", "home.arnold.title", "From the dissecting table to tractography", "reveal d1")}
+        </div>
+        <div class="arnold-row reveal">
+          <div class="arnold-fig arnold-med" data-brain="assets/img/arnold-med-lines.svg" role="img" aria-label="Friedrich Arnold's dissection of the medial surface of the hemisphere, with its fibre bundles redrawn as tractography streamlines"></div>
+          <div class="arnold-fig arnold-ax" data-brain="assets/img/arnold-ax-lines.svg" role="img" aria-label="Friedrich Arnold's horizontal section of the hemisphere, with the cut fibre bundles continued as tractography streamlines"></div>
+        </div>
+        {T("p", "home.arnold.caption", "Fibre dissections of the cerebral hemisphere by F. Arnold, *Tabulae anatomicae*, Fasc. I: *Icones cerebri et medullae spinalis* (Zürich, 1838). The bundles of the plates are redrawn as streamlines, and diffusion tractography of a living brain continues them beyond the plane of the dissection.", "plate-caption arnold-caption reveal")}
+      </div>
+    </section>
+
     <section>
       <div class="container">
         <div class="section-head">

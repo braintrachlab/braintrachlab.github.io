@@ -821,3 +821,13 @@ a.tool-card:hover { border-color: var(--ink); transform: translateY(-2px); box-s
 /* students: a second row below the team */
 .people-group { margin-top: 72px; }
 .people-sub { font-family: var(--serif); font-weight: 400; font-size: clamp(1.5rem, 2.6vw, 1.9rem); margin: 0 0 28px; padding-top: 28px; border-top: 1px solid var(--line); max-width: 980px; }
+
+/* ---------- Home: Arnold's plates turning into tractography ---------- */
+.arnold-row { display: grid; grid-template-columns: minmax(0, 2.32fr) minmax(0, 1fr); gap: 40px; align-items: center; margin-top: 8px; }
+.arnold-fig svg { display: block; width: 100%; height: auto; }
+[data-brain] image.plate-arnold { filter: sepia(0.25); opacity: 0; }
+[data-brain].ready image.plate-arnold { animation: arnold-plate 8s ease forwards; }
+@keyframes arnold-plate { 0% { opacity: 0; } 12% { opacity: 0.95; } 46% { opacity: 0.95; } 66% { opacity: 0.12; } 100% { opacity: 0.12; } }
+.arnold-caption { max-width: 74ch; margin-top: 18px; }
+@media (max-width: 700px) { .arnold-row { grid-template-columns: 1fr; gap: 24px; } .arnold-ax { max-width: 300px; margin: 0 auto; } }
+@media (prefers-reduced-motion: reduce) { [data-brain].ready image.plate-arnold { animation: none; opacity: 0.14; } }

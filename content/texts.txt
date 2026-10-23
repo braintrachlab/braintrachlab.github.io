@@ -48,6 +48,9 @@ home.who.p1: Whenever a new technique is developed, scientist are forced to look
 home.who.p2: 
 home.who.link: Learn more about the lab
 home.who.photo: 
+home.arnold.eyebrow: From history to discoveries
+home.arnold.title: From the dissecting table to tractography
+home.arnold.caption: Fibre dissections of the cerebral hemisphere by F. Arnold, *Tabulae anatomicae*, Fasc. I: *Icones cerebri et medullae spinalis* (Zürich, 1838). The bundles of the plates are redrawn as streamlines, and diffusion tractography of a living brain continues them beyond the plane of the dissection.
 home.areas.eyebrow: Research areas
 home.areas.title: What we study
 home.area1.title: Methods
