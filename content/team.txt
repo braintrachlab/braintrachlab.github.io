@@ -18,6 +18,7 @@
 #  name:   full name                                   (required)
 #  role:   e.g. Principal Investigator                 (required)
 #  photo:  portrait, ideally square                    (optional)
+#  group:  student = shown in the Students row, below the team   (optional)
 #  text:   short biography                             (optional)
 #  links:  e.g. [ORCID](https://orcid.org/...) · [Google Scholar](https://...)
 #  link:   personal web page, makes the name clickable (optional)
@@ -39,6 +40,13 @@ name: Salvatore Citro
 role: Research Fellow
 photo: team/salvatore-citro.png
 text:
+links:
+
+name: Anna Chiara De Melis
+role: Medical student, thesis in Neuropsychiatry
+group: student
+photo: team/anna-chiara-de-melis.png
+text: Sixth-year student of Medicine and Surgery at the University "G. d'Annunzio" of Chieti–Pescara. She is preparing her thesis in Neuropsychiatry at BrainTraCh Lab, on *A scale for ADHD: multidimensional assessment of related conditions*.
 links:
 
 # Example of a complete entry (remove the # signs to use it):

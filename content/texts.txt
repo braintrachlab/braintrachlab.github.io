@@ -74,6 +74,7 @@ home.page_description: BrainTraCh Lab studies the white matter connections of th
 about.eyebrow: People
 about.title: Our team
 about.intro: 
+about.students.title: Students
 about.network.eyebrow: Network
 about.network.title: International Collaborations
 about.page_title: About us — BrainTraCh Lab

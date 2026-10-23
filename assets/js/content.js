@@ -86,7 +86,7 @@
   if (team) {
     load("content/team.txt").then((people) => {
       people = people.filter((p) => p.name);
-      team.innerHTML = people.map((p, i) => {
+      const card = (p, i) => {
         const ini = p.name.split(/\s+/).map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
         const pic = p.photo ? `<img src="${esc(photoUrl(p.photo))}" alt="${esc(p.name)}" loading="lazy">` : `<span class="initials">${esc(ini)}</span>`;
         return `<button class="person reveal visible" data-i="${i}" aria-haspopup="dialog">
@@ -94,10 +94,17 @@
             <span class="name">${esc(p.name)}</span>
             <span class="role">${md(p.role)}</span>
           </button>`;
-      }).join("");
+      };
+      const isStudent = (p) => /^student/i.test(p.group || "");
+      team.innerHTML = people.map((p, i) => (isStudent(p) ? "" : card(p, i))).join("");
+      const stList = document.getElementById("students-list");
+      if (stList) {
+        stList.innerHTML = people.map((p, i) => (isStudent(p) ? card(p, i) : "")).join("");
+        document.getElementById("students-group").hidden = !people.some(isStudent);
+      }
       const panel = document.getElementById("member-panel");
       const body = panel.querySelector(".member-body");
-      team.querySelectorAll(".person").forEach((btn) => btn.addEventListener("click", () => {
+      document.querySelectorAll("#team-list .person, #students-list .person").forEach((btn) => btn.addEventListener("click", () => {
         const p = people[+btn.dataset.i];
         const text = p.text || p.bio || "";
         const links = p.links || "";

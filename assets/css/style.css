@@ -817,3 +817,7 @@ a.tool-card:hover { border-color: var(--ink); transform: translateY(-2px); box-s
 [data-brain].ready .cover-lines { opacity: 0; }
 .cover-fig .plate-caption { max-width: 340px; margin-left: auto; margin-right: auto; }
 @media (prefers-reduced-motion: reduce) { [data-brain] image.plate-cover, [data-brain] .cover-lines { transition: none; } }
+
+/* students: a second row below the team */
+.people-group { margin-top: 72px; }
+.people-sub { font-family: var(--serif); font-weight: 400; font-size: clamp(1.5rem, 2.6vw, 1.9rem); margin: 0 0 28px; padding-top: 28px; border-top: 1px solid var(--line); max-width: 980px; }

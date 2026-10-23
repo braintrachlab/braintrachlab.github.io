@@ -288,6 +288,10 @@ about = f'''
     <section id="team">
       <div class="container">
         <div class="people" id="team-list"></div>
+        <div class="people-group" id="students-group" hidden>
+          {T("h2", "about.students.title", "Students", "people-sub")}
+          <div class="people" id="students-list"></div>
+        </div>
       </div>
     </section>
 
