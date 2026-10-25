@@ -225,20 +225,9 @@ home = f'''
           {T("p", "home.who.p2", "Alongside this work, the lab cultivates a strong interest in the history of neuroscience, tracing how our knowledge of the brain's connections has taken shape over the centuries.", "reveal d2")}
           <a class="link-arrow reveal d3" href="about.html" data-text="home.who.link">{md(val("home.who.link", "Learn more about the lab"))}</a>
         </div>
-        {IMG("home.who.photo", "Lab image", "figure reveal d2")}
-      </div>
-    </section>
-
-    <section class="arnold-sec">
-      <div class="container grid-2" style="align-items:center">
-        <div>
-          {T("span", "home.arnold.eyebrow", "From history to discoveries", "eyebrow reveal")}
-          {T("h2", "home.arnold.title", "From the dissecting table to tractography", "reveal d1")}
-          <hr class="divider reveal d1">
-          {T("p", "home.arnold.caption", "Fibre dissection of the medial surface of the cerebral hemisphere by F. Arnold, *Tabulae anatomicae*, Fasc. I: *Icones cerebri et medullae spinalis* (Zürich, 1838). The fibres engraved in the plate become streamlines; guided by a diffusion tractogram, the drawing continues in Arnold's manner through the rest of the hemisphere and across to the other, before turning into tractography.", "plate-caption arnold-caption reveal d2")}
-        </div>
-        <figure class="reveal d1" style="margin:0">
+        <figure class="reveal d2 arnold-fig" style="margin:0">
           <div class="arnold-3d" data-arnold="med" role="img" aria-label="Friedrich Arnold's dissection of the medial surface of the hemisphere turning into a three-dimensional diffusion tractography of the whole brain"></div>
+          {T("figcaption", "home.arnold.caption", "F. Arnold, *Tabulae anatomicae* (Zürich, 1838): the fibres of his dissection continued as diffusion tractography.", "plate-caption")}
         </figure>
       </div>
     </section>
