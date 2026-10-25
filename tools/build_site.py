@@ -230,16 +230,16 @@ home = f'''
     </section>
 
     <section class="arnold-sec">
-      <div class="container">
-        <div class="section-head">
+      <div class="container grid-2" style="align-items:center">
+        <div>
           {T("span", "home.arnold.eyebrow", "From history to discoveries", "eyebrow reveal")}
           {T("h2", "home.arnold.title", "From the dissecting table to tractography", "reveal d1")}
+          <hr class="divider reveal d1">
+          {T("p", "home.arnold.caption", "Fibre dissection of the medial surface of the cerebral hemisphere by F. Arnold, *Tabulae anatomicae*, Fasc. I: *Icones cerebri et medullae spinalis* (Zürich, 1838). The fibres engraved in the plate become streamlines; guided by a diffusion tractogram, the drawing continues in Arnold's manner through the rest of the hemisphere and across to the other, before turning into tractography.", "plate-caption arnold-caption reveal d2")}
         </div>
-        <div class="arnold-row reveal">
-          <div class="arnold-fig arnold-med" data-brain="assets/img/arnold-med-lines.svg" role="img" aria-label="Friedrich Arnold's dissection of the medial surface of the hemisphere, with its fibre bundles redrawn as tractography streamlines"></div>
-          <div class="arnold-fig arnold-ax" data-brain="assets/img/arnold-ax-lines.svg" role="img" aria-label="Friedrich Arnold's horizontal section of the hemisphere, with the cut fibre bundles continued as tractography streamlines"></div>
-        </div>
-        {T("p", "home.arnold.caption", "Fibre dissections of the cerebral hemisphere by F. Arnold, *Tabulae anatomicae*, Fasc. I: *Icones cerebri et medullae spinalis* (Zürich, 1838). The bundles of the plates are redrawn as streamlines, and diffusion tractography of a living brain continues them beyond the plane of the dissection.", "plate-caption arnold-caption reveal")}
+        <figure class="reveal d1" style="margin:0">
+          <div class="arnold-3d" data-arnold="med" role="img" aria-label="Friedrich Arnold's dissection of the medial surface of the hemisphere turning into a three-dimensional diffusion tractography of the whole brain"></div>
+        </figure>
       </div>
     </section>
 
@@ -286,7 +286,7 @@ home = f'''
     </section>
 '''
 page("index.html", "home.page_title", "TrachLab — White Matter Neuroanatomy",
-     "home.page_description", "TrachLab studies the white matter connections of the human brain, their functions in health and disease, and the history of neuroscience.", home)
+     "home.page_description", "TrachLab studies the white matter connections of the human brain, their functions in health and disease, and the history of neuroscience.", home, '  <script src="assets/js/arnold3d.js"></script>\n')
 
 # ================================================================= ABOUT
 section("ABOUT US PAGE (team members are in content/team.txt, collaborations in content/collaborations.txt)")

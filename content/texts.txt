@@ -50,7 +50,7 @@ home.who.link: Learn more about the lab
 home.who.photo: 
 home.arnold.eyebrow: From history to discoveries
 home.arnold.title: From the dissecting table to tractography
-home.arnold.caption: Fibre dissections of the cerebral hemisphere by F. Arnold, *Tabulae anatomicae*, Fasc. I: *Icones cerebri et medullae spinalis* (Zürich, 1838). The bundles of the plates are redrawn as streamlines, and diffusion tractography of a living brain continues them beyond the plane of the dissection.
+home.arnold.caption: Fibre dissection of the medial surface of the cerebral hemisphere by F. Arnold, *Tabulae anatomicae*, Fasc. I: *Icones cerebri et medullae spinalis* (Zürich, 1838). The fibres engraved in the plate become streamlines; guided by a diffusion tractogram, the drawing continues in Arnold's manner through the rest of the hemisphere and across to the other, before turning into tractography.
 home.areas.eyebrow: Research areas
 home.areas.title: What we study
 home.area1.title: Methods
