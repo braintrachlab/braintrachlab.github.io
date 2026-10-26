@@ -117,7 +117,7 @@ research.history.title: History of neuroscience
 research.history.p1: We are passionate about the history of brain anatomy and neuroscience. We delve into the lives and work of the great neuroanatomists, in search of untold stories, anecdotes and forgotten discoveries.
 research.history.p2: 
 research.history.caption: Cover of M. Catani & S. Sandrone, [*Brain Renaissance: From Vesalius to Modern Neuroscience*](https://academic.oup.com/book/24568) (New York: Oxford University Press, 2015), a biography of Vesalius with a new English translation of Book VII of the *Fabrica* and five centuries of brain discoveries.
-research.history.eras: Antiquity 129; Renaissance 1514; 17th century 1641; 18th century 1748; 19th century 1776; 20th century 1888
+research.history.eras: Antiquity 129; Renaissance 1514; 17th century 1638; 18th century 1748; 19th century 1776; 20th century 1888
 research.history.timeline_title: White matter pioneers
 research.history.timeline_intro: Hover or tap a portrait for a short note on the person and the figure of the discovery.
 research.page_title: Research — BrainTraCh Lab

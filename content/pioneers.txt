@@ -206,3 +206,34 @@ text: 'Disconnexion syndromes in animals and man' (*Brain* 1965) revived the the
 figure: Geschwind's diagram of the disconnection of the language areas
 image:
 ref: Catani & ffytche, *Brain* 2005
+
+name: Arcangelo Piccolomini
+born: 1525
+year: 1586
+life: 1525 – 1586
+portrait: pioneers/piccolomini.webp
+text: In the *Anatomicae praelectiones* (1586) he separated the brain into an outer grey substance, the *cerebrum*, and an inner white substance, the *medulla*: the first clear distinction between cortex and white matter.
+figure: Anatomicae praelectiones (Rome, 1586): the title page with Piccolomini's portrait
+image:
+ref: A. Piccolomini, *Anatomicae praelectiones* (Rome: Bonfadini, 1586)
+
+name: Niels Stensen
+born: 1638
+year: 1669
+life: 1638 – 1686
+portrait: pioneers/stensen.webp
+text: In his *Discours sur l'anatomie du cerveau* (Paris, 1669) he argued that the white matter is made of fibres, and that the only way to understand the brain is to follow them through its substance.
+figure: Discours sur l'anatomie du cerveau (1669): Steno's programme of following the fibres of the white matter
+image:
+ref: N. Stensen, *Discours sur l'anatomie du cerveau* (Paris, 1669)
+
+name: Augusta Déjerine-Klumpke
+short: Déjerine-Klumpke
+born: 1859
+year: 1885
+life: 1859 – 1927
+portrait: pioneers/dejerine-klumpke.webp
+text: The first woman to become an intern in the Paris hospitals; she described the paralysis of the lower brachial plexus that bears her name (1885) and, with Jules Dejerine, wrote the atlas *Anatomie des centres nerveux* (1895–1901).
+figure: Anatomie des centres nerveux (1895–1901): sections of the hemisphere drawn for the atlas
+image:
+ref: A. Klumpke, *Revue de médecine* 1885; J. Dejerine & A. Dejerine-Klumpke, *Anatomie des centres nerveux* (Paris, 1895–1901)
