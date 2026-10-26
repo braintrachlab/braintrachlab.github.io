@@ -12,13 +12,13 @@
   },
   {
    "id": "fat",
-   "lines": 368,
-   "points": 17359
+   "lines": 600,
+   "points": 26352
   },
   {
    "id": "ifof",
    "lines": 900,
-   "points": 87959
+   "points": 87881
   },
   {
    "id": "uf",
@@ -28,15 +28,21 @@
   {
    "id": "fornix",
    "lines": 500,
-   "points": 28544,
+   "points": 28548,
+   "subject": "102109"
+  },
+  {
+   "id": "afp",
+   "lines": 900,
+   "points": 39536,
    "subject": "102109"
   }
  ],
  "scale": 0.1,
  "center_rasmm": [
-  -1.397,
-  -11.66,
-  72.41
+  10.738,
+  52.793,
+  78.266
  ],
- "radius": 91.39135308987579
+ "radius": 160.44998146665202
 }

@@ -12,7 +12,7 @@ TRACTS = [("cc", "CC.trk", 1700), ("atr", "anterior_thalamic_radiations.trk", 40
 # tracts dissected in subject 102109 (diffusion space, 1.25 mm): converted to the AC-PC space of the sections
 # and placed like the sections (assets/atlas/planes/sections.json). To add one: drop the .trk in tools/atlas
 # and add a line here, then a card in content/tracts.txt.
-TRACTS_102109 = [("fornix", "fornix.trk", 500)]
+TRACTS_102109 = [("fornix", "fornix.trk", 500), ("afp", "AF_posterior.trk", 900)]   # afp: PS_DTI + PS_SD together
 DTI2ACPC = np.array([-91.25, -127.25, -73.25])
 STEP = 1.6
 rng = np.random.default_rng(1)

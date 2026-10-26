@@ -90,3 +90,15 @@ anatomy: From the fimbria of the hippocampus the fibres form the crura, which co
 function: Episodic memory and spatial navigation, as part of the hippocampal–diencephalic circuit (Papez circuit).
 clinical: Lesions (tumours, surgery of the third ventricle, trauma) cause anterograde amnesia; alterations are reported early in Alzheimer's disease, and the fornix is a target of deep brain stimulation trials for memory.
 links: [Catani, Dell'Acqua & Thiebaut de Schotten, *Neurosci Biobehav Rev* (2013) — limbic networks](https://doi.org/10.1016/j.neubiorev.2013.07.001)
+
+id: afp
+name: Arcuate fasciculus, posterior segment
+short: Posterior segment of the arcuate
+system: Association
+text: The vertical, posterior segment of the arcuate fasciculus, linking the posterior temporal cortex (Wernicke's territory) with the inferior parietal lobule (Geschwind's territory).
+history: The arcuate fasciculus was described by Reil and named by Burdach in the early 19th century. Tractography showed that, besides the long direct segment between temporal and frontal lobes, it has an indirect pathway made of an anterior and a posterior segment (Catani, Jones & ffytche, 2005).
+anatomy: From the posterior part of the superior and middle temporal gyri the fibres run upward, lateral to the long segment, to the supramarginal and angular gyri of the inferior parietal lobule.
+function: Part of the indirect language pathway; involved in auditory comprehension, verbal repetition, reading and the link between sounds and meaning.
+clinical: Damage is associated with impaired repetition and comprehension; in primary progressive aphasia its atrophy relates to repetition scores. Its volume shows a leftward asymmetry that varies between individuals.
+links: [Catani, Jones & ffytche, *Annals of Neurology* (2005) — perisylvian language networks](https://doi.org/10.1002/ana.20319)
+
