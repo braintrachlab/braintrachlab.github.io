@@ -9,11 +9,11 @@
   const LVS = `attribute float aT; varying float vT; void main(){ vT = aT; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
   const LFS = `uniform float uDraw; uniform float uAlpha; uniform vec3 uCol; varying float vT;
     void main(){ if (vT > uDraw) discard; gl_FragColor = vec4(uCol, uAlpha); }`;
-  const TVS = `attribute vec3 aNext; attribute float aSide; attribute vec3 aC; attribute float aT; attribute float aDel; attribute float aR;
+  const TVS = `attribute vec3 aNext; attribute float aSide; attribute vec3 aC; attribute float aT; attribute float aDel; attribute float aR; attribute float aSw;
     uniform float uD0; uniform float uD1; uniform float uMorph; uniform vec2 uRes; uniform float uRad; uniform float uMinPx; uniform float uGrow; uniform float uC; uniform float uEdgeC;
     varying vec3 vC; varying float vT; varying float vS; varying float vG; varying float vZ; varying float vK; varying float vR; varying float vD;
     void main(){
-      vR = aR; vZ = position.z; vK = 1.0 - smoothstep(-uEdgeC, uEdgeC, position.z - uC); vec3 p = position; p.z *= uMorph; vec3 q = aNext; q.z *= uMorph;
+      vR = aR; vZ = position.z; vK = 1.0 - smoothstep(-uEdgeC, uEdgeC, aSw - uC); vec3 p = position; p.z *= uMorph; vec3 q = aNext; q.z *= uMorph;
       vec4 mv = modelViewMatrix * vec4(p, 1.0); vD = clamp((-mv.z - uD0) / (uD1 - uD0), 0.0, 1.0);
       vec4 a = projectionMatrix * mv; vec4 b = projectionMatrix * modelViewMatrix * vec4(q, 1.0);
       vec2 sa = a.xy / a.w * uRes * 0.5, sb = b.xy / b.w * uRes * 0.5; vec2 d = sb - sa; float L = length(d);
@@ -52,6 +52,28 @@
     return new THREE.LineSegments(g, new THREE.ShaderMaterial({ vertexShader: LVS, fragmentShader: LFS, transparent: true, depthWrite: false,
       uniforms: { uDraw: { value: 0 }, uAlpha: { value: 0 }, uCol: { value: new THREE.Color(...INK) } } }));
   }
+  // where each vertex sits along the sweep of its colour: red fibres colour from left to right (Arnold's
+  // hemisphere first), green from posterior to anterior, blue from top to bottom; weights recovered from the colour
+  const PR = [188, 70, 60], PG = [64, 142, 86], PB = [56, 92, 160], PAPER = [247, 247, 245];
+  const inv3 = (m) => { const [a, b, c, d, e, f, g, h, i] = m, A = e * i - f * h, B = -(d * i - f * g), C = d * h - e * g, D = a * A + b * B + c * C;
+    return [A / D, -(b * i - c * h) / D, (b * f - c * e) / D, B / D, (a * i - c * g) / D, -(a * f - c * d) / D, C / D, -(a * h - b * g) / D, (a * e - b * d) / D]; };
+  const MI = inv3([PR[0], PG[0], PB[0], PR[1], PG[1], PB[1], PR[2], PG[2], PB[2]]);
+  function sweep(S, NV, mode) {
+    const out = new Float32Array(NV);
+    if (mode === "flat" || !S.C) return out.fill(2);
+    const n = S.P.length / 3; let lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
+    for (let q = 0; q < n; q++) for (let j = 0; j < 3; j++) { const v = S.P[q * 3 + j]; if (v < lo[j]) lo[j] = v; if (v > hi[j]) hi[j] = v; }
+    for (let q = 0; q < n; q++) {
+      const c = [0, 1, 2].map((j) => (S.C[q * 3 + j] - 0.1 * PAPER[j]) / 0.9);
+      let w = [0, 1, 2].map((r) => Math.max(0, MI[r * 3] * c[0] + MI[r * 3 + 1] * c[1] + MI[r * 3 + 2] * c[2]));
+      const sw = w[0] + w[1] + w[2] || 1; w = w.map((x) => x / sw);
+      const lr = (S.P[q * 3 + 2] - lo[2]) / (hi[2] - lo[2]);          // left (Arnold) -> right
+      const pa = (S.P[q * 3] - lo[0]) / (hi[0] - lo[0]);              // posterior -> anterior
+      const tb = (hi[1] - S.P[q * 3 + 1]) / (hi[1] - lo[1]);          // top -> bottom
+      out[q * 2] = out[q * 2 + 1] = w[0] * lr + w[1] * pa + w[2] * tb;
+    }
+    return out;
+  }
   function tubes(THREE, S, rad, mode, zref) {   // mode: where each streamline starts to grow: plane | mid | near | flat
     const dim = S.dim, NV = S.P.length / dim * 2;
     const rr = new Float32Array(NV), pos = new Float32Array(NV * 3), nxt = new Float32Array(NV * 3), col = new Float32Array(NV * 3), tt = new Float32Array(NV), side = new Float32Array(NV), del = new Float32Array(NV);
@@ -87,11 +109,11 @@
       v += l; si++;
     }
     const g = new THREE.BufferGeometry();
-    for (const [n, a, d] of [["position", pos, 3], ["aNext", nxt, 3], ["aC", col, 3], ["aT", tt, 1], ["aSide", side, 1], ["aDel", del, 1], ["aR", rr, 1]]) g.setAttribute(n, new THREE.BufferAttribute(a, d));
+    for (const [n, a, d] of [["position", pos, 3], ["aNext", nxt, 3], ["aC", col, 3], ["aT", tt, 1], ["aSide", side, 1], ["aDel", del, 1], ["aR", rr, 1], ["aSw", sweep(S, NV, mode), 1]]) g.setAttribute(n, new THREE.BufferAttribute(a, d));
     g.setIndex(new THREE.BufferAttribute(idx, 1));
     const m = new THREE.ShaderMaterial({ vertexShader: TVS, fragmentShader: TFS, transparent: true, depthWrite: true, side: THREE.DoubleSide,
       uniforms: { uMorph: { value: 0 }, uGrow: { value: 0 }, uAlpha: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uRad: { value: rad }, uMinPx: { value: 0.6 },
-        uTint: { value: new THREE.Color(...INK) }, uTintK: { value: 0 }, uA: { value: -1e6 }, uB: { value: 1e6 }, uEdge: { value: 60 }, uC: { value: 1e6 }, uEdgeC: { value: 70 }, uD0: { value: 0 }, uD1: { value: 1 } } });
+        uTint: { value: new THREE.Color(...INK) }, uTintK: { value: 0 }, uA: { value: -1e6 }, uB: { value: 1e6 }, uEdge: { value: 60 }, uC: { value: 1e6 }, uEdgeC: { value: 0.1 }, uD0: { value: 0 }, uD1: { value: 1 } } });
     const mesh = new THREE.Mesh(g, m); mesh.frustumCulled = false; return mesh;
   }
   const VIEW = { med: { rot: [0.2, -0.8], zoom: 1.3, aspect: 1.15, pan: [0, -0.1] }, ax: { rot: [-0.62, 0.0], zoom: 1.12, aspect: 1.6, pan: [-0.3, 0] } };
@@ -137,7 +159,7 @@
         trace.material.uniforms.uAlpha.value = 0.85 * (1 - ramp(t, 3600, 6200));
         // 3 the lines slowly thicken into tubes
         const thick = ramp(t, 3200, 6400);
-        traceT.material.uniforms.uGrow.value = 2; traceT.material.uniforms.uRad.value = R * (0.15 + 0.85 * thick); traceT.material.uniforms.uC.value = -1e6;
+        traceT.material.uniforms.uGrow.value = 2; traceT.material.uniforms.uRad.value = R * (0.15 + 0.85 * thick); traceT.material.uniforms.uC.value = -10;
         traceT.material.uniforms.uAlpha.value = 0.8 * thick * (1 - ramp(t, 6800, 11000));
         traceT.visible = traceT.material.uniforms.uAlpha.value > 0.005;
         // 4 two fronts leave the plane and reveal the tractography: Arnold's hemisphere first, then across to the other
@@ -147,7 +169,7 @@
         u.uB.value = zmax * ramp(t, 5600, 15500, (x) => 1 - Math.pow(1 - x, 1.4)) + 2;
         u.uAlpha.value = ramp(t, 5600, 6400);
         // 5 then the engraving turns into tractography, from left to right
-        u.uC.value = (zmin - 160) + (zmax - zmin + 320) * ramp(t, 14500, 21500, (x) => x);
+        u.uC.value = -0.15 + 1.3 * ramp(t, 14500, 22500, (x) => x);
         const m = 1;
         // one continuous camera move
         const c = ramp(t, 6000, 21500, smoother), e = ramp(t, 11500, 21500, smoother);
