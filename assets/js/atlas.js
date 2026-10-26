@@ -73,6 +73,7 @@
     const frag = `
       uniform vec3 cDark; uniform vec3 cLight; uniform float uProg; uniform float uAlpha; uniform float uFade;
       uniform float uSweep; uniform float uSweepOn; uniform vec3 uN; uniform float uSide; uniform float uKl; uniform vec3 uKlTint;
+      uniform float uGrey; uniform float uFront; uniform vec3 uGN; uniform float uS0; uniform float uS1;
       varying vec3 vT; varying vec3 vB; varying float vSide; varying float vt; varying float vShade; varying float vInk; varying vec3 vP;
       void main() {
         if (vt > uProg) discard;
@@ -102,7 +103,12 @@
         col = mix(col, colK, uKl);
         vec3 inkCol = mix(vec3(0.22), vec3(0.42), vShade);  // ink of the old plates
         inkCol *= 1.0 - 0.45 * nearPlane;                                          // fresh ink where the fibres emerge
-        col = mix(col, inkCol, vInk);
+        // the pen strokes thicken into tubes that keep the ink of the plate (soft round shading, each fibre its own tone),
+        // then the colour of the tract sweeps along it, as in the opening of the home page
+        vec3 inkTube = mix(vec3(0.24), vec3(0.50), vShade) * (0.80 + 0.26 * nz);
+        float sN = (dot(vP, uGN) - uS0) / max(uS1 - uS0, 1e-3);
+        float grey = max(vInk, uGrey * smoothstep(uFront - 0.08, uFront + 0.08, sN));
+        col = mix(col, mix(inkTube, inkCol, vInk / max(grey, 1e-3)), grey);
         col = mix(col, vec3(0.86, 0.87, 0.88), uFade * 0.92);      // non-selected tracts: pale grey ghost
         float behind = step(1.5, uSweepOn);                          // with a section: the tracts behind it as a pale ghost
         col = mix(col, vec3(0.90, 0.90, 0.89), behind * 0.72);
@@ -168,8 +174,11 @@
         vertexShader: vert, fragmentShader: frag, transparent: true, depthWrite: true, side: THREE.DoubleSide,
         uniforms: { cDark: { value: new THREE.Color(...rgb(pal[0])) }, cLight: { value: new THREE.Color(...rgb(pal[1])) },
                     uProg: { value: 0 }, uAlpha: { value: 1.0 }, uFade: { value: 0 }, uWidth: { value: WIDTH }, uKl: { value: 0 }, uKlTint: { value: new THREE.Color(1, 1, 1) },
-                    uInk: { value: 1 }, uWave: { value: -0.2 }, uInkW: { value: 0.13 }, uSweep: { value: 999 }, uSweepOn: { value: 0 }, uN: { value: new THREE.Vector3(0, 1, 0) }, uSide: { value: 1 } },
+                    uInk: { value: 1 }, uWave: { value: -0.2 }, uInkW: { value: 0.13 }, uGrey: { value: 0 }, uFront: { value: -0.2 }, uGN: { value: new THREE.Vector3(0, 1, 0) }, uS0: { value: 0 }, uS1: { value: 1 }, uSweep: { value: 999 }, uSweepOn: { value: 0 }, uN: { value: new THREE.Vector3(0, 1, 0) }, uSide: { value: 1 } },
       });
+      { const h = GROW[t.id] || [0, 1, 0], L = Math.hypot(...h) || 1, n = [h[0] / L, h[1] / L, h[2] / L]; let s0 = 1e9, s1 = -1e9;
+        for (let i = 0; i < pos.length; i += 12) { const d = pos[i] * n[0] + pos[i + 1] * n[1] + pos[i + 2] * n[2]; if (d < s0) s0 = d; if (d > s1) s1 = d; }
+        m.uniforms.uGN.value.set(n[0], n[1], n[2]); m.uniforms.uS0.value = s0; m.uniforms.uS1.value = s1; }
       mats[t.id] = m;
       pickPts[t.id] = pick; segs[t.id] = { a: sa, b: sb, n: si };
       const mesh = new THREE.Mesh(g, m); mesh.renderOrder = 1; mesh.frustumCulled = false; meshes[t.id] = mesh;
@@ -622,6 +631,7 @@
       introReady = true;
     });
     let introReady = false;
+    function setGrey(on, front) { for (const t of tracts) { mats[t.id].uniforms.uGrey.value = on; mats[t.id].uniforms.uFront.value = front; } }
     function setInk(ink, wave) { for (const t of tracts) { mats[t.id].uniforms.uInk.value = ink; mats[t.id].uniforms.uWave.value = wave; } }
     const ease = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
     let t0 = null, started = false, prev = null, skip = false;
@@ -636,7 +646,7 @@
 
     // ----- intro "mri": 1) the drawn coronal sections scroll from front to back, face on, like turning
     // the plates; 2) the streamlines grow in ink while the brain turns to the lateral view; 3) colour.
-    const M_IN = 0.6, M_SWEEP = 7.5, M_OUT = M_IN + M_SWEEP * 0.86, M_GROW = M_OUT + 0.1, MRI_END = M_GROW + 6.2;
+    const M_IN = 0.6, M_SWEEP = 7.5, M_OUT = M_IN + M_SWEEP * 0.86, M_GROW = M_OUT + 0.1, MRI_END = M_GROW + 10.4;
     const v0 = { x: 0.0, y: Math.PI / 2 };                              // seen from behind, face on
     const tmpV = new THREE.Vector3();
     function mriIntro(sec) {
@@ -654,9 +664,15 @@
       tmpV.set(0, y * follow, (ext.z1 + ext.z0) / 2 * 0).applyEuler(group.rotation);
       group.position.set(-tmpV.x, -tmpV.y, -tmpV.z);
       dist = R * (3.3 + 0.3 * r);
-      const x = sec - (M_GROW + 3.4);
-      const ink = 1 - ease(x / 2.4); setInk(ink, -0.2);
-      return ink;
+      return morph(sec - (M_GROW + 3.4));
+    }
+    // drawing -> tractography, as in the opening of the home page: the pen strokes thicken into tubes that keep
+    // the ink of the plate, then the colour of each tract sweeps along it
+    function morph(x) {
+      const ink = 1 - ease(x / 2.6); setInk(ink, -0.2);
+      const f = (x - 1.8) / 5.0;
+      setGrey(1, -0.15 + 1.3 * Math.max(0, Math.min(1, f)));
+      return Math.max(ink, f < 1 ? 1 - Math.max(0, f) * 0.999 : 0);
     }
     // ----- intro "d": Dejerine's section planes
     const SWEEP0 = 1.6, SWEEP = 5.8, DISS = SWEEP0 + SWEEP + 0.5;
@@ -715,8 +731,8 @@
       // ----- intro: drawing -> streamlines
       if (!introDone) {
         const x = sec - DRAWN;                         // time since the drawing was completed
-        if (skip) { inkNow = Math.max(0, inkNow - dt * 2.5); setInk(inkNow, -0.2); endSections(); }
-        else if (intro === "a") { inkNow = 1 - ease(x / 2.2); setInk(inkNow, -0.2); }
+        if (skip) { inkNow = Math.max(0, inkNow - dt * 2.5); setInk(inkNow, -0.2); setGrey(inkNow, 1.2 - inkNow * 1.4); endSections(); }
+        else if (intro === "a") inkNow = morph(x);
         else if (intro === "b") { const w = -0.2 + 1.45 * ease(x / 2.6); inkNow = w > 1.2 ? 0 : 1 - Math.max(0, w) / 1.2; setInk(1, w); }
         else if (intro === "d") inkNow = sectionsIntro(sec, dt);
         else if (intro === "mri") inkNow = mriIntro(sec);
@@ -725,7 +741,7 @@
         box.style.setProperty("--paper", Math.min(1, inkNow * 1.4).toFixed(3));
         if (inkNow <= 0 && intro === "d" && !skip && sec < 11.6) inkNow = 0.0001;
         if (inkNow <= 0 && intro === "mri" && !skip && sec < MRI_END) inkNow = 0.0001;   // wait for the turn to the lateral view
-        if (inkNow <= 0) { introDone = true; endSections(); setInk(0, 2); lastInteract = skip ? lastInteract : now - 4000; }
+        if (inkNow <= 0) { introDone = true; endSections(); setInk(0, 2); setGrey(0, 2); lastInteract = skip ? lastInteract : now - 4000; }
       }
       if (introDone && auto && now - lastInteract > 4000) pivot.rotation.y += 0.15 * dt;
       if (viewTo) {          // turn so that the section faces the viewer

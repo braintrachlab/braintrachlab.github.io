@@ -1,40 +1,15 @@
 {
  "tracts": [
   {
-   "id": "cc",
-   "lines": 1700,
-   "points": 116508
-  },
-  {
-   "id": "atr",
-   "lines": 158,
-   "points": 6996
-  },
-  {
-   "id": "fat",
-   "lines": 600,
-   "points": 26352
-  },
-  {
-   "id": "ifof",
-   "lines": 900,
-   "points": 87881
-  },
-  {
-   "id": "uf",
-   "lines": 445,
-   "points": 23367
-  },
-  {
    "id": "fornix",
    "lines": 500,
-   "points": 28548,
+   "points": 28554,
    "subject": "102109"
   },
   {
    "id": "afp",
    "lines": 900,
-   "points": 39536,
+   "points": 39495,
    "subject": "102109"
   }
  ],
@@ -44,5 +19,5 @@
   52.793,
   78.266
  ],
- "radius": 160.44998146665202
+ "radius": 160.45
 }

@@ -13,7 +13,7 @@ import numpy as np, cv2, nibabel as nib
 from scipy import ndimage as ndi
 from PIL import Image
 sys.path.insert(0, os.path.dirname(__file__))
-from dejerine_render import Tracts, splat, smoothstep
+from dejerine_render import Tracts, splat, smoothstep, lic
 
 DTI2ACPC = np.array([-91.25, -127.25, -73.25], np.float32)
 UP = 3                        # 0.7 mm voxels -> 0.23 mm pixels
@@ -161,7 +161,7 @@ def silver(t1s, ps, tis, rng, ctx_m=None, wm_m=None):
 NONCEREBRAL = [7, 8, 46, 47, 16, 28, 60, 10, 49, 11, 50, 12, 51, 13, 52, 26, 58, 17, 53, 18, 54, 251, 252, 253, 254, 255, 85]
 VENT_FINE = [4, 5, 14, 15, 43, 44, 72, 24, 31, 63]
 
-def draw(t1s, labs, fib, seed=0, t2s=None, ps=None, surf=None):
+def draw(t1s, labs, fib, seed=0, t2s=None, ps=None, surf=None, fa=None):
     """Dejerine (Weigert) drawing of one section. Returns ink (with fibres), ink (without), tissue alpha.
     surf: cut of the pial/white surfaces of both hemispheres (exact cortical border, hemispheres never fuse)"""
     rng = np.random.default_rng(seed)
@@ -173,7 +173,16 @@ def draw(t1s, labs, fib, seed=0, t2s=None, ps=None, surf=None):
         other = (cv2.GaussianBlur(cv2.resize(np.isin(ps, [7, 8, 46, 47, 16, 28, 60]).astype(np.float32), None, fx=UP, fy=UP, interpolation=cv2.INTER_LINEAR), (0, 0), UP * 0.6) > 0.5)   # cerebellum, brainstem, ventral DC
         upls = lambda m: cv2.GaussianBlur(cv2.resize(m.astype(np.float32), None, fx=UP, fy=UP, interpolation=cv2.INTER_LINEAR), (0, 0), UP * 0.7) > 0.5
         vent = upls(np.isin(ps, VENT_FINE))                              # ventricles: smooth outline
-        tis = (pial | other) & ~vent
+        # commissures (corpus callosum, anterior commissure, fornix body): white matter of the parcellation between the two
+        # pial surfaces, so the fibres crossing the midline are not cut
+        comm = upls(np.isin(ps, [251, 252, 253, 254, 255, 2, 41, 5001, 5002, 85]) | ((ps >= 3000) & (ps < 5000))) & ~pial
+        tis = (pial | other | comm) & ~vent
+        if fib is not None:   # small commissures not labelled in the parcellation (anterior commissure): where dense fibres bridge the gap
+            near = cv2.dilate(tis.astype(np.uint8), np.ones((int(UP * 4) + 1, int(UP * 4) + 1), np.uint8)) > 0
+            fbr = (cv2.GaussianBlur(fib, (0, 0), UP * 0.5) > 2.5) & near & ~pial
+            fbr = cv2.morphologyEx(fbr.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)).astype(bool)
+            tis |= fbr; comm |= fbr
+        other = other | comm
         tis = cv2.morphologyEx(tis.astype(np.uint8), cv2.MORPH_OPEN, np.ones((2, 2), np.uint8)).astype(bool)
         cortex = pial & ~white & ~upl(np.isin(ps, NONCEREBRAL))
         C = np.maximum(cv2.GaussianBlur(cortex.astype(np.float32), (0, 0), 0.6), up_mask(np.isin(ps, [8, 47, 17, 53, 18, 54]), 0.25))
@@ -223,7 +232,24 @@ def draw(t1s, labs, fib, seed=0, t2s=None, ps=None, surf=None):
         fibink *= 1.0 - 0.6 * np.clip(Dp, 0, 1)              # deep grey nuclei: only the stronger bundles show
     else:
         fibink = np.zeros_like(base)
-    full = np.maximum(base, fibink)
+    if fa is not None and fib is not None:
+        # FA guides the drawing: the Weigert stain is dark where the myelinated fibres are dense and coherent.
+        # 1) fibre texture filling the white matter, oriented along the local streamlines, as dark as the FA;
+        # 2) the drawn streamlines themselves weighted by the FA (faint in low-anisotropy white matter)
+        FAu = cv2.GaussianBlur(cv2.resize(fa, None, fx=UP, fy=UP, interpolation=cv2.INTER_CUBIC), (0, 0), UP * 0.35)
+        wmz = np.clip(W, 0, 1) * tis
+        faw = smoothstep(0.16, 0.62, FAu) * wmz
+        # strokes: bolder and darker in coherent bundles (corpus callosum, internal capsule, cingulum...),
+        # removed where the FA says there is no white matter (stray fibres in cortex and nuclei)
+        fa_k = smoothstep(0.12, 0.60, FAu)
+        gate = smoothstep(0.05, 0.12, FAu)
+        fl2 = cv2.GaussianBlur(fib, (0, 0), 0.30)
+        fibink = 0.9 * (1.0 - np.exp(-fl2 * FIB_GAIN * (0.8 + 0.5 * fa_k))) * tis * (0.84 + 0.16 * fa_k) * gate
+        fibink *= 1.0 - 0.6 * np.clip(Dp, 0, 1)
+        wmink = wash
+        full = np.maximum(np.maximum(base, wmink), fibink)
+    else:
+        full = np.maximum(base, fibink)
     # thin contour of the brain and of the ventricles (border of the tissue)
     canvas = np.zeros(t.shape, np.uint8)
     cs, _ = cv2.findContours(tis.astype(np.uint8), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
@@ -280,6 +306,7 @@ def main():
         sec = cut(t1, P, j)[r0:r1, c0:c1]
         labs = [cut(m, P, j)[r0:r1, c0:c1] for m in (tissue, ctx, deep, wm)]
         extra = (cut(t2, P, j)[r0:r1, c0:c1], cut(parc, P, j)[r0:r1, c0:c1])
+        fas = cut(FA, P, j)[r0:r1, c0:c1] if FA is not None else None
         fib = None
         w0 = world(P["axis"], j)
         def px(p):
@@ -292,7 +319,7 @@ def main():
             pa, pb = TR.slab(w0, vx / 2 + 0.3, P["axis"])
             fib = splat(shape, px(pa), px(pb))
         surf = surface_section(SURF, P["axis"], w0, px, shape) if SURF else None
-        return sec, labs, fib, extra + (surf,)
+        return sec, labs, fib, extra + (surf, fas)
 
     def crop(P):
         cc = np.where(tissue.any(tuple(d for d in range(3) if d != P["cols"])))[0]
@@ -308,8 +335,8 @@ def main():
             idx = np.where(tissue.any(tuple(d for d in range(3) if d != P["axis"])))[0]
             j = int(round(idx.max() - f * (idx.max() - idx.min()))) if P["reverse"] else int(round(idx.min() + f * (idx.max() - idx.min())))
             c0, c1, r0, r1 = crop(P)
-            sec, labs, fib, (t2s, ps, sf) = section(P, j, c0, c1, r0, r1)
-            full, base, alpha = draw(sec, labs, fib, seed=j, t2s=t2s, ps=ps, surf=sf)
+            sec, labs, fib, (t2s, ps, sf, fas) = section(P, j, c0, c1, r0, r1)
+            full, base, alpha = draw(sec, labs, fib, seed=j, t2s=t2s, ps=ps, surf=sf, fa=fas)
             sv = LAST_SILVER * alpha + (1 - alpha) * 0.97
             Image.fromarray((np.clip(sv, 0, 1) * 255).astype(np.uint8)).save(os.path.join(od, f"{pl}_{f}_silver.png"))
             for nm, x in (("full", full), ("base", base)):
@@ -327,8 +354,8 @@ def main():
         js = list(range(idx.max(), idx.min() - 1, -STEP)) if P["reverse"] else list(range(idx.min(), idx.max() + 1, STEP))
         c0, c1, r0, r1 = crop(P)
         for k, j in enumerate(js):
-            sec, labs, fib, (t2s, ps, sf) = section(P, j, c0, c1, r0, r1)
-            full, base, alpha = draw(sec, labs, fib, seed=j, t2s=t2s, ps=ps, surf=sf)
+            sec, labs, fib, (t2s, ps, sf, fas) = section(P, j, c0, c1, r0, r1)
+            full, base, alpha = draw(sec, labs, fib, seed=j, t2s=t2s, ps=ps, surf=sf, fa=fas)
             h = int(round(full.shape[0] * WIDTH / full.shape[1]))
             fname = f"s{k:03d}.webp"
             for sub, x in (("", full), ("base", base), ("silver", LAST_SILVER)):

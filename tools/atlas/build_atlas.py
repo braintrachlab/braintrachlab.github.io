@@ -7,8 +7,11 @@ warnings.filterwarnings("ignore")
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
 OUT = os.path.join(ROOT, "assets", "atlas")
 # id, file, max streamlines
-TRACTS = [("cc", "CC.trk", 1700), ("atr", "anterior_thalamic_radiations.trk", 400),
-          ("fat", "FAT.trk", 600), ("ifof", "IFOF.trk", 900), ("uf", "UF.trk", 600)]
+# (the first dissections, from another subject, were removed: CC, ATR, FAT, IFOF, UF; their .trk stay in this folder)
+TRACTS = []
+# atlas frame fixed by those first tracts: kept so that everything stays where it was
+CENTER = np.array([10.737613677978516, 52.792806381610816, 78.26570588029334])
+T_102109 = np.array([-0.05000153183937073, 17.150001853704453, -8.484001752504795])
 # tracts dissected in subject 102109 (diffusion space, 1.25 mm): converted to the AC-PC space of the sections
 # and placed like the sections (assets/atlas/planes/sections.json). To add one: drop the .trk in tools/atlas
 # and add a line here, then a card in content/tracts.txt.
@@ -29,12 +32,9 @@ for tid, fn, nmax in TRACTS:
     meta.append({"id": tid, "lines": len(lines), "points": int(sum(len(l) for l in lines))})
     for l in lines:
         counts.append(len(l)); coords.append(l)
-coords_all = np.concatenate(coords)
-center = (coords_all.min(0) + coords_all.max(0)) / 2
+center = CENTER
 # placement of subject 102109 in the atlas frame: the same translation the atlas page uses for the sections
-sec = json.load(open(os.path.join(OUT, "planes", "sections.json")))
-bb = np.array(sec["brain_box"]); c = coords_all - center
-T = np.array([-(bb[0, 0] + bb[1, 0]) / 2, (c[:, 1].min() + c[:, 1].max()) / 2 - (bb[0, 1] + bb[1, 1]) / 2, c[:, 2].max() + 5 - bb[1, 2]])
+T = T_102109
 for tid, fn, nmax in TRACTS_102109:
     sl = list(nib.streamlines.load(os.path.join(HERE, fn)).streamlines)
     if len(sl) > nmax: sl = [sl[i] for i in sorted(rng.choice(len(sl), nmax, replace=False))]
@@ -46,6 +46,6 @@ coords_all = np.concatenate(coords)
 q = np.round((coords_all - center) * 10).astype(np.int16)
 os.makedirs(OUT, exist_ok=True)
 open(os.path.join(OUT, "atlas.bin"), "wb").write(np.array(counts, np.uint16).tobytes() + q.tobytes())
-json.dump({"tracts": meta, "scale": 0.1, "center_rasmm": [round(float(c), 3) for c in center], "radius": float(np.linalg.norm(coords_all - center, axis=1).max())},
+json.dump({"tracts": meta, "scale": 0.1, "center_rasmm": [round(float(c), 3) for c in center], "radius": 160.45},
           open(os.path.join(OUT, "atlas.json"), "w"), indent=1)
 print(meta, "total points", len(q), "bytes", os.path.getsize(os.path.join(OUT, "atlas.bin")))

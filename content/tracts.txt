@@ -25,61 +25,6 @@
 #  NOTE: these texts are a first draft to be reviewed by the lab before publication.
 # ======================================================================
 
-id: cc
-name: Corpus callosum
-short: Corpus callosum
-system: Commissural
-text: The largest commissure of the brain, linking homologous and heterotopic regions of the two cerebral hemispheres.
-history: Known since antiquity, the corpus callosum was described by Galen and later illustrated by Vesalius in the *De humani corporis fabrica* (1543). Its fibres, radiating into the hemispheres, were dissected and drawn in detail by the anatomists of the 18th and 19th centuries, among them Reil and Dejerine. Its role became clear in the 20th century with the "split-brain" studies of Roger Sperry and Michael Gazzaniga.
-anatomy: From front to back it is divided into rostrum, genu, body and splenium. Its fibres cross the midline and fan out laterally as the *radiations of the corpus callosum*, reaching frontal, parietal, temporal and occipital cortex; the forceps minor (genu) connects the frontal lobes and the forceps major (splenium) the occipital lobes.
-function: Transfer and integration of sensory, motor and cognitive information between the hemispheres, including bimanual coordination, interhemispheric transfer of language and attention.
-clinical: Disconnection syndromes after callosal lesions or surgery (callosotomy), callosal agenesis, and involvement in multiple sclerosis, traumatic brain injury and neurodegenerative disorders.
-links: [Catani & Thiebaut de Schotten, *Cortex* (2008) — tractography atlas](https://doi.org/10.1016/j.cortex.2008.05.004)
-
-id: atr
-name: Anterior thalamic radiations
-short: Anterior thalamic radiations
-system: Projection
-text: Projection fibres connecting the anterior and medial thalamus with the prefrontal and anterior cingulate cortex.
-history: The fibres linking the thalamus to the cortex, grouped into thalamic "peduncles" or stalks, were described by 19th-century anatomists through blunt dissection and myelin-stained sections. Their individual reconstruction in the living brain became possible with diffusion tractography.
-anatomy: From the anterior and mediodorsal thalamic nuclei the fibres run forward through the anterior limb of the internal capsule and fan out to the dorsolateral and orbital prefrontal cortex and to the anterior cingulate cortex.
-function: Part of the thalamo-prefrontal circuits supporting executive functions, working memory, planning and emotional regulation.
-clinical: Alterations have been reported in mood disorders, schizophrenia and obsessive-compulsive disorder; the anterior limb of the internal capsule is a target of deep brain stimulation for psychiatric conditions.
-links: [Catani & Thiebaut de Schotten, *Cortex* (2008) — tractography atlas](https://doi.org/10.1016/j.cortex.2008.05.004)
-
-id: fat
-name: Frontal aslant tract
-short: Frontal aslant tract
-system: Association
-text: A short frontal association tract linking the inferior frontal gyrus with the supplementary and pre-supplementary motor areas.
-history: Recognised and named in the tractography era as a distinct intralobar frontal connection, and described in detail as part of the short frontal lobe connections of the human brain. Its evolution across primates has been studied by the lab.
-anatomy: Runs obliquely ("aslant") from the posterior inferior frontal gyrus (pars opercularis) to the medial superior frontal gyrus (SMA and pre-SMA), with a prefrontal and a precentral component.
-function: Speech initiation, verbal fluency and the motor control of articulation; also implicated in action control and executive functions.
-clinical: Damage is associated with reduced verbal fluency, speech initiation difficulties and features of non-fluent primary progressive aphasia; it has been studied in developmental stuttering.
-links: [Citro et al., *Nature Communications* (2026) — evolution of the FAT](https://doi.org/10.1038/s41467-026-73731-8)
-
-id: ifof
-name: Inferior fronto-occipital fasciculus
-short: Inferior fronto-occipital fasciculus
-system: Association
-text: A long ventral association pathway connecting the occipital lobe and the posterior temporal cortex with the frontal lobe.
-history: Described in the early 20th century and included by Dejerine among the long association bundles of the hemisphere. Its existence in the monkey brain has long been debated, which makes it an important tract for comparative neuroanatomy.
-anatomy: From occipital, posterior temporal and parietal regions the fibres run forward in the temporal stem and extreme/external capsule, narrowing at the level of the insula, and fan out in the inferior and orbital frontal cortex.
-function: Proposed roles in semantic processing, reading, visual attention and the integration of visual information with frontal processes.
-clinical: Intraoperative stimulation can produce semantic paraphasias; involvement has been reported in neurodevelopmental and neurodegenerative conditions.
-links: [Catani & Thiebaut de Schotten, *Cortex* (2008) — tractography atlas](https://doi.org/10.1016/j.cortex.2008.05.004)
-
-id: uf
-name: Uncinate fasciculus
-short: Uncinate fasciculus
-system: Association
-text: A hook-shaped association tract connecting the anterior temporal lobe with the orbitofrontal cortex.
-history: Its characteristic hooked course was described by the classical dissectors of the early 19th century, and the name *uncinate* ("hook-shaped") reflects it.
-anatomy: From the temporal pole, uncus and amygdala region the fibres curve upward and forward through the limen insulae, below the insula, into the orbitofrontal and frontopolar cortex.
-function: Part of the limbic and semantic networks; involved in episodic and semantic memory, emotion, social cognition and the attribution of value.
-clinical: Implicated in the semantic variant of primary progressive aphasia and in behavioural-variant frontotemporal dementia, as well as in psychiatric and developmental conditions.
-links: [Catani & Thiebaut de Schotten, *Cortex* (2008) — tractography atlas](https://doi.org/10.1016/j.cortex.2008.05.004)
-
 id: fornix
 name: Fornix
 short: Fornix
