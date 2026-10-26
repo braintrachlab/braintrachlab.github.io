@@ -241,12 +241,9 @@
         .sort((a, b) => a.b - b.b);
       if (!P.length) return;
       const ERAS = erasTxt.split(";").map((e) => e.trim().match(/^(.*\S)\s+(\d+)$/)).filter(Boolean).map((m) => [m[1], +m[2]]);
-      // compressed time scale: log of the distance from today blended with the order, then a minimum spacing
-      const lg = (y) => -Math.log(2030 - y);
-      const L0 = lg(P[0].b), L1 = lg(P[P.length - 1].b) || L0 + 1;
-      const GAP = 104, W = Math.max(GAP * (P.length - 1) * 1.3, 1000);
-      const xs = P.map((p, i) => 0.38 * (lg(p.b) - L0) / (L1 - L0 || 1) + 0.62 * i / Math.max(1, P.length - 1)).map((f) => 56 + f * W);
-      for (let i = 1; i < xs.length; i++) xs[i] = Math.max(xs[i], xs[i - 1] + GAP);
+      // portraits at the same distance from each other, in order of birth
+      const GAP = 112;
+      const xs = P.map((p, i) => 56 + i * GAP);
       const xOf = (y) => { const k = P.findIndex((p) => p.b >= y); return k < 0 ? xs[xs.length - 1] : xs[k]; };
       const when = (y) => (y < 1000 ? "c. " + y : String(y));
       const face = (p) => (p.portrait ? `<img src="${esc(photoUrl(p.portrait))}" alt="" draggable="false" loading="lazy">` : "");
