@@ -49,6 +49,20 @@ photo: team/anna-chiara-de-melis.png
 text: Sixth-year student of Medicine and Surgery at the University "G. d'Annunzio" of Chieti–Pescara. She is preparing her thesis in Neuropsychiatry at BrainTraCh Lab, on *A scale for ADHD: multidimensional assessment of related conditions*.
 links:
 
+name: Sara Fiorini
+role: Psychology student, thesis on the neural circuits of phobia
+group: student
+photo: team/sara-fiorini.png
+text: Bachelor's degree in Psychological Sciences and Techniques; Master's degree in Developmental Psychology in progress, both at the University "G. d'Annunzio" of Chieti–Pescara. Her thesis, supervised by Prof. Marco Catani and Prof. Salvatore Citro, is on the *neural circuits of phobia*: the structures involved in fear processing and fear extinction.
+links:
+
+name: Claudia D'Alessandro
+role: Psychology student, Developmental Psychology
+group: student
+photo: team/claudia-dalessandro.png
+text: Bachelor's degree in Psychological Sciences and Techniques; final-year student of the Master's degree in Developmental Psychology at the University "G. d'Annunzio" of Chieti–Pescara. Her interests are neurodevelopmental disorders, in particular autism spectrum disorder and the differences in how it presents between the sexes, including the questions this raises for diagnosis. She completed a curricular internship and is in Civil Service at ANFFAS Onlus Lanciano, where she takes part in educational and group activities that build skills and autonomy for people with neurodevelopmental disorders and intellectual disability.
+links:
+
 # Example of a complete entry (remove the # signs to use it):
 # name: Jane Doe
 # role: PhD Student
