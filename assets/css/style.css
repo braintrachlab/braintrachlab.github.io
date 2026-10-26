@@ -372,7 +372,7 @@ section.soft { background: var(--bg-soft); }
 /* ---------- People ---------- */
 .people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; max-width: 980px; }
 button.person {
-  display: block; text-align: left; background: none; border: 0; padding: 0;
+  display: block; align-self: start; text-align: left; background: none; border: 0; padding: 0;
   font: inherit; color: inherit; cursor: pointer;
 }
 .person .portrait { transition: transform 0.4s ease, box-shadow 0.4s ease; }
