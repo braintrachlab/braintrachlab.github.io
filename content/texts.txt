@@ -44,7 +44,7 @@ home.button1: Our research
 home.button2: About us
 home.who.eyebrow: Our mission
 home.who.title: From history to discoveries
-home.who.p1: Whenever a new technique is developed, scientist are forced to look back to move forward. Understanding what has been done by our predecessors is pivotal to make true discoveries. For this reason, our research is deeply embedded in the roots of history of neuroscience.
+home.who.p1: Whenever a new technique is developed, scientists are forced to look back to move forward. Understanding what has been done by our predecessors is pivotal to make true discoveries. For this reason, our research is deeply embedded in the roots of history of neuroscience.
 home.who.p2: 
 home.who.link: Learn more about the lab
 home.arnold.caption: F. Arnold, *Tabulae anatomicae* (Zürich, 1838): the fibres of his dissection continued as diffusion tractography.
