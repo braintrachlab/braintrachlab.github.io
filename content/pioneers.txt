@@ -57,11 +57,12 @@ born: 1748
 year: 1786
 life: 1748 – 1794
 portrait: pioneers/vicq-dazyr.webp
-text: Cut the brain in thin horizontal and coronal slices and printed them in colour plates of new precision; described the mammillothalamic tract that bears his name and the white stripe of the visual cortex.
+text: He was the first to use the terms "frontal", "parietal" and "occipital" for the lobes. He also described the mammillothalamic tract that bears his name.
 figure: Horizontal section in colour: grey and white matter distinguished, the ventricles opened
 image: pioneers/fig-vicq-dazyr.jpg
 source: F. Vicq d'Azyr, *Traité d'anatomie et de physiologie* (Paris: Didot, 1786)
-ref: Parent, *Can J Neurol Sci* 2007 — Félix Vicq d'Azyr: anatomy, medicine and revolution
+ref: Catani & Thiebaut de Schotten, *Atlas of Human Brain Connections* (Oxford University Press, 2012)
+
 
 name: Johann Christian Reil
 born: 1759
