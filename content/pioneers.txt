@@ -34,7 +34,7 @@ born: 1514
 year: 1543
 life: 1514 – 1564
 portrait: pioneers/vesalius.webp
-text: In the *Fabrica* (1543) drew the first accurate views of the corpus callosum and of the white matter of the hemispheres, from human dissection.
+text: In the *Fabrica* (1543) drew the first accurate anatomy of the corpus callosum and of the white matter of the internal and external capsules, without naming them.
 figure: Horizontal section through the hemispheres, opening the lateral ventricles within the white matter
 image: pioneers/fig-vesalius.jpg
 source: A. Vesalius, *De humani corporis fabrica libri septem*, Book VII (Basel: Oporinus, 1543)
@@ -215,7 +215,7 @@ portrait: pioneers/piccolomini.webp
 text: In the *Anatomicae praelectiones* (1586) he separated the brain into an outer grey substance, the *cerebrum*, and an inner white substance, the *medulla*: the first clear distinction between cortex and white matter.
 figure: Anatomicae praelectiones (Rome, 1586): the title page with Piccolomini's portrait
 image:
-ref: A. Piccolomini, *Anatomicae praelectiones* (Rome: Bonfadini, 1586)
+ref: Catani & de Schotten, *Atlas of Human Brain Connections* (Oxford University Press, 2012)
 
 name: Niels Stensen
 born: 1638
