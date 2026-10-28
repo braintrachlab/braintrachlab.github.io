@@ -122,17 +122,17 @@ born: 1843
 year: 1873
 life: 1843 – 1926
 portrait: pioneers/golgi.webp
-text: The 'black reaction' (1873): silver impregnation that shows a whole neuron with its axon, opening the study of the fibres at the cellular level. Nobel Prize with Cajal, 1906.
+text: The 'black reaction' (1873): silver impregnation that shows a whole neuron with its axon, opening the study of the fibres at the cellular level. He promoted a network view of the brain with all neurons connected in a syncytium Nobel. Prize with Cajal, 1906. 
 figure: Golgi's drawing of neurons and their axons stained with the black reaction
 image:
-ref: 
+ref: Catani & Thiebaut de Schotten, *Atlas of Human Brain Connections* (Oxford University Press, 2012)
 
 name: Ludwig Lichtheim
 born: 1845
 year: 1885
 life: 1845 – 1928
 portrait: pioneers/lichtheim.webp
-text: The 'house' model of language: centres joined by pathways, each lesion a different aphasia.
+text: He proposed a network model of language: centres joined by pathways, each lesion a different aphasia.
 figure: Lichtheim's house diagram (1885)
 image:
 ref: Catani & ffytche, *Brain* 2005
@@ -153,7 +153,7 @@ born: 1848
 year: 1895
 life: 1848 – 1927
 portrait: pioneers/bianchi.webp
-text: Studied the frontal lobes with ablations in monkeys and clinical cases, describing them as the seat of the coordination of perceptions and behaviour, later collected in *The Mechanism of the Brain and the Function of the Frontal Lobes*.
+text: He wrote the first monograph on the frontal lobes (Brain, 1895) and applied his research to understand neuropsychiatric disorders, studying frontal lobe ablations in monkeys and clinical cases. 
 figure: Bianchi's figures of the frontal lobe ablations in the monkey brain
 image:
 ref: 
@@ -163,7 +163,7 @@ born: 1849
 year: 1892
 life: 1849 – 1917
 portrait: pioneers/dejerine.webp
-text: With Augusta Dejerine-Klumpke, the atlas *Anatomie des centres nerveux*; described pure alexia as a disconnection of the visual areas from language (1892).
+text: With his wife, Augusta Dejerine-Klumpke, he described the anatomy of white matter fibers in detail, using histological sections - *Anatomie des centres nerveux*; he also described pure alexia as a disconnection of the visual areas from language (1892).
 figure: Anatomie des centres nerveux: coronal section by H. Gillet — the plate used on our home page
 image:
 ref: Catani & ffytche, *Brain* 2005; Catani & Mesulam, *Cortex* 2008
@@ -173,7 +173,7 @@ born: 1852
 year: 1906
 life: 1852 – 1934
 portrait: pioneers/cajal.webp
-text: The neuron doctrine: the course of each axon, and the direction of the nerve impulse.
+text: He proposed the neuron doctrine: the course of each axon, and the direction of the nerve impulse; he hypothesized the existence of synapses.
 figure: Cajal's drawing of the axons of the corpus callosum or of the cortex
 image:
 ref: 
