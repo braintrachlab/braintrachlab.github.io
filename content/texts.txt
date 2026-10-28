@@ -50,16 +50,16 @@ home.who.link: Learn more about the lab
 home.arnold.caption: F. Arnold, *Tabulae anatomicae* (Zürich, 1838): the fibres of his dissection continued as diffusion tractography.
 home.areas.eyebrow: Research areas
 home.areas.title: What we study
-home.area1.title: Methods
-home.area1.text: 
-home.area2.title: Neuroanatomy
-home.area2.text: 
-home.area3.title: Brain disorders
-home.area3.text: 
-home.area4.title: History of neuroscience
-home.area4.text: The figures, ideas and discoveries that shaped our understanding of brain anatomy and connectivity, from early anatomists to the present.
+home.area1.title: Neuroanatomy
+home.area1.text: We use neuroimaging to study the anatomy of brain connections in the living human brain. Post-mortem methods are also used to confirm our findings.  
+home.area2.title: Brain disorders
+home.area2.text: Neurological and psychiatric conditions affect brain connections and manifest with symptoms related to network dysfunction. Our main focus is on neurodevelopmental conditions (autism spectrum disorder, ADHD), neurodegenerative diseases (primary progressive aphasia, Alzheimer disease), stroke, and brain tumours.
+home.area3.title: History of neuroscience
+home.area3.text: The people, ideas and discoveries that shaped our understanding of brain anatomy and connectivity, from early anatomists to the present.
+home.area4.title: Methods
+home.area4.text: We developed in house tools to integrate methods for the study of brain networks (diffusion magnetic resonance imaging, tractography), vascular anatomy and perfusion (DSA rotational angiography, TOF, photon-counting CT) and grey matter morphology (structural MRI). 
 home.areas.link: Explore our research
-home.quote: Follow your path.
+home.quote: Follow your path from its origin to its destiny.
 home.quote_source: 
 home.news.eyebrow: Latest
 home.news.title: News & Events
