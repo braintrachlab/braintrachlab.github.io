@@ -165,7 +165,7 @@ tools.page_description: Atlases, software and data of the BrainTraCh Lab.
 contacts.eyebrow: Contacts
 contacts.title: Get in touch
 contacts.intro: For collaborations, student enquiries or information about our research.
-contacts.email: 
+contacts.email: braintrachlab@unich.it
 contacts.email.title: Email
 contacts.address: 
 contacts.address.title: Address
