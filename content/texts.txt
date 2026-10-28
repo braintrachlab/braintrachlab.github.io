@@ -59,7 +59,7 @@ home.area3.text: The people, ideas and discoveries that shaped our understanding
 home.area4.title: Methods
 home.area4.text: We developed in house tools to integrate methods for the study of brain networks (diffusion magnetic resonance imaging, tractography), vascular anatomy and perfusion (DSA rotational angiography, TOF, photon-counting CT) and grey matter morphology (structural MRI). 
 home.areas.link: Explore our research
-home.quote: Follow your path from its origin to its destiny.
+home.quote: Follow your path.
 home.quote_source: 
 home.news.eyebrow: Latest
 home.news.title: News & Events
