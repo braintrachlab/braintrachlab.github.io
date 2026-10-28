@@ -45,11 +45,11 @@ born: 1641
 year: 1684
 life: 1641 – 1715
 portrait: pioneers/vieussens.webp
-text: Named the *centrum ovale* (1684): the white matter as a structure of its own, continuous with the internal capsule.
+text: In his *Neurographia universalis*, named the *centrum ovale* (1684): the white matter as a structure of its own, continuous with the internal capsule.
 figure: The fibres of the centrum ovale converging through the internal capsule towards the brainstem
 image: pioneers/fig-vieussens.jpg
 source: R. Vieussens, *Neurographia universalis*, Tabula XVI (Lyon, 1684); engraving by Beaudeau, Montpellier
-ref: *Terminologia Neuroanatomica* (FIPAT 2017), endnote 131
+ref: Catani & de Schotten, *Atlas of Human Brain Connections* (Oxford University Press, 2012)
 
 name: Félix Vicq d'Azyr
 short: Vicq d'Azyr
@@ -225,7 +225,7 @@ portrait: pioneers/stensen.webp
 text: In his *Discours sur l'anatomie du cerveau* (Paris, 1669) he argued that the white matter is made of fibres, and that the only way to understand the brain is to follow them through its substance.
 figure: Discours sur l'anatomie du cerveau (1669): Steno's programme of following the fibres of the white matter
 image:
-ref: N. Stensen, *Discours sur l'anatomie du cerveau* (Paris, 1669)
+ref: Catani & de Schotten, *Atlas of Human Brain Connections* (Oxford University Press, 2012)
 
 name: Augusta Déjerine-Klumpke
 short: Déjerine-Klumpke
