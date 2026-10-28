@@ -193,7 +193,7 @@ born: 1888
 year: 1935
 life: 1888 – 1963
 portrait: pioneers/klingler.webp
-text: Freezing the fixed brain separates the fibres: the Klingler method of white matter dissection, still in use.
+text: He revitalized the post-mortem study of brain connections using a method that bears his name, still in use today.
 figure: Klingler's dissection of the lateral hemisphere: the long association bundles
 image:
 ref: Basis of the 'Klingler dissection' view of our atlas
@@ -234,7 +234,7 @@ born: 1859
 year: 1885
 life: 1859 – 1927
 portrait: pioneers/dejerine-klumpke.webp
-text: The first woman to become an intern in the Paris hospitals; she described the paralysis of the lower brachial plexus that bears her name (1885) and, with Jules Dejerine, wrote the atlas *Anatomie des centres nerveux* (1895–1901).
+text: She was the real mind behind the *Anatomie des centres nerveux*, published in collaboration with her husband Jules Dejerine.
 figure: Anatomie des centres nerveux (1895–1901): sections of the hemisphere drawn for the atlas
 image:
 ref: A. Klumpke, *Revue de médecine* 1885; J. Dejerine & A. Dejerine-Klumpke, *Anatomie des centres nerveux* (Paris, 1895–1901)
