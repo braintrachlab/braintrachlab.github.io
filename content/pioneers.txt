@@ -112,10 +112,10 @@ born: 1833
 year: 1872
 life: 1833 – 1892
 portrait: pioneers/meynert.webp
-text: Classified the fibres as association, commissural and projection, and described the short U-fibres between neighbouring gyri.
+text: Classified the fibres as association, commissural and projection, and described the short U-fibres between neighbouring gyri. The Meynert's rule states that longer fibers connecting distant brain regions run deeper than shorter fibers. 
 figure: Meynert's diagram of association, commissural and projection systems
 image:
-ref: *Terminologia Neuroanatomica*, endnote 134
+ref: Catani, The brain and its pathways, in *Handbook of Diffusion MR Tractography* (Academic Press, 2025)
 
 name: Camillo Golgi
 born: 1843
